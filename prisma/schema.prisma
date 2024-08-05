@@ -13,3 +13,76 @@ datasource db {
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
+
+enum AccountType {
+  CHECKING
+  CASH
+  CREDIT_CARD
+}
+
+model User {
+  id           String        @id @default(cuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  email        String        @unique
+  clerkId      String        @unique
+  username     String        @unique
+  categories   Category[]
+  payees       Payee[]
+  transactions Transaction[]
+  accounts     Account[]
+}
+
+model Category {
+  id           String        @id @default(cuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  name         String
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String
+  transactions Transaction[]
+
+  @@unique(name: "categoryId", fields: [userId, name])
+}
+
+model Payee {
+  id           String        @id @default(cuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  name         String
+  User         User          @relation(fields: [userId], references: [id])
+  userId       String
+  transactions Transaction[]
+
+  @@unique(name: "payeeId", fields: [userId, name])
+}
+
+model Transaction {
+  id         String    @id @default(cuid())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  date       DateTime  @default(now())
+  cents      Int
+  payee      Payee?    @relation(fields: [payeeId], references: [id])
+  payeeId    String?
+  user       User      @relation(fields: [userId], references: [id])
+  userId     String
+  flag       String //TODO: enum or custom flags? ask Becca about db structing for tags
+  category   Category? @relation(fields: [categoryId], references: [id])
+  categoryId String?
+  account    Account?  @relation(fields: [accountId], references: [id])
+  accountId  String?
+}
+
+model Account {
+  id           String        @id @default(cuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  name         String
+  type AccountType
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String
+  transactions Transaction[]
+
+  @@unique(name: "accountId", fields: [userId, name])
+}
