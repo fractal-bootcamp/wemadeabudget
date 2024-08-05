@@ -58,21 +58,21 @@ model Payee {
 }
 
 model Transaction {
-  id         String    @id @default(cuid())
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-  date       DateTime  @default(now())
+  id         String   @id @default(cuid())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  date       DateTime
   cents      Int
-  memo       String?
-  payee      Payee?    @relation(fields: [payeeId], references: [id])
-  payeeId    String?
-  user       User      @relation(fields: [userId], references: [id])
+  memo       String
+  payee      Payee    @relation(fields: [payeeId], references: [id])
+  payeeId    String
+  user       User     @relation(fields: [userId], references: [id])
   userId     String
   flag       String //TODO: enum or custom flags? ask Becca about db structing for tags
-  category   Category? @relation(fields: [categoryId], references: [id])
-  categoryId String?
-  account    Account?  @relation(fields: [accountId], references: [id])
-  accountId  String?
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId String
+  account    Account  @relation(fields: [accountId], references: [id])
+  accountId  String
 }
 
 model Account {
