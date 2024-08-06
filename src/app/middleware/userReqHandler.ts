@@ -1,45 +1,36 @@
-import { auth, currentUser } from "@clerk/nextjs/server";
-import prisma from "@/app/client";
-import { NextResponse } from "next/server";
+import { currentUser } from "@clerk/nextjs/server";
+import prisma from "../client";
+import { NextRequest, NextResponse } from "next/server";
+import { User } from "@prisma/client";
+
+type ExtendedNextRequest = NextRequest & { user?: User };
 
 export function userReqHandler(
-  handler: (req: NextRequest) => Promise<NextResponse>
+  handler: (req: ExtendedNextRequest) => Promise<NextResponse>
 ): (req: NextRequest) => Promise<NextResponse> {
   return async (req: NextRequest) => {
-    //get the clerk id from the clerk provider using auth()
-    const { userId } = auth();
-    //if there is no logged in user, this middleware does nothing
-    if (!userId) {
-      return handler(req);
+    const clerkUser = await currentUser();
+    if (!clerkUser) {
+      return handler(req as ExtendedNextRequest);
     }
-    //if there is, look up that user in the database by their clerk id
+
     const user = await prisma.user.findUnique({
-      where: {
-        clerkId: userId
-      }
+      where: { clerkId: clerkUser.id }
     });
 
-    //if we find the user, attach their retrieved user object to the request
     if (user) {
-      req.user = user;
-    }
-    //otherwise, create a new user in the db with that clerkID, and email and username taken from the clerk auth()
-    else {
+      (req as ExtendedNextRequest).user = user;
+    } else {
       try {
-        //get the user details from clerk's currentuser
-        const curr = await currentUser();
-
         const newUser = await prisma.user.create({
           data: {
-            clerkId: userId,
-            email: curr?.emailAddresses[0].emailAddress || "",
-            username: curr?.username || ""
+            clerkId: clerkUser.id,
+            email: clerkUser.emailAddresses[0]?.emailAddress ?? "",
+            username: clerkUser.username ?? ""
           }
         });
-        //log the successful db creation
         console.log("Successfully created new user in the database:", newUser);
-        //attach the newly created user object to the request
-        req.user = newUser;
+        (req as ExtendedNextRequest).user = newUser;
       } catch (error) {
         console.error("Failed to create new user:", error);
         return NextResponse.json(
@@ -48,7 +39,7 @@ export function userReqHandler(
         );
       }
     }
-    //return the original handler function, with the user object attached to the request
-    return handler(req);
+
+    return handler(req as ExtendedNextRequest);
   };
 }
