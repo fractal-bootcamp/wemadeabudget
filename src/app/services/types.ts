@@ -7,12 +7,12 @@ export interface User {
 export interface TransactionDetails {
   date: Date;
   cents: number;
-  payee?: string;
+  payee: string;
   memo: string;
   reconciled: boolean;
-  category?: string;
+  category: string;
   account: string;
-  flag?: string;
+  flag: string;
 }
 
 export interface Account {
