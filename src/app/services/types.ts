@@ -1,19 +1,20 @@
+import { User as DbUser, Transaction as DbTransaction } from "@prisma/client";
+
 export interface User {
   username: string;
   email: string;
   clerkId: string;
 }
 
-export interface TransactionDetails {
-  date: Date;
-  cents: number;
-  payee: string;
-  memo: string;
-  reconciled: boolean;
+/**The parameters of a local transaction */
+export type TransactionDetails = Omit<
+  DbTransaction,
+  "id" | "userId" | "payeeId" | "accountId" | "categoryId"
+> & {
   category: string;
+  payee: string;
   account: string;
-  flag: string;
-}
+};
 
 export interface Account {
   name: string;

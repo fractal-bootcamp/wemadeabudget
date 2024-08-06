@@ -1,74 +1,81 @@
 import { TransactionDetails } from "./types";
 import { Prisma } from "@prisma/client";
 import prisma from "../client";
+import { create } from "domain";
 
-export async function createCategory (categoryName: string) {
-    
-interface TransactionPayload {
-    TransactionDetails: TransactionDetails;
-    username: string;
-}
+export async function createCategory(categoryName: string) {}
 
-export async function postNewTransaction( payload: TransactionPayload ) {
-    try {
-        const userId = (await prisma.user.findFirstOrThrow({
+export async function postNewTransaction(
+  transaction: TransactionDetails,
+  username: string
+) {
+  try {
+    const userId = (
+      await prisma.user.findFirstOrThrow({
         where: {
-            username: payload.username,
+          username: username
         },
         select: {
-            id: true,
+          id: true
         }
-    })).id;
+      })
+    ).id;
     const postRes = await prisma.transaction.create({
-        
-        data: {
-            date: payload.TransactionDetails.date,
-            cents: payload.TransactionDetails.cents,
-            memo: payload.TransactionDetails.memo,
-            category: {
-                connect: {
-                    categoryId: {
-                        userId: userId,
-                        name: payload.TransactionDetails.category,
-                    }
-                }
+      data: {
+        date: transaction.date,
+        cents: transaction.cents,
+        memo: transaction.memo,
+        category: {
+          connectOrCreate: {
+            where: {
+              categoryId: {
+                userId: userId,
+                name: transaction.category
+              }
             },
-            payee: {
+            create: {
+              user: {
                 connect: {
-                    payeeId: {
-                        userId: userId,
-                        name: payload.TransactionDetails.payee,
-                    }
+                  id: userId
                 }
-            },
-            user: {
-                connect: {
-                    username: userId,
-                }
-            },
-                flag: payload.TransactionDetails.flag,
-            user: {
-                connect: {
-                    username: userId,
-                }
-            },
-            account: {
-                connect: {
-                    accountId: {
-                        userId: userId,
-                        name: payload.TransactionDetails.account,
-                    }
-                }
-            },
-    
+              },
+              name: transaction.category
+            }
+          }
+        },
+        payee: {
+          connect: {
+            payeeId: {
+              userId: userId,
+              name: transaction.payee
+            }
+          }
+        },
+        user: {
+          connect: {
+            id: userId
+          }
+        },
+        flag: transaction.flag,
+        account: {
+          connect: {
+            accountId: {
+              userId: userId,
+              name: transaction.account
+            }
+          }
         }
+      }
     });
-} catch (error) {
+    return postRes;
+  } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        switch (error.code) {
-            case "P2025":
-                throw new Error("Username not found");
-            default:
-                throw error;
-        }
-}}
+      switch (error.code) {
+        case "P2025":
+          throw new Error("Username not found");
+        default:
+          throw error;
+      }
+    }
+  }
+}
