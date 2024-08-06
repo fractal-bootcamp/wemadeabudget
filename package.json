@@ -10,6 +10,7 @@
     "db:migrate": "dotenv -e .env.local -- npx prisma migrate dev"
   },
   "dependencies": {
+    "@clerk/nextjs": "^5.2.13",
     "@prisma/client": "^5.17.0",
     "dotenv-cli": "^7.4.2",
     "lucide": "^0.424.0",
