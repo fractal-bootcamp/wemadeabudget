@@ -1,13 +1,21 @@
 import React, { useState } from 'react';
-import { Resizable } from 'react-resizable';
+import { Resizable, ResizeCallbackData } from 'react-resizable';
 import 'react-resizable/css/styles.css';
 
+type ResizableColumnProps = {
+    width: number;
+    minWidth?: number;
+    onResize: (event: React.SyntheticEvent, data: ResizeCallbackData) => void;
+    children: React.ReactNode;
+}
 
-const ResizableColumn = ({ width, onResize, children }) => {
+
+const ResizableColumn = ({ width, minWidth, onResize, children }: ResizableColumnProps) => {
     return (
       <Resizable
         width={width}
         height={0}
+        minConstraints={[minWidth || width, 0]}
         handle={
           <div className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize" />
         }

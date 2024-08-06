@@ -65,7 +65,6 @@ const dummyRows = [
 
 function AccountTable() {
     const [columnWidths, setColumnWidths] = useState({
-        checkbox: 40,
         flag: 40,
         account: 100,
         date: 100,
@@ -76,20 +75,19 @@ function AccountTable() {
         inflow: 100,
       });
     
-      const onResize = (column) => (event, { size }) => {
-        setColumnWidths(prev => ({ ...prev, [column]: size.width }));
+      const onResize = (column: string) => (event: React.SyntheticEvent<Element, Event>, data: { size: { width: number; height: number } })  => {
+        setColumnWidths(prev => ({ ...prev, [column]: data.size.width }));
       };
 
     return (
+        // i think this code is very redundant and might simplify later, but works
         <div className="w-full overflow-x-auto">
         <div className="min-w-max">
         <div className="flex flex-row items-stretch text-gray-500 border-t border-l border-b border-gray-300">
-            <ResizableColumn width={columnWidths.checkbox} onResize={onResize('checkbox')}>
-                <div className="flex p-2">
-                <div className="border rounded-sm border-gray-500 h-3 w-3"></div>
-                </div>
-            </ResizableColumn>
-            <ResizableColumn width={columnWidths.flag} onResize={onResize('flag')}>
+            <div className="flex p-2 w-[40px] border-r border-gray-300 items-center justify-center">
+                <div className="border rounded-sm border-gray-500 h-[10px] w-[10px]"></div>
+            </div>
+            <ResizableColumn width={columnWidths.flag} minWidth={50} onResize={onResize('flag')}>
                 <div className="flex p-2">
                 <Bookmark className="text-gray-500 transform rotate-[270deg]" size={16} />
                 </div>
@@ -113,7 +111,7 @@ function AccountTable() {
                 <div className="flex p-2">OUTFLOW</div>
             </ResizableColumn>
             <ResizableColumn width={columnWidths.inflow} onResize={onResize('inflow')}>
-                <div className="flex p-2 border-r border-gray-300">INFLOW</div>
+                <div className="flex p-2 border-gray-300">INFLOW</div>
             </ResizableColumn>
             </div>
             </div>

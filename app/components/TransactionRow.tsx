@@ -10,7 +10,16 @@ const dummyRow = {
     outflow: 100,
     inflow: 0,
 }
-
+interface ColumnWidths {
+    flag: number;
+    account: number;
+    date: number;
+    payee: number;
+    category: number;
+    memo: number;
+    outflow: number;
+    inflow: number;
+}
 interface TransactionRowProps {
     account: string;
     date: string;
@@ -20,13 +29,13 @@ interface TransactionRowProps {
     outflow: number;
     inflow: number;
     showAccount: boolean;
-    columnWidths: ColumnWidths;
+    columnWidths: ColumnWidths
 }
 
 function TransactionRow({ account, date, payee, category, memo, outflow, inflow, showAccount, columnWidths }: TransactionRowProps) {    
     return (
       <div className="flex flex-row items-stretch w-full border-b border-gray-300">
-        <div style={{ width: columnWidths.checkbox }} className="flex items-center justify-center p-2">
+        <div className="flex items-center justify-center p-2 w-[40px] border-r ">
           <input type='checkbox' className="h-3 w-3" />
         </div>
         <div style={{ width: columnWidths.flag }} className="flex items-center justify-center p-2">
