@@ -30,44 +30,44 @@ enum AccountType {
 }
 
 model User {
-  id             String          @id @default(cuid())
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  email          String          @unique
-  clerkId        String          @unique
-  username       String          @unique
-  categories     Category[]
-  payees         Payee[]
-  transactions   Transaction[]
-  accounts       Account[]
-  categoryGroups CategoryGroup[]
+  id           String        @id @default(cuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  email        String        @unique
+  clerkId      String        @unique
+  username     String        @unique
+  categories   Category[]
+  payees       Payee[]
+  transactions Transaction[]
+  accounts     Account[]
+  // categoryGroups CategoryGroup[]
 }
 
 model Category {
-  id              String        @id @default(cuid())
-  createdAt       DateTime      @default(now())
-  updatedAt       DateTime      @updatedAt
-  name            String
-  categoryGroup   CategoryGroup @relation(fields: [categoryGroupId], references: [id])
-  categoryGroupId String
-  user            User          @relation(fields: [userId], references: [id])
-  userId          String
-  transactions    Transaction[]
+  id           String        @id @default(cuid())
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  name         String
+  // categoryGroup   CategoryGroup @relation(fields: [categoryGroupId], references: [id])
+  // categoryGroupId String
+  user         User          @relation(fields: [userId], references: [id])
+  userId       String
+  transactions Transaction[]
 
   @@unique(name: "categoryId", fields: [userId, name])
 }
 
-model CategoryGroup {
-  id         String     @id @default(cuid())
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-  name       String
-  user       User       @relation(fields: [userId], references: [id])
-  userId     String
-  categories Category[]
+// model CategoryGroup {
+//   id         String     @id @default(cuid())
+//   createdAt  DateTime   @default(now())
+//   updatedAt  DateTime   @updatedAt
+//   name       String
+//   user       User       @relation(fields: [userId], references: [id])
+//   userId     String
+//   categories Category[]
 
-  @@unique(name: "categoryGroupId", fields: [userId, name])
-}
+//   @@unique(name: "categoryGroupId", fields: [userId, name])
+// }
 
 model Payee {
   id           String        @id @default(cuid())
