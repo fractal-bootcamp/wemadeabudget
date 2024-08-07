@@ -14,7 +14,7 @@ export type TransactionDetails = {
   cents: number;
   memo: string;
   flag: Flag;
-  reconciled: boolean;
+  cleared: boolean;
 };
 
 export interface AccountDetails {
