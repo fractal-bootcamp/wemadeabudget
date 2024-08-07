@@ -25,3 +25,11 @@ export interface AccountDetails {
 export interface Category {
   name: string;
 }
+
+export interface CategoryDisplayDetails {
+  name: string;
+  categoryGroup: string;
+  budgeted: number;
+  spent: number;
+  available: number;
+}
