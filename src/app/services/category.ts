@@ -1,10 +1,7 @@
 import prisma from "../client";
-interface CategoryDetails {
-    name: string;
-    categoryGroupName: string;
-}
+
 const mutations = {
-    findOrCreateCategory: async (details: CategoryDetails, userId: string) => {
+    upsertCategory: async (details: CategoryDetails, userId: string) => {
         const category = await prisma.category.upsert({
             where: {
                 categoryId: {
@@ -14,6 +11,7 @@ const mutations = {
             },
             create: {
                 name: details.name,
+                categoryGroupId: {
                 user: {
                     connect: {
                         id: userId
