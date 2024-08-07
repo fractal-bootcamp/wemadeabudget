@@ -1,15 +1,7 @@
 'use client'
 import { Bookmark } from "lucide-react";
 
-const dummyRow = {
-    account: "Checking",
-    date: "2023-01-01",
-    payee: "Trader Joe",
-    category: "Food",
-    memo: "Groceries",
-    outflow: 100,
-    inflow: 0,
-}
+
 interface ColumnWidths {
     flag: number;
     account: number;
@@ -35,14 +27,17 @@ interface TransactionRowProps {
     onSelect: () => void;
     onClick: () => void;
     onCancel: () => void;
+    onSave: () => void;
     toggleCleared: () => void;
     isCleared: boolean;
 }
 
-function TransactionRow({ account, date, payee, category, memo, cents, cleared, showAccount, columnWidths, isEditing, isSelected, onSelect, onClick, onCancel, toggleCleared, isCleared }: TransactionRowProps) {    
+function TransactionRow({ account, date, payee, category, memo, cents, cleared, showAccount, columnWidths, isEditing, isSelected, onSelect, onClick, onCancel, onSave, toggleCleared, isCleared }: TransactionRowProps) {    
   //editing form needs to display the checkbox and flag   
   return (
       isEditing ? (
+        //ugh i should def make this a component but i don't want to figure that out right now
+        //oops shit i need to add an onchange handler to the inputs 
         <form className="bg-indigo-100 flex flex-col text-xs">
           <div className="flex flex-row">
             <div className="flex items-center justify-center p-2" style={{ width: columnWidths.flag }}>
@@ -80,7 +75,9 @@ function TransactionRow({ account, date, payee, category, memo, cents, cleared, 
           </div> 
           <div className="flex flex-row justify-end gap-2 mb-2 mr-16">
             <button className="rounded border border-indigo-600 text-indigo-600 px-2 py-1" onClick={onCancel} type="button">Cancel</button>
-            <button className="rounded bg-blue-600 text-white px-2 py-1 " type="submit">Save</button> 
+            <button className="rounded bg-blue-600 text-white px-2 py-1 " onClick={onSave} >Save</button> 
+            {/* something is wrong with the save button, it closes but seems to refresh the whole console in browser */}
+            {/* oh shit, i need to use onsubmit instead of onclick */}
           </div>
         </form>
       ) : (

@@ -2,7 +2,13 @@
 import TransactionRow from "./TransactionRow"
 import { Bookmark, LucideSearch, LucideUndo, LucideRedo, FileIcon, PlusCircle, SearchIcon, ChevronDown } from "lucide-react";
 import ResizableColumn from "./ResizableColumn";
+import TransactionForm from "./TransactionForm";
 import { useState } from "react";
+
+const defaultCategories= [
+    "Restaurants", "Rent", "Utilities", "Renters Insurance", "Phone", "Internet", "Music", "Groceries", "Train/Bus Fare", "Personal Care", "Stuff I Forgot to Budget For", "Celebrations"]
+  
+
 const dummyRows = [
     {
         id: "1",
@@ -86,11 +92,11 @@ const dummyRows = [
     },
 ]
 
-function ActionBar() {
+function ActionBar({onAddTransaction}: {onAddTransaction: () => void}) {      
     return (
         <div className="flex flex-row text-indigo-600 p-3 justify-between text-sm">
             <div className="flex flex-row gap-2">
-                <button className="flex items-center gap-1">
+                <button className="flex items-center gap-1" onClick={onAddTransaction}>
                     <PlusCircle className="h-4 w-4" /> 
                     <span>Add Transaction</span>
                 </button>
@@ -126,6 +132,7 @@ function AccountTable() {
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
     const [clearedRows, setClearedRows] = useState<Set<string>>(new Set());
     const [editingRow, setEditingRow] = useState<string | null>(null);
+    const [showAddTransactionRow, setShowAddTransactionRow] = useState(false);
 
     const [columnWidths, setColumnWidths] = useState({
         flag: 50,
@@ -178,12 +185,26 @@ function AccountTable() {
         });
     }
 
+    function toggleAddTransactionRow() {
+        setShowAddTransactionRow(prev => !prev);
+        console.log("toggled");
+    }
+
     function handleCancel() {
         setEditingRow(null);
     }
 
     function handleSave() {
-        console.log("Saved!");
+        console.log("Saved edited transaction!");
+        //post to db
+    }
+
+    function handleCancelAddTransaction() {
+        setShowAddTransactionRow(false);
+    }
+
+    function handleSaveAddTransaction() {
+        console.log("Saved new transaction!");
         //post to db
     }
 
@@ -193,7 +214,7 @@ function AccountTable() {
         // i think this code is very redundant and might simplify later, but works
         <div className="w-full overflow-x-auto">
         <div className="min-w-max">
-            <ActionBar />
+            <ActionBar onAddTransaction={toggleAddTransactionRow} />
         <div className="flex flex-row items-stretch text-gray-500 text-xs border-t border-l border-b border-gray-300">
             <div className="flex p-2 w-[40px] border-r border-gray-300 items-center justify-center">
                 <div className="border rounded-sm border-gray-500 h-[10px] w-[10px]"></div>
@@ -229,7 +250,7 @@ function AccountTable() {
             </div>
             </div>
             </div>
-
+            {showAddTransactionRow && <TransactionForm columnWidths={columnWidths} showAccount={true} onCancel={handleCancelAddTransaction} onSave={handleSaveAddTransaction} />}
             <div className="flex flex-col w-full">
                 {dummyRows.map((row) => (
                     <TransactionRow 
@@ -242,6 +263,7 @@ function AccountTable() {
                         onSelect={() => toggleRowSelect(row.id)}
                         onClick={() => handleRowClick(row.id)}
                         onCancel={handleCancel}
+                        onSave={handleSave}
                         toggleCleared={() => toggleCleared(row.id)}
                         isCleared={clearedRows.has(row.id)}
 
