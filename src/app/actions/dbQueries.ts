@@ -3,17 +3,43 @@ import { AccountDetails, TransactionDetails } from "../types";
 import prisma from "../client";
 import { Account } from "@prisma/client";
 
-export async function createCategory(categoryName: string, userId: string) {
+interface CategoryDetails {
+  name: string;
+  categoryGroupName: string;
+}
+export async function dbCreateCategory(
+  details: CategoryDetails,
+  userId: string
+) {
   const newCategory = await prisma.category.create({
     data: {
-      name: categoryName,
+      name: details.name,
       user: {
         connect: {
           id: userId
         }
+      },
+      categoryGroup: {
+        connectOrCreate: {
+          where: {
+            categoryGroupId: {
+              userId: userId,
+              name: details.categoryGroupName
+            }
+          },
+          create: {
+            user: {
+              connect: {
+                id: userId
+              }
+            },
+            name: details.categoryGroupName
+          }
+        }
       }
     }
   });
+  return newCategory;
 }
 export async function deleteCategory(name: string, userId: string) {
   const ret = await prisma.category.delete({
@@ -34,6 +60,7 @@ export async function dbAddUser(details: UserSignupDetails) {
   const newUser = await prisma.user.create({
     data: details
   });
+  return newUser;
 }
 export async function dbAddBudgetAccount(
   details: AccountDetails,
@@ -53,7 +80,7 @@ export async function dbAddBudgetAccount(
   return newAccount;
 }
 
-export async function postNewTransaction(
+export async function dbAddTransaction(
   transaction: TransactionDetails,
   userId: string
 ) {
