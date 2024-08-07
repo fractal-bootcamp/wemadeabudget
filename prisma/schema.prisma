@@ -65,6 +65,8 @@ model CategoryGroup {
   user       User       @relation(fields: [userId], references: [id])
   userId     String
   categories Category[]
+
+  @@unique(name: "categoryGroupId", fields: [userId, name])
 }
 
 model Payee {
