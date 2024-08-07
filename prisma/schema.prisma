@@ -14,6 +14,15 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+enum Flag {
+  RED
+  ORANGE
+  YELLOW
+  GREEN
+  BLUE
+  PURPLE
+}
+
 enum AccountType {
   CHECKING
   CASH
@@ -21,28 +30,41 @@ enum AccountType {
 }
 
 model User {
-  id           String        @id @default(cuid())
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  email        String        @unique
-  clerkId      String        @unique
-  username     String        @unique
-  categories   Category[]
-  payees       Payee[]
-  transactions Transaction[]
-  accounts     Account[]
+  id             String          @id @default(cuid())
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  email          String          @unique
+  clerkId        String          @unique
+  username       String          @unique
+  categories     Category[]
+  payees         Payee[]
+  transactions   Transaction[]
+  accounts       Account[]
+  categoryGroups CategoryGroup[]
 }
 
 model Category {
-  id           String        @id @default(cuid())
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  name         String
-  user         User          @relation(fields: [userId], references: [id])
-  userId       String
-  transactions Transaction[]
+  id              String        @id @default(cuid())
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  name            String
+  categoryGroup   CategoryGroup @relation(fields: [categoryGroupId], references: [id])
+  categoryGroupId String
+  user            User          @relation(fields: [userId], references: [id])
+  userId          String
+  transactions    Transaction[]
 
   @@unique(name: "categoryId", fields: [userId, name])
+}
+
+model CategoryGroup {
+  id         String     @id @default(cuid())
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  name       String
+  user       User       @relation(fields: [userId], references: [id])
+  userId     String
+  categories Category[]
 }
 
 model Payee {
@@ -64,6 +86,7 @@ model Transaction {
   date       DateTime
   cents      Int
   memo       String
+  reconciled Boolean
   payee      Payee    @relation(fields: [payeeId], references: [id])
   payeeId    String
   user       User     @relation(fields: [userId], references: [id])
@@ -76,13 +99,14 @@ model Transaction {
 }
 
 model Account {
-  id           String        @id @default(cuid())
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  name         String
-  type         AccountType
-  user         User          @relation(fields: [userId], references: [id])
-  userId       String
+  id        String      @id @default(cuid())
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  name      String
+  type      AccountType
+  user      User        @relation(fields: [userId], references: [id])
+  userId    String
+
   transactions Transaction[]
 
   @@unique(name: "accountId", fields: [userId, name])
