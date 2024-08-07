@@ -2,44 +2,44 @@ import { currentUser } from "@clerk/nextjs/server";
 import prisma from "../client";
 import { NextRequest, NextResponse } from "next/server";
 import { User } from "@prisma/client";
+import { dbAddUser } from "../actions/dbQueries";
 
-type ExtendedNextRequest = NextRequest & { user?: User };
+export type ExtendedNextRequest = NextRequest & { userId: User["id"] };
 
 export function userReqHandler(
   handler: (req: ExtendedNextRequest) => Promise<NextResponse>
 ): (req: NextRequest) => Promise<NextResponse> {
   return async (req: NextRequest) => {
+    const newReq = req as ExtendedNextRequest;
     const clerkUser = await currentUser();
     if (!clerkUser) {
-      return handler(req as ExtendedNextRequest);
+      throw new Error("No clerk user found");
     }
 
     const user = await prisma.user.findUnique({
-      where: { clerkId: clerkUser.id }
+      where: { clerkId: clerkUser.id },
+      select: {
+        id: true
+      }
     });
 
     if (user) {
-      (req as ExtendedNextRequest).user = user;
+      newReq.userId = user.id;
     } else {
       try {
-        const newUser = await prisma.user.create({
-          data: {
-            clerkId: clerkUser.id,
-            email: clerkUser.emailAddresses[0]?.emailAddress ?? "",
-            username: clerkUser.username ?? ""
-          }
-        });
+        const details = {
+          clerkId: clerkUser.id,
+          email: clerkUser.emailAddresses[0]?.emailAddress ?? "",
+          username: clerkUser.username ?? ""
+        };
+        const newUser = await dbAddUser(details);
         console.log("Successfully created new user in the database:", newUser);
-        (req as ExtendedNextRequest).user = newUser;
+        newReq.userId = newUser.id;
       } catch (error) {
-        console.error("Failed to create new user:", error);
-        return NextResponse.json(
-          { error: "Failed to create new user" },
-          { status: 500 }
-        );
+        throw new Error("Failed to create new user in the database");
       }
     }
 
-    return handler(req as ExtendedNextRequest);
+    return handler(newReq);
   };
 }
