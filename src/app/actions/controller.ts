@@ -15,7 +15,7 @@ const attachUserId =
     return await callback(user.id, ...details);
   };
 
-export const clientController = {
+const clientController = {
   transaction: {
     add: attachUserId(transactionServices.add),
     delete: attachUserId(transactionServices.delete),
@@ -45,3 +45,5 @@ export const clientController = {
     update: attachUserId(accountServices.update)
   }
 };
+
+export default clientController;
