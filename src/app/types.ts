@@ -10,7 +10,7 @@ export type TransactionDetails = {
   account: string
   category: string
   payee: string
-  date: string
+  date: Date
   cents: number
   memo: string
   flag: Flag
