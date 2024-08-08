@@ -1,17 +1,16 @@
 'use client'
-import Sidebar from "./Sidebar";
-import AccountTable from "./AccountTable";
-import BudgetTable from "./BudgetTable";
-import TransactionRow from "./TransactionRow";
+import Sidebar from './Sidebar'
+import AccountTable from './AccountTable'
+import BudgetTable from './BudgetTable'
+import TransactionRow from './TransactionRow'
 
 function Sandbox() {
-  return(
+  return (
     <div className="flex">
       <Sidebar />
-      < AccountTable />
-      
+      <AccountTable />
     </div>
   )
 }
 
-export default Sandbox;
+export default Sandbox
