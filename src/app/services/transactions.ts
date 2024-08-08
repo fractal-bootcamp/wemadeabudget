@@ -7,11 +7,7 @@ const queries = {
       where: {
         userId: userId
       },
-      select: {
-        id: true,
-        date: true,
-        cents: true,
-        memo: true,
+      include: {
         account: {
           select: {
             name: true
@@ -26,9 +22,17 @@ const queries = {
           select: {
             name: true
           }
-        },
-        flag: true,
-        cleared: true
+        }
+      }
+    });
+  },
+  getTransactionsByCategory: async (userId: string, categoryName: string) => {
+    return await prisma.transaction.findMany({
+      where: {
+        category: {
+          name: categoryName,
+          userId: userId
+        }
       }
     });
   },
@@ -38,11 +42,7 @@ const queries = {
         id: transactionId,
         userId: userId
       },
-      select: {
-        id: true,
-        date: true,
-        cents: true,
-        memo: true,
+      include: {
         account: {
           select: {
             name: true
@@ -57,9 +57,7 @@ const queries = {
           select: {
             name: true
           }
-        },
-        cleared: true,
-        flag: true
+        }
       }
     });
 
@@ -181,15 +179,19 @@ const mutations = {
     return updatedTransaction;
   }
 };
-export const transactionServices = {
+const transactionServices = {
   add: async (userId: string, details: TransactionDetails) =>
     await mutations.addTransaction(details, userId),
   delete: async (userId: string, transactionId: string) =>
     await mutations.deleteTransaction(transactionId, userId),
+  update: async (userId: string, details: TransactionDetails) =>
+    await mutations.updateTransaction(details, userId),
   getById: async (userId: string, transactionId: string) =>
     await queries.getTransactionById(transactionId, userId),
   getAllByUser: async (userId: string) =>
     await queries.getAllTransactionsByUser(userId),
-  update: async (userId: string, details: TransactionDetails) =>
-    await mutations.updateTransaction(details, userId)
+  getByCategory: async (userId: string, categoryName: string) =>
+    await queries.getTransactionsByCategory(userId, categoryName)
 };
+
+export default transactionServices;
