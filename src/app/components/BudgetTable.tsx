@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { PlusCircle, LucideUndo, LucideRedo } from "lucide-react";
 
 const defaultCategories = [
     { name: "Restaurants", assigned: 0, activity: 0, available: 0 },
@@ -16,9 +17,85 @@ const defaultCategories = [
 ];
 
 
+const BudgetHeader = () => {
+    const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
+    const [selectedMonth, setSelectedMonth] = useState(1); // Add state for selected month
+
+    return (
+    <div className="flex flex-col justify-center my-2 mx-4">
+            <div className="text-xl font-semibold font-sans ml-4">{new Date(selectedYear, selectedMonth - 1).toLocaleString('default', { month: 'short', year: 'numeric' })}</div>
+        <div className="flex">
+            <select id="monthSelector" className="border rounded p-1" value={selectedMonth} onChange={e => setSelectedMonth(Number(e.target.value))}>
+                {Array.from({ length: 12 }, (_, index) => {
+                    const month = new Date(0, index).toLocaleString('default', { month: 'long' });
+                    return (
+                        <option key={index} value={index + 1}>{month}</option>
+                    );
+                })}
+            </select>
+            <select id="yearSelector" className="border rounded p-1" value={selectedYear} onChange={e => setSelectedYear(Number(e.target.value))}>
+                {Array.from({ length: 10 }, (_, index) => {
+                    const year = new Date().getFullYear() - index;
+                    return (
+                        <option key={year} value={year}>{year}</option>
+                    );
+                })}
+            </select>
+        </div>
+        
+    </div>
+    )
+}
+ 
+
+
+const AddCategoryModal = ({onCancel, saveCategory}: {onCancel: () => void, saveCategory: (name: string) => void}) => {
+    const [name, setName] = useState("");
+    const [showError, setShowError] = useState(false);
+
+    const handleSave = () => {
+        if (name.length === 0) {
+            setShowError(true);
+            return;
+        } else{
+        setShowError(false);
+        saveCategory(name);
+        }
+    }
+
+    return (
+        <div className="absolute bg-white shadow-2xl shadow-top border rounded-md mt-1 -translate-x-10 translate-y-8 p-3">
+            <div className="absolute left-1/2 transform rotate-45 -translate-x-1/2 -top-2 w-4 h-4 border-transparent bg-white border-b-white shadow-2xl" />
+            <div className={`border ${showError ? `border-red-300` : `border-gray-200`} rounded p-2`}>
+                <input type="text" placeholder="New Category Name" value={name} onChange={e => setName(e.target.value)} />
+            </div>
+            {showError && <div className="bg-red-300 text-black p-2 rounded-md">The category name is required.</div>}
+            <div className="flex justify-end mt-4">
+                <button onClick={onCancel} className="bg-indigo-100 hover:bg-indigo-200 text-blue-600 py-2 px-4 rounded-lg "> Cancel </button>
+                <button onClick={handleSave} className="bg-blue-600 hover:bg-blue-800 text-white py-2 px-4 rounded-lg ml-2"> OK </button>
+            </div>
+        </div> 
+    )
+}
+
+function ActionBar({addingCategory, addCategory, onCancel, saveCategory}: {addingCategory: boolean, addCategory: () => void, onCancel: () => void,  saveCategory: (name: string) => void}) {
+    return(
+        <>
+        <div className="relative flex flex-row gap-4 text-indigo-600 border-t border-l border-b border-gray-300 p-2">
+            <button onClick={addCategory} className="flex gap-1 text-xs"><PlusCircle className="h-4 w-4"/> Category </button>   
+            <button className="flex gap-1 text-xs"><LucideUndo className="h-4 w-4"/> Undo </button>
+            <button className="flex gap-1 text-xs"><LucideRedo className="h-4 w-4"/> Redo </button>
+        </div>
+        {addingCategory && <AddCategoryModal onCancel={onCancel} saveCategory={saveCategory} />}
+        </>
+    )
+}
+
+
 function BudgetTable() {
     const [categories, setCategories] = useState(defaultCategories);
     const [selectedCategories, setSelectedCategories] = useState(new Set());
+    const [addingCategory, setAddingCategory] = useState(false);
 
 
     const toggleCategory = (category: string) => () => {
@@ -33,8 +110,15 @@ function BudgetTable() {
         });
     }
 
+    function saveCategory(name: string) {
+        setAddingCategory(false);
+        setCategories(prev => [...prev, {name, assigned: 0, activity: 0, available: 0}]);
+    }
+
     return (
         <div className="flex flex-col text-xs w-full">
+            <BudgetHeader />
+            <ActionBar addingCategory={addingCategory} onCancel={() => setAddingCategory(false)}  addCategory={() => setAddingCategory(true)} saveCategory={saveCategory} />
              <div className="flex flex-row items-stretch text-gray-500 border-t border-l border-b border-gray-300">
                 <div className="flex p-2 w-[40px] border-r border-gray-300 items-center justify-center">
                     <div className="border rounded-sm border-gray-500 h-[10px] w-[10px]"></div>
