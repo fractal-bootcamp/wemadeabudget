@@ -1,6 +1,6 @@
-import { Prisma } from "@prisma/client";
-import prisma from "../client";
-import { AccountDetails } from "../types";
+import { Prisma } from '@prisma/client'
+import prisma from '../client'
+import { AccountDetails } from '../types'
 
 const queries = {
   /** Retrieve all accounts for a user */
@@ -8,13 +8,13 @@ const queries = {
     const accounts = await prisma.account.findMany({
       where: {
         user: {
-          id: userId
-        }
-      }
-    });
-    return accounts;
-  }
-};
+          id: userId,
+        },
+      },
+    })
+    return accounts
+  },
+}
 
 const mutations = {
   /** Add a specified account to a user */
@@ -25,23 +25,23 @@ const mutations = {
         type: details.type,
         user: {
           connect: {
-            id: userId
-          }
-        }
-      }
-    });
-    return newAccount;
+            id: userId,
+          },
+        },
+      },
+    })
+    return newAccount
   },
   deleteAccount: async (userId: string, accountName: string) => {
     const deletedAccount = await prisma.account.delete({
       where: {
         accountId: {
           name: accountName,
-          userId: userId
-        }
-      }
-    });
-    return deletedAccount;
+          userId: userId,
+        },
+      },
+    })
+    return deletedAccount
   },
   updateAccount: async (
     userId: string,
@@ -52,17 +52,17 @@ const mutations = {
       where: {
         accountId: {
           name: oldName,
-          userId: userId
-        }
+          userId: userId,
+        },
       },
       data: {
         name: newDetails.name,
-        type: newDetails.type
-      }
-    });
-    return updatedAccount;
-  }
-};
+        type: newDetails.type,
+      },
+    })
+    return updatedAccount
+  },
+}
 
 const accountServices = {
   getAllByUser: (userId: string) => queries.getAccounts(userId),
@@ -71,7 +71,7 @@ const accountServices = {
   delete: (userId: string, accountName: string) =>
     mutations.deleteAccount(userId, accountName),
   update: (userId: string, oldName: string, newDetails: AccountDetails) =>
-    mutations.updateAccount(userId, oldName, newDetails)
-};
+    mutations.updateAccount(userId, oldName, newDetails),
+}
 
-export default accountServices;
+export default accountServices
