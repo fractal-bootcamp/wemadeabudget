@@ -45,8 +45,8 @@ export const userServices = {
   /**returns database entry for a user from the clerk id */
   findByClerkId: async (clerkId: string) => {
     return await queries.findUserByClerkId(clerkId);
-  /** Adds/looksup/updates a user in the database using clerk id and optional email and username */
   },
+  /** Adds/looksup/updates a user in the database using clerk id and optional email and username */
   upsertUserFromClerkDetails: async (
     clerkId: string,
     email: string,
