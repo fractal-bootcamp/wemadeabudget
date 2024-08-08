@@ -210,12 +210,14 @@ function AccountTable() {
           return newSet;
         });
         // Exit edit mode when toggling selection
+        //The toggleRowSelect function exits edit mode unconditionally when a row's selection state is toggled. This might lead to unexpected behavior where the user intends to select multiple rows without exiting edit mode. Consider modifying this behavior to allow for multi-row selection without affecting the edit state of a row.
         if (editingRow === rowId) {
           setEditingRow(null);
         }
       }
 
     function toggleSelectAll() {
+        //The toggleSelectAll function does not handle the editing state when toggling the selection of all rows. This could lead to inconsistencies, such as a row remaining in an editing state while it is not selected. Consider resetting the editing state when toggling all selections.
         setSelectedRows(prev => {
             const newSet = new Set(prev);
             if (newSet.size < dummyRows.length) {
