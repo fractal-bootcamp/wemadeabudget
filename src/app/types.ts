@@ -16,7 +16,11 @@ export type TransactionDetails = {
   flag: Flag;
   cleared: boolean;
 };
-
+export type CategoryDetails = {
+  name: string;
+  allocated: number;
+  // categoryGroupName: string;
+};
 export interface AccountDetails {
   name: string;
   type: AccountType;
@@ -24,12 +28,4 @@ export interface AccountDetails {
 
 export interface Category {
   name: string;
-}
-
-export interface CategoryDisplayDetails {
-  name: string;
-  categoryGroup: string;
-  budgeted: number;
-  spent: number;
-  available: number;
 }
