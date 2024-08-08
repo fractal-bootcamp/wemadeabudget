@@ -3,7 +3,7 @@ import TransactionRow from "./TransactionRow"
 import { Bookmark, LucideSearch, LucideUndo, LucideRedo, FileIcon, PlusCircle, SearchIcon, ChevronDown } from "lucide-react";
 import ResizableColumn from "./ResizableColumn";
 import TransactionForm from "./TransactionForm";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 const defaultCategories= [
     "Restaurants", "Rent", "Utilities", "Renters Insurance", "Phone", "Internet", "Music", "Groceries", "Train/Bus Fare", "Personal Care", "Stuff I Forgot to Budget For", "Celebrations"]
@@ -92,6 +92,38 @@ const dummyRows = [
     },
 ]
 
+const AccountsHeader = () => {
+    return (
+        //TODO make these numbers dynamic
+        <div className="flex flex-col">
+            <div className="text-xl font-semibold mx-4 my-2"> All Accounts</div>
+            <div className="flex p-2 border-t border-b border-gray-300 w-full">
+                <div className="flex flex-col px-2">
+                    <div> -$1400.00 </div>
+                    <div className="text-[10px] flex items-center gap-1">
+                        <div className="rounded-full bg-gray-800 h-3 w-3 font-bold text-white flex items-center justify-center">C</div> 
+                        Cleared Balance 
+                    </div>
+                </div>
+                <div className="px-2"> + </div>
+                <div className="flex flex-col px-2">
+                    <div className="text-green-600"> $1400.00 </div>
+                    <div className="text-[10px] flex items-center gap-1">
+                        <div className="rounded-full border h-3 w-3 font-bold border-gray-500 text-gray-500 flex items-center justify-center">C</div> 
+                        Uncleared Balance 
+                    </div>
+                </div>
+                <div className="px-2"> = </div>
+                <div className="flex flex-col px-2"> 
+                    <div> $1400.00 </div>
+                    <div className="text-[10px]"> Working Balance </div>
+                </div>
+            </div>
+
+        </div>
+    )
+}
+
 function ActionBar({onAddTransaction}: {onAddTransaction: () => void}) {      
     return (
         <div className="flex flex-row text-indigo-600 p-3 justify-between text-sm">
@@ -145,18 +177,51 @@ function AccountTable() {
         inflow: 80,
         cleared: 50
       });
+
+      useEffect(() => {
+        const handleDoubleClick = (e: MouseEvent) => {
+          // Check if the double-click occurred outside of any row
+          if (!(e.target as Element).closest('.transaction-row')) {
+            setSelectedRows(new Set());
+            setEditingRow(null);
+          }
+        };
+    
+        document.addEventListener('dblclick', handleDoubleClick);
+    
+        return () => {
+          document.removeEventListener('dblclick', handleDoubleClick);
+        };
+      }, []);
     
       const onResize = (column: string) => (event: React.SyntheticEvent<Element, Event>, data: { size: { width: number; height: number } })  => {
         setColumnWidths(prev => ({ ...prev, [column]: data.size.width }));
       };
 
-    function toggleRowSelect(rowId: string) {
+
+      function toggleRowSelect(rowId: string) {
+        setSelectedRows(prev => {
+          const newSet = new Set(prev);
+          if (newSet.has(rowId)) {
+            newSet.delete(rowId);
+          } else {
+            newSet.add(rowId);
+          }
+          return newSet;
+        });
+        // Exit edit mode when toggling selection
+        if (editingRow === rowId) {
+          setEditingRow(null);
+        }
+      }
+
+    function toggleSelectAll() {
         setSelectedRows(prev => {
             const newSet = new Set(prev);
-            if (newSet.has(rowId)) {
-                newSet.delete(rowId);
+            if (newSet.size < dummyRows.length) {
+                dummyRows.forEach(row => newSet.add(row.id));
             } else {
-                newSet.add(rowId);
+                newSet.clear();
             }
             return newSet;
         });
@@ -165,9 +230,11 @@ function AccountTable() {
 
     function handleRowClick(id: string) {
         if (selectedRows.has(id)) {
+            // If the row is already selected, put it into edit mode
             setEditingRow(id);
         } else {
-            setSelectedRows(prev => new Set(prev).add(id));
+            // If the row is not selected, toggle its selection
+            toggleRowSelect(id);
         }
     }
 
@@ -214,10 +281,11 @@ function AccountTable() {
         // i think this code is very redundant and might simplify later, but works
         <div className="w-full overflow-x-auto">
         <div className="min-w-max">
+            <AccountsHeader />
             <ActionBar onAddTransaction={toggleAddTransactionRow} />
-        <div className="flex flex-row items-stretch text-gray-500 text-xs border-t border-l border-b border-gray-300">
+        <div className="flex flex-row items-stretch text-gray-500 text-[10px] border-t border-l border-b border-gray-300">
             <div className="flex p-2 w-[40px] border-r border-gray-300 items-center justify-center">
-                <div className="border rounded-sm border-gray-500 h-[10px] w-[10px]"></div>
+                <input type="checkbox" className="h-4 w-4" onChange={() => toggleSelectAll()} />
             </div>
             <ResizableColumn width={columnWidths.flag} minWidth={50} onResize={onResize('flag')}>
                 <div className="flex p-2">
@@ -246,29 +314,27 @@ function AccountTable() {
                 <div className="flex pt-2 border-gray-300">INFLOW</div>
             </ResizableColumn>
             <div className={`flex p-2 border-gray-300 w-[${columnWidths.cleared}px] items-center justify-center`}>
-                <div className="rounded-full w-4 h-4 bg-green-600 text-white text-bold text-center"> C </div>
+                <div className="rounded-full w-4 h-4 bg-green-600 text-white text-bold text-[12px] text-center"> C </div>
             </div>
             </div>
             </div>
             {showAddTransactionRow && <TransactionForm columnWidths={columnWidths} showAccount={true} onCancel={handleCancelAddTransaction} onSave={handleSaveAddTransaction} />}
             <div className="flex flex-col w-full">
-                {dummyRows.map((row) => (
-                    <TransactionRow 
-                        key={row.id}
-                        {...row}
-                        showAccount={true}
-                        columnWidths={columnWidths}
-                        isSelected={selectedRows.has(row.id)}
-                        isEditing={editingRow === row.id}
-                        onSelect={() => toggleRowSelect(row.id)}
-                        onClick={() => handleRowClick(row.id)}
-                        onCancel={handleCancel}
-                        onSave={handleSave}
-                        toggleCleared={() => toggleCleared(row.id)}
-                        isCleared={clearedRows.has(row.id)}
-
-
-                    />
+            {dummyRows.map((row) => (
+                <TransactionRow 
+                    key={row.id}
+                    {...row}
+                    showAccount={true}
+                    columnWidths={columnWidths}
+                    isSelected={selectedRows.has(row.id)}
+                    isEditing={editingRow === row.id}
+                    onSelect={() => toggleRowSelect(row.id)}
+                    onClick={() => handleRowClick(row.id)}
+                    onCancel={handleCancel}
+                    onSave={handleSave}
+                    toggleCleared={() => toggleCleared(row.id)}
+                    isCleared={clearedRows.has(row.id)}
+                />
                 ))}
             </div>
         </div>

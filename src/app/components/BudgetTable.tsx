@@ -22,6 +22,7 @@ const BudgetHeader = () => {
     const [selectedMonth, setSelectedMonth] = useState(1); // Add state for selected month
 
     return (
+        //TODO make this actually change the view based on the month
     <div className="flex flex-col justify-center my-2 mx-4">
             <div className="text-xl font-semibold font-sans ml-4">{new Date(selectedYear, selectedMonth - 1).toLocaleString('default', { month: 'short', year: 'numeric' })}</div>
         <div className="flex">
@@ -42,7 +43,6 @@ const BudgetHeader = () => {
                 })}
             </select>
         </div>
-        
     </div>
     )
 }
