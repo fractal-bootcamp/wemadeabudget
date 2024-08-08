@@ -4,6 +4,10 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&display=swap');
 
+.shadow-top {
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2); /* Horizontal offset, vertical offset (negative), blur radius, color */
+}
+
 .react-resizable-handle {
   position: absolute;
   right: -5px;
