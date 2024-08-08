@@ -68,8 +68,8 @@ const mutations = {
     return updatedCategory;
   }
 };
-const categoryService = {
-  getAllByUserId: (userId: string) => queries.getCategories(userId),
+const categoryServices = {
+  getAllByUser: (userId: string) => queries.getCategories(userId),
   add: (userId: string, details: CategoryDetails) =>
     mutations.addCategory(userId, details),
   delete: (userId: string, categoryName: string) =>
@@ -78,4 +78,4 @@ const categoryService = {
     mutations.updateCategory(userId, details)
 };
 
-export default categoryService;
+export default categoryServices;
