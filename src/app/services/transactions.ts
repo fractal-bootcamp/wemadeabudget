@@ -1,5 +1,23 @@
 import prisma from "../client";
 import { TransactionDetails } from "../types";
+//This is a helper object that is used to include the name field in the related models to the transactions
+const nameInclusions = {
+  account: {
+    select: {
+      name: true
+    }
+  },
+  category: {
+    select: {
+      name: true
+    }
+  },
+  payee: {
+    select: {
+      name: true
+    }
+  }
+};
 
 const queries = {
   getAllTransactionsByUser: async (userId: string) => {
@@ -7,23 +25,7 @@ const queries = {
       where: {
         userId: userId
       },
-      include: {
-        account: {
-          select: {
-            name: true
-          }
-        },
-        category: {
-          select: {
-            name: true
-          }
-        },
-        payee: {
-          select: {
-            name: true
-          }
-        }
-      }
+      include: nameInclusions
     });
   },
   getTransactionsByCategory: async (userId: string, categoryName: string) => {
@@ -33,7 +35,8 @@ const queries = {
           name: categoryName,
           userId: userId
         }
-      }
+      },
+      include: nameInclusions
     });
   },
   getTransactionById: async (transactionId: string, userId: string) => {
@@ -42,28 +45,8 @@ const queries = {
         id: transactionId,
         userId: userId
       },
-      include: {
-        account: {
-          select: {
-            name: true
-          }
-        },
-        category: {
-          select: {
-            name: true
-          }
-        },
-        payee: {
-          select: {
-            name: true
-          }
-        }
-      }
+      include: nameInclusions
     });
-
-    if (!transaction) {
-      throw new Error("Transaction not found");
-    }
     return transaction;
   }
 };
