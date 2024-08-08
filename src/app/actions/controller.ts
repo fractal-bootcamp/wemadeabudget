@@ -36,5 +36,10 @@ export const clientController = {
     getAllByUser: attachUserId(payeeServices.getAllByUser),
     update: attachUserId(payeeServices.update)
   },
-  account: {}
+  account: {
+    add: attachUserId(accountServices.add),
+    delete: attachUserId(accountServices.delete),
+    getAllByUser: attachUserId(accountServices.getAllByUser),
+    update: attachUserId(accountServices.update)
+  }
 };
