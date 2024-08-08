@@ -1,5 +1,6 @@
 import clerkHandler from "../middleware/clerkHandler";
-import { transactionServices } from "../services/transactions";
+import categoryServices from "../services/categories";
+import transactionServices from "../services/transactions";
 
 const attachUserId =
   <T extends any[], R>(callback: (userId: string, ...args: T) => Promise<R>) =>
@@ -17,9 +18,15 @@ export const clientController = {
     delete: attachUserId(transactionServices.delete),
     getById: attachUserId(transactionServices.getById),
     getAllByUser: attachUserId(transactionServices.getAllByUser),
-    update: attachUserId(transactionServices.update)
+    update: attachUserId(transactionServices.update),
+    getByCategory: attachUserId(transactionServices.getByCategory)
   },
-  category: {},
+  category: {
+    add: attachUserId(categoryServices.add),
+    delete: attachUserId(categoryServices.delete),
+    getAllByUser: attachUserId(categoryServices.getAllByUser),
+    update: attachUserId(categoryServices.update)
+  },
   payee: {},
   account: {}
 };
