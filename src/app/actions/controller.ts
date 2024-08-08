@@ -1,5 +1,6 @@
 import clerkHandler from "../middleware/clerkHandler";
 import categoryServices from "../services/categories";
+import payeeServices from "../services/payees";
 import transactionServices from "../services/transactions";
 
 const attachUserId =
@@ -27,6 +28,11 @@ export const clientController = {
     getAllByUser: attachUserId(categoryServices.getAllByUser),
     update: attachUserId(categoryServices.update)
   },
-  payee: {},
+  payee: {
+    add: attachUserId(payeeServices.add),
+    delete: attachUserId(payeeServices.delete),
+    getAllByUser: attachUserId(payeeServices.getAllByUser),
+    update: attachUserId(payeeServices.update)
+  },
   account: {}
 };
