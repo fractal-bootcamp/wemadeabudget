@@ -19,12 +19,12 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <SignedOut>
-          <SignUpOrIn />
-        </SignedOut>
-        <SignedIn>
-          <body className={inter.className}>{children}</body>
-        </SignedIn>
+        <body className={inter.className}>
+          <SignedOut>
+            <SignUpOrIn />
+          </SignedOut>
+          <SignedIn>{children}</SignedIn>
+        </body>
       </html>
     </ClerkProvider>
   )
