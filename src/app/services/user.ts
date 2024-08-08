@@ -1,6 +1,4 @@
-import { get } from "http";
 import prisma from "../client";
-import { auth, currentUser, User } from "@clerk/nextjs/server";
 const queries = {
   findUserByClerkId: async (clerkId: string) => {
     const user = await prisma.user.findUnique({
