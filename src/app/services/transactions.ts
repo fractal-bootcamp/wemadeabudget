@@ -1,3 +1,4 @@
+import { get } from "http";
 import prisma from "../client";
 import { TransactionDetails } from "../types";
 //This is a helper object that is used to include the name field in the related models to the transactions
@@ -59,6 +60,17 @@ const queries = {
       include: nameInclusions
     });
     return transaction;
+  },
+  getTransactionsByAccount: async (userId: string, accountName: string) => {
+    return await prisma.transaction.findMany({
+      where: {
+        account: {
+          name: accountName,
+          userId: userId
+        }
+      },
+      include: nameInclusions
+    });
   }
 };
 const mutations = {
@@ -187,7 +199,9 @@ const transactionServices = {
   getByCategory: async (userId: string, categoryName: string) =>
     await queries.getTransactionsByCategory(userId, categoryName),
   getByPayee: async (userId: string, payeeName: string) =>
-    await queries.getTransactionsByPayee(userId, payeeName)
+    await queries.getTransactionsByPayee(userId, payeeName),
+  getByAccount: async (userId: string, accountName: string) =>
+    await queries.getTransactionsByAccount(userId, accountName)
 };
 
 export default transactionServices;

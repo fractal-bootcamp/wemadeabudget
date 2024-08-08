@@ -3,6 +3,7 @@ import clerkHandler from "../middleware/clerkHandler";
 import categoryServices from "../services/categories";
 import payeeServices from "../services/payees";
 import transactionServices from "../services/transactions";
+import accountServices from "../services/accounts";
 
 const attachUserId =
   <T extends any[], R>(callback: (userId: string, ...args: T) => Promise<R>) =>
@@ -22,7 +23,8 @@ export const clientController = {
     getAllByUser: attachUserId(transactionServices.getAllByUser),
     update: attachUserId(transactionServices.update),
     getByCategory: attachUserId(transactionServices.getByCategory),
-    getByPayee: attachUserId(transactionServices.getByPayee)
+    getByPayee: attachUserId(transactionServices.getByPayee),
+    getByAccount: attachUserId(transactionServices.getByAccount)
   },
   category: {
     add: attachUserId(categoryServices.add),
