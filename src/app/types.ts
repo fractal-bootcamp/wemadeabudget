@@ -14,9 +14,12 @@ export type TransactionDetails = {
   cents: number;
   memo: string;
   flag: Flag;
-  reconciled: boolean;
+  cleared: boolean;
 };
-
+export type CategoryDetails = {
+  name: string;
+  // categoryGroupName: string;
+};
 export interface AccountDetails {
   name: string;
   type: AccountType;
