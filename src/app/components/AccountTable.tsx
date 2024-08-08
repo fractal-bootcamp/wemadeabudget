@@ -1,8 +1,14 @@
 'use client'
 import TransactionRow from "./TransactionRow"
-import { Bookmark, LucideSearch, LucideUndo, LucideRedo, FileIcon, PlusCircle } from "lucide-react";
+import { Bookmark, LucideSearch, LucideUndo, LucideRedo, FileIcon, PlusCircle, SearchIcon, ChevronDown } from "lucide-react";
 import ResizableColumn from "./ResizableColumn";
+import TransactionForm from "./TransactionForm";
 import { useState } from "react";
+
+const defaultCategories= [
+    "Restaurants", "Rent", "Utilities", "Renters Insurance", "Phone", "Internet", "Music", "Groceries", "Train/Bus Fare", "Personal Care", "Stuff I Forgot to Budget For", "Celebrations"]
+  
+
 const dummyRows = [
     {
         id: "1",
@@ -11,8 +17,8 @@ const dummyRows = [
         payee: "Trader Joe",
         category: "Food",
         memo: "Groceries",
-        outflow: 100,
-        inflow: 0,
+        cents: -1000,
+        cleared: true,
     },
     {
         id: "2",
@@ -21,8 +27,8 @@ const dummyRows = [
         payee: "Amazon",
         category: "Shopping",
         memo: "Books",
-        outflow: 50,
-        inflow: 0,
+        cents: -500,
+        cleared: false,
     },
     {
         id: "3",
@@ -31,8 +37,8 @@ const dummyRows = [
         payee: "Gas Station",
         category: "Transport",
         memo: "Fuel",
-        outflow: 40,
-        inflow: 0,
+        cents: -400,
+        cleared: true,
     },
     {
         id: "4",
@@ -41,8 +47,8 @@ const dummyRows = [
         payee: "Starbucks",
         category: "Food",
         memo: "Coffee",
-        outflow: 10,
-        inflow: 0,
+        cents: -100,
+        cleared: false,
     },
     {
         id: "5",
@@ -51,8 +57,8 @@ const dummyRows = [
         payee: "Netflix",
         category: "Entertainment",
         memo: "Subscription",
-        outflow: 15,
-        inflow: 0,
+        cents: -150,
+        cleared: true,
     },
     {
         id: "6",
@@ -61,10 +67,62 @@ const dummyRows = [
         payee: "Local Market",
         category: "Food",
         memo: "Fruits",
-        outflow: 30,
-        inflow: 0,
+        cents: -300,
+        cleared: false,
+    },
+    {
+        id: "7",
+        account: "Checking",
+        date: "2023-01-07",
+        payee: "Payroll",
+        category: "Income",
+        memo: "Salary",
+        cents: 5000,
+        cleared: true,
+    },
+    {
+        id: "8",
+        account: "Savings",
+        date: "2023-01-08",
+        payee: "Interest",
+        category: "Interest",
+        memo: "Interest Payment",
+        cents: 200,
+        cleared: true,
     },
 ]
+
+function ActionBar({onAddTransaction}: {onAddTransaction: () => void}) {      
+    return (
+        <div className="flex flex-row text-indigo-600 p-3 justify-between text-sm">
+            <div className="flex flex-row gap-2">
+                <button className="flex items-center gap-1" onClick={onAddTransaction}>
+                    <PlusCircle className="h-4 w-4" /> 
+                    <span>Add Transaction</span>
+                </button>
+                <button className="flex items-center gap-1">
+                    <FileIcon className="h-4 w-4" /> 
+                    <span>File Import</span>
+                </button>
+                <button className="flex items-center gap-1">
+                    <LucideUndo className="h-4 w-4" /> 
+                    <span>Undo</span>
+                </button>
+                <button className="flex items-center gap-1">
+                    <LucideRedo className="h-4 w-4" /> 
+                    <span>Redo</span>
+                </button>
+            </div>
+            <div className="flex flex-row gap-2">
+                <button className="flex gap-1"> View <ChevronDown className="h-4 w-4" /></button>
+                <div className="flex items-center">
+                    <SearchIcon className="h-5 w-5 mr-2" />
+                    <input type="text" placeholder="Search" />
+                </div>
+            </div>
+        </div>
+    )
+}
 
 
 
@@ -72,17 +130,20 @@ const dummyRows = [
 
 function AccountTable() {
     const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+    const [clearedRows, setClearedRows] = useState<Set<string>>(new Set());
     const [editingRow, setEditingRow] = useState<string | null>(null);
+    const [showAddTransactionRow, setShowAddTransactionRow] = useState(false);
 
     const [columnWidths, setColumnWidths] = useState({
-        flag: 40,
+        flag: 50,
         account: 100,
         date: 100,
-        payee: 150,
-        category: 100,
-        memo: 150,
-        outflow: 100,
-        inflow: 100,
+        payee: 120,
+        category: 120,
+        memo: 210,
+        outflow: 80,
+        inflow: 80,
+        cleared: 50
       });
     
       const onResize = (column: string) => (event: React.SyntheticEvent<Element, Event>, data: { size: { width: number; height: number } })  => {
@@ -110,19 +171,51 @@ function AccountTable() {
         }
     }
 
+    function toggleCleared(id: string) {
+        //this has gotta changed something in the db 
+        //but rn i'll change it locally
+        setClearedRows(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(id)) {
+                newSet.delete(id);
+            } else {
+                newSet.add(id);
+            }
+            return newSet; // Return the updated set
+        });
+    }
+
+    function toggleAddTransactionRow() {
+        setShowAddTransactionRow(prev => !prev);
+        console.log("toggled");
+    }
+
+    function handleCancel() {
+        setEditingRow(null);
+    }
+
+    function handleSave() {
+        console.log("Saved edited transaction!");
+        //post to db
+    }
+
+    function handleCancelAddTransaction() {
+        setShowAddTransactionRow(false);
+    }
+
+    function handleSaveAddTransaction() {
+        console.log("Saved new transaction!");
+        //post to db
+    }
+
+
+
     return (
         // i think this code is very redundant and might simplify later, but works
         <div className="w-full overflow-x-auto">
         <div className="min-w-max">
-            <div className="flex flex-row text-indigo-600 p-3 justify-between text-sm">
-                <button className="flex gap-1"> <PlusCircle /> Add Transaction</button>
-                <button className="flex gap-1"> <FileIcon /> File Import </button>
-                <button className="flex gap-1"> Undo </button>
-                <button className="flex gap-1"> Redo </button>
-                <button className="flex gap-1"> View </button>
-                <input type="text" placeholder="Search" />
-            </div>
-        <div className="flex flex-row items-stretch text-gray-500 border-t border-l border-b border-gray-300">
+            <ActionBar onAddTransaction={toggleAddTransactionRow} />
+        <div className="flex flex-row items-stretch text-gray-500 text-xs border-t border-l border-b border-gray-300">
             <div className="flex p-2 w-[40px] border-r border-gray-300 items-center justify-center">
                 <div className="border rounded-sm border-gray-500 h-[10px] w-[10px]"></div>
             </div>
@@ -132,30 +225,33 @@ function AccountTable() {
                 </div>
             </ResizableColumn>
             <ResizableColumn width={columnWidths.account} onResize={onResize('account')}>
-                <div className="flex p-2">ACCOUNTS</div>
+                <div className="flex pt-2">ACCOUNTS</div>
             </ResizableColumn>
             <ResizableColumn width={columnWidths.date} onResize={onResize('date')}>
-                <div className="flex p-2">DATE</div>
+                <div className="flex pt-2">DATE</div>
             </ResizableColumn>
             <ResizableColumn width={columnWidths.payee} onResize={onResize('payee')}>
-                <div className="flex p-2">PAYEE</div>
+                <div className="flex pt-2">PAYEE</div>
             </ResizableColumn>
             <ResizableColumn width={columnWidths.category} onResize={onResize('category')}>
-                <div className="flex p-2">CATEGORY</div>
+                <div className="flex pt-2">CATEGORY</div>
             </ResizableColumn>
             <ResizableColumn width={columnWidths.memo} onResize={onResize('memo')}>
-                <div className="flex p-2">MEMO</div>
+                <div className="flex pt-2">MEMO</div>
             </ResizableColumn>
             <ResizableColumn width={columnWidths.outflow} onResize={onResize('outflow')}>
-                <div className="flex p-2">OUTFLOW</div>
+                <div className="flex pt-2">OUTFLOW</div>
             </ResizableColumn>
             <ResizableColumn width={columnWidths.inflow} onResize={onResize('inflow')}>
-                <div className="flex p-2 border-gray-300">INFLOW</div>
+                <div className="flex pt-2 border-gray-300">INFLOW</div>
             </ResizableColumn>
+            <div className={`flex p-2 border-gray-300 w-[${columnWidths.cleared}px] items-center justify-center`}>
+                <div className="rounded-full w-4 h-4 bg-green-600 text-white text-bold text-center"> C </div>
             </div>
             </div>
-
-            <div className="flex flex-col gap-4 w-full">
+            </div>
+            {showAddTransactionRow && <TransactionForm columnWidths={columnWidths} showAccount={true} onCancel={handleCancelAddTransaction} onSave={handleSaveAddTransaction} />}
+            <div className="flex flex-col w-full">
                 {dummyRows.map((row) => (
                     <TransactionRow 
                         key={row.id}
@@ -166,6 +262,10 @@ function AccountTable() {
                         isEditing={editingRow === row.id}
                         onSelect={() => toggleRowSelect(row.id)}
                         onClick={() => handleRowClick(row.id)}
+                        onCancel={handleCancel}
+                        onSave={handleSave}
+                        toggleCleared={() => toggleCleared(row.id)}
+                        isCleared={clearedRows.has(row.id)}
 
 
                     />
