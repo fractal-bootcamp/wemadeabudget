@@ -1,5 +1,6 @@
 import { currentUser } from "@clerk/nextjs/server";
 import { userServices } from "../services/user";
+/** Queries the current clerk context and returns authenticated status and database user info (or adds it if it doesn't exist) */
 export default async function clerkHandler() {
   const clerkUser = await currentUser();
   if (!clerkUser) {
