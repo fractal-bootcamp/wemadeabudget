@@ -18,6 +18,7 @@ export type TransactionDetails = {
 };
 export type CategoryDetails = {
   name: string;
+  allocated: number;
   // categoryGroupName: string;
 };
 export interface AccountDetails {
