@@ -1,3 +1,4 @@
+import { get } from "http";
 import clerkHandler from "../middleware/clerkHandler";
 import categoryServices from "../services/categories";
 import payeeServices from "../services/payees";
@@ -20,7 +21,8 @@ export const clientController = {
     getById: attachUserId(transactionServices.getById),
     getAllByUser: attachUserId(transactionServices.getAllByUser),
     update: attachUserId(transactionServices.update),
-    getByCategory: attachUserId(transactionServices.getByCategory)
+    getByCategory: attachUserId(transactionServices.getByCategory),
+    getByPayee: attachUserId(transactionServices.getByPayee)
   },
   category: {
     add: attachUserId(categoryServices.add),

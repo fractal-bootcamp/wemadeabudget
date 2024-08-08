@@ -39,6 +39,17 @@ const queries = {
       include: nameInclusions
     });
   },
+  getTransactionsByPayee: async (userId: string, payeeName: string) => {
+    return await prisma.transaction.findMany({
+      where: {
+        payee: {
+          name: payeeName,
+          userId: userId
+        }
+      },
+      include: nameInclusions
+    });
+  },
   getTransactionById: async (transactionId: string, userId: string) => {
     const transaction = await prisma.transaction.findUnique({
       where: {
@@ -174,7 +185,9 @@ const transactionServices = {
   getAllByUser: async (userId: string) =>
     await queries.getAllTransactionsByUser(userId),
   getByCategory: async (userId: string, categoryName: string) =>
-    await queries.getTransactionsByCategory(userId, categoryName)
+    await queries.getTransactionsByCategory(userId, categoryName),
+  getByPayee: async (userId: string, payeeName: string) =>
+    await queries.getTransactionsByPayee(userId, payeeName)
 };
 
 export default transactionServices;
