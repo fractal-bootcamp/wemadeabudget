@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ClerkProvider, SignedIn, SignedOut } from '@clerk/nextjs'
 import SignUpOrIn from './sign-up/page'
+import { Suspense } from 'react'
+import Loading from './loading'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -19,12 +21,14 @@ export default function RootLayout({
   return (
     <ClerkProvider>
       <html lang="en">
-        <SignedOut>
-          <SignUpOrIn />
-        </SignedOut>
-        <SignedIn>
-          <body className={inter.className}>{children}</body>
-        </SignedIn>
+        <body className={inter.className}>
+          <SignedOut>
+            <SignUpOrIn />
+          </SignedOut>
+          <SignedIn>
+            <Suspense fallback={<Loading />}>{children}</Suspense>
+          </SignedIn>
+        </body>
       </html>
     </ClerkProvider>
   )

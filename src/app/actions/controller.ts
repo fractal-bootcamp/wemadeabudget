@@ -1,3 +1,4 @@
+'use server'
 import { get } from 'http'
 import clerkHandler from '../middleware/clerkHandler'
 import categoryServices from '../services/categories'
@@ -46,4 +47,27 @@ const clientController = {
   },
 }
 
-export default clientController
+export const transactionAdd = clientController.transaction.add
+export const transactionDelete = clientController.transaction.delete
+export const transactionGetById = clientController.transaction.getById
+export const transactionGetAllByUser = clientController.transaction.getAllByUser
+export const transactionUpdate = clientController.transaction.update
+export const transactionGetByCategory =
+  clientController.transaction.getByCategory
+export const transactionGetByPayee = clientController.transaction.getByPayee
+export const transactionGetByAccount = clientController.transaction.getByAccount
+
+export const categoryAdd = clientController.category.add
+export const categoryDelete = clientController.category.delete
+export const categoryGetAllByUser = clientController.category.getAllByUser
+export const categoryUpdate = clientController.category.update
+
+export const payeeAdd = clientController.payee.add
+export const payeeDelete = clientController.payee.delete
+export const payeeGetAllByUser = clientController.payee.getAllByUser
+export const payeeUpdate = clientController.payee.update
+
+export const accountAdd = clientController.account.add
+export const accountDelete = clientController.account.delete
+export const accountGetAllByUser = clientController.account.getAllByUser
+export const accountUpdate = clientController.account.update

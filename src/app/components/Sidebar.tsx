@@ -10,6 +10,7 @@ import {
 } from 'lucide-react'
 import { useState } from 'react'
 import AddAccountModal from './AddAccountModal'
+import { useUser } from '@clerk/nextjs'
 
 const accounts = [
   { name: 'Checking', balance: 1000 },
@@ -18,6 +19,7 @@ const accounts = [
 ]
 
 function Sidebar() {
+  const { user, isLoaded } = useUser()
   const [showDropdown, setShowDropdown] = useState(false)
   const [showAddAccountModal, setShowAddAccountModal] = useState(false)
 
@@ -29,14 +31,20 @@ function Sidebar() {
     setShowAddAccountModal((prev) => !prev)
     console.log('toggleAddAccountModal')
   }
+  const firstNameDisplay = isLoaded
+    ? `${user?.firstName ?? user?.username}'s`
+    : 'Your'
 
   return (
     <div className="flex h-screen w-[300px] flex-col gap-4 bg-[#2c396a] pt-4 font-sans font-light text-white">
       <div className="mx-2 flex flex-row items-center gap-2 rounded-md p-2 hover:bg-[#374D9B]">
         <Sprout className="h-[30px] w-[30px]" />
         <div className="flex flex-col">
-          <div className="font-semibold"> sarah's Budget</div>
-          <div className="text-xs"> sarahebicknell@gmail.com </div>
+          <div className="font-semibold">{firstNameDisplay} Budget</div>
+          <div className="text-xs">
+            {' '}
+            {user?.emailAddresses[0].emailAddress ?? ''}{' '}
+          </div>
         </div>
         <ChevronDown className="h-3 w-3" />
       </div>

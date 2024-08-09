@@ -1,6 +1,7 @@
 import { get } from 'http'
 import prisma from '../client'
-import { TransactionDetails } from '../types'
+import { AccountType, TransactionDetails } from '../types'
+import { Transaction } from '@prisma/client'
 //This is a helper object that is used to include the name field in the related models to the transactions
 const nameInclusions = {
   account: {
@@ -18,6 +19,29 @@ const nameInclusions = {
       name: true,
     },
   },
+}
+
+//What a database transaction response looks like when names above included
+interface FetchedTransaction extends Transaction {
+  account: { name: string }
+  category: { name: string }
+  payee: { name: string }
+}
+
+const formatTransaction = (
+  transaction: FetchedTransaction
+): TransactionDetails => {
+  return {
+    id: transaction.id,
+    account: transaction.account.name,
+    category: transaction.category.name,
+    payee: transaction.payee.name,
+    date: transaction.date,
+    cents: transaction.cents,
+    memo: transaction.memo,
+    flag: transaction.flag,
+    cleared: transaction.cleared,
+  }
 }
 
 const queries = {
@@ -192,16 +216,24 @@ const transactionServices = {
     await mutations.deleteTransaction(transactionId, userId),
   update: async (userId: string, details: TransactionDetails) =>
     await mutations.updateTransaction(details, userId),
-  getById: async (userId: string, transactionId: string) =>
-    await queries.getTransactionById(transactionId, userId),
+  getById: async (userId: string, transactionId: string) => {
+    const transaction = await queries.getTransactionById(transactionId, userId)
+    return transaction ? formatTransaction(transaction) : null
+  },
   getAllByUser: async (userId: string) =>
-    await queries.getAllTransactionsByUser(userId),
+    (await queries.getAllTransactionsByUser(userId)).map(formatTransaction),
   getByCategory: async (userId: string, categoryName: string) =>
-    await queries.getTransactionsByCategory(userId, categoryName),
+    (await queries.getTransactionsByCategory(userId, categoryName)).map(
+      formatTransaction
+    ),
   getByPayee: async (userId: string, payeeName: string) =>
-    await queries.getTransactionsByPayee(userId, payeeName),
+    (await queries.getTransactionsByPayee(userId, payeeName)).map(
+      formatTransaction
+    ),
   getByAccount: async (userId: string, accountName: string) =>
-    await queries.getTransactionsByAccount(userId, accountName),
+    (await queries.getTransactionsByAccount(userId, accountName)).map(
+      formatTransaction
+    ),
 }
 
 export default transactionServices
