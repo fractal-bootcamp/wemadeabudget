@@ -228,6 +228,8 @@ function AccountTable() {
     }
 
   function toggleRowSelect(rowId: string) {
+    setShowAddTransactionRow(false)
+    setEditingRow(null)
     setSelectedRows((prev) => {
       const newSet = new Set(prev)
       if (newSet.has(rowId)) {
@@ -237,10 +239,6 @@ function AccountTable() {
       }
       return newSet
     })
-    // Exit edit mode when toggling selection
-    if (editingRow === rowId) {
-      setEditingRow(null)
-    }
   }
 
   function toggleSelectAll() {
@@ -259,6 +257,7 @@ function AccountTable() {
     if (selectedRows.has(id)) {
       // If the row is already selected, put it into edit mode
       setEditingRow(id)
+      setSelectedRows(new Set(id))
     } else {
       // If the row is not selected, toggle its selection
       toggleRowSelect(id)
@@ -279,27 +278,18 @@ function AccountTable() {
     })
   }
 
-  function toggleAddTransactionRow() {
+  function toggleShowAddTransactionRow() {
     setShowAddTransactionRow((prev) => !prev)
-    console.log('toggled')
+    setSelectedRows(new Set())
   }
 
-  function handleCancel() {
+  const closeEditingRow = () => {
     setEditingRow(null)
-  }
-
-  function handleSave() {
-    console.log('Saved edited transaction!')
-    //post to db
+    setShowAddTransactionRow(false)
   }
 
   function handleCancelAddTransaction() {
     setShowAddTransactionRow(false)
-  }
-
-  function handleSaveAddTransaction() {
-    console.log('Saved new transaction!')
-    //post to db
   }
 
   return (
@@ -307,7 +297,7 @@ function AccountTable() {
     <div className="w-full overflow-x-auto">
       <div className="min-w-max">
         <AccountsHeader />
-        <ActionBar onAddTransaction={toggleAddTransactionRow} />
+        <ActionBar onAddTransaction={toggleShowAddTransactionRow} />
         <div className="flex flex-row items-stretch border-b border-l border-t border-gray-300 text-[10px] text-gray-500">
           <div className="flex w-[40px] items-center justify-center border-r border-gray-300 p-2">
             <input
@@ -384,8 +374,7 @@ function AccountTable() {
         <TransactionForm
           columnWidths={columnWidths}
           showAccount={true}
-          onCancel={handleCancelAddTransaction}
-          onSave={handleSaveAddTransaction}
+          closeFunction={closeEditingRow}
         />
       )}
       <div className="flex w-full flex-col">
@@ -399,8 +388,7 @@ function AccountTable() {
             isEditing={editingRow === row.id}
             onSelect={() => toggleRowSelect(row.id)}
             onClick={() => handleRowClick(row.id)}
-            onCancel={handleCancel}
-            onSave={handleSave}
+            closeFunction={closeEditingRow}
             toggleCleared={() => toggleCleared(row.id)}
             isCleared={clearedRows.has(row.id)}
           />
