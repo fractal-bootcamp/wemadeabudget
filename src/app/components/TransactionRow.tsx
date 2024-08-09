@@ -47,7 +47,7 @@ function TransactionRow({ account, date, payee, category, memo, cents, cleared, 
 
         <form className="bg-indigo-100 transaction-row flex flex-col text-xs" onSubmit={onSubmit}>
           <div className="flex flex-row">
-            <div className="flex items-center justify-center p-2" style={{ width: columnWidths.flag }}>
+            <div className="flex items-center justify-center p-2" style={{ width: 40 }}>
               <input 
                 type='checkbox' 
                 className="rounded" 
@@ -94,7 +94,7 @@ function TransactionRow({ account, date, payee, category, memo, cents, cleared, 
         </form>
       ) : (
         <div className={`flex transaction-row ${isSelected ? "bg-indigo-100" : ""}`} onClick={onClick}>
-        <div className="flex flex-row items-center justify-center p-2" style={{ width: columnWidths.flag }}>
+        <div className="flex flex-row items-center justify-center p-2" style={{ width: 40 }}>
           <input 
             type='checkbox' 
             className="rounded" 
