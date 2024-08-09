@@ -5,6 +5,7 @@ import { useState } from 'react'
 interface ColumnWidths {
   flag: number
   account: number
+  checkbox: number
   date: number
   payee: number
   category: number
@@ -241,7 +242,7 @@ function TransactionRow({
     >
       <div
         className="flex flex-row items-center justify-center p-2"
-        style={{ width: columnWidths.flag }}
+        style={{ width: columnWidths.checkbox }}
       >
         <input
           type="checkbox"

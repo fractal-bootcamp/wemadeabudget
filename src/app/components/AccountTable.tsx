@@ -220,12 +220,26 @@ function AccountTable() {
   }, [])
 
   const onResize =
-    (column: string) =>
+    (
+      column: keyof typeof columnWidths,
+      nextColumn: keyof typeof columnWidths
+    ) =>
     (
       event: React.SyntheticEvent<Element, Event>,
       data: { size: { width: number; height: number } }
     ) => {
-      setColumnWidths((prev) => ({ ...prev, [column]: data.size.width }))
+      const newWidth = data.size.width
+      const widthDifference = newWidth - columnWidths[column]
+      const nextColumnNewWidth = columnWidths[nextColumn] - widthDifference
+      // Ensure the next column doesn't go below its minimum width
+      const minWidth = 50 // You can adjust this or make it a parameter
+      const maxWidth =
+        columnWidths[column] + Math.max(columnWidths[nextColumn] - minWidth, 0)
+      setColumnWidths((prev) => ({
+        ...prev,
+        [column]: Math.min(newWidth, maxWidth),
+        [nextColumn]: Math.max(nextColumnNewWidth, minWidth),
+      }))
     }
 
   function toggleRowSelect(rowId: string) {
@@ -300,67 +314,90 @@ function AccountTable() {
         <AccountsHeader />
         <ActionBar onAddTransaction={toggleShowAddTransactionRow} />
         <div className="flex flex-row items-stretch border-b border-l border-t border-gray-300 text-[10px] text-gray-500">
-          <div className="flex w-[40px] items-center justify-center border-r border-gray-300 p-2">
+          <div
+            className="container-class flex items-center justify-center border-r border-gray-300 p-2"
+            style={{ width: columnWidths.checkbox }}
+          >
             <input
               type="checkbox"
               className="h-4 w-4"
               onChange={() => toggleSelectAll()}
             />
           </div>
-          <ResizableColumn
-            width={columnWidths.flag}
-            minWidth={50}
-            onResize={onResize('flag')}
+          <div
+            className="flex justify-center border-r border-gray-300 p-2"
+            style={{ width: columnWidths.flag }}
           >
-            <div className="flex p-2">
-              <Bookmark
-                className="rotate-[270deg] transform text-gray-500"
-                size={16}
-              />
-            </div>
-          </ResizableColumn>
+            <Bookmark
+              className="rotate-[270deg] transform text-gray-500"
+              size={16}
+            />
+          </div>
           <ResizableColumn
             width={columnWidths.account}
-            onResize={onResize('account')}
+            minWidth={50}
+            maxWidth={
+              columnWidths.account + Math.max(columnWidths.date - 50, 0)
+            }
+            onResize={onResize('account', 'date')}
           >
             <div className="flex pt-2">ACCOUNTS</div>
           </ResizableColumn>
           <ResizableColumn
             width={columnWidths.date}
-            onResize={onResize('date')}
+            minWidth={50}
+            maxWidth={columnWidths.date + Math.max(columnWidths.payee - 50, 0)}
+            onResize={onResize('date', 'payee')}
           >
             <div className="flex pt-2">DATE</div>
           </ResizableColumn>
           <ResizableColumn
             width={columnWidths.payee}
-            onResize={onResize('payee')}
+            minWidth={50}
+            maxWidth={
+              columnWidths.payee + Math.max(columnWidths.category - 50, 0)
+            }
+            onResize={onResize('payee', 'category')}
           >
             <div className="flex pt-2">PAYEE</div>
           </ResizableColumn>
           <ResizableColumn
             width={columnWidths.category}
-            onResize={onResize('category')}
+            minWidth={50}
+            maxWidth={
+              columnWidths.category + Math.max(columnWidths.memo - 50, 0)
+            }
+            onResize={onResize('category', 'memo')}
           >
             <div className="flex pt-2">CATEGORY</div>
           </ResizableColumn>
           <ResizableColumn
             width={columnWidths.memo}
-            onResize={onResize('memo')}
+            minWidth={50}
+            maxWidth={
+              columnWidths.memo + Math.max(columnWidths.outflow - 50, 0)
+            }
+            onResize={onResize('memo', 'outflow')}
           >
             <div className="flex pt-2">MEMO</div>
           </ResizableColumn>
           <ResizableColumn
             width={columnWidths.outflow}
-            onResize={onResize('outflow')}
+            minWidth={50}
+            maxWidth={
+              columnWidths.outflow + Math.max(columnWidths.inflow - 50, 0)
+            }
+            onResize={onResize('outflow', 'inflow')}
           >
-            <div className="flex pt-2">OUTFLOW</div>
+            <div className="flex justify-end pt-2">OUTFLOW</div>
           </ResizableColumn>
-          <ResizableColumn
-            width={columnWidths.inflow}
-            onResize={onResize('inflow')}
+          <div
+            className="flex items-center justify-end border-r border-gray-300 px-2"
+            style={{ width: columnWidths.inflow }}
           >
-            <div className="flex border-gray-300 pt-2">INFLOW</div>
-          </ResizableColumn>
+            INFLOW
+          </div>
+
           <div
             className={`flex border-gray-300 p-2 w-[${columnWidths.cleared}px] items-center justify-center`}
           >
