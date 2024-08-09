@@ -192,6 +192,7 @@ function AccountTable() {
 
   const [columnWidths, setColumnWidths] = useState({
     flag: 50,
+    checkbox: 40,
     account: 100,
     date: 100,
     payee: 120,
