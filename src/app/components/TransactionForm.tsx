@@ -5,6 +5,7 @@ import FlagToggle from './FlagToggle'
 import ClearedButton from './ClearedButton'
 import { useState } from 'react'
 import useBudgetStore from '../stores/transactionStore'
+import Dropdown from './Dropdown/Dropdown'
 
 const submitTransaction = (
   formData: TransactionDetails,
@@ -30,6 +31,7 @@ function TransactionForm({
   showAccount,
   closeFunction,
 }: TransactionFormProps) {
+  const { accounts, payees, categories } = useBudgetStore()
   const [formData, setFormData] = useState<TransactionDetails>(emptyTransaction)
   const [inflow, setInflow] = useState(0)
   const [outflow, setOutflow] = useState(0)
@@ -69,7 +71,14 @@ function TransactionForm({
             style={{ width: columnWidths.account }}
             className="flex items-center truncate p-2 text-xs"
           >
-            <input
+            <Dropdown
+              options={accounts.map((account) => account.name)}
+              selected={formData.account}
+              setSelected={(selection: string) => {
+                setFormData({ ...formData, account: selection })
+              }}
+            />
+            {/* <input
               type="text"
               name="account"
               placeholder="Account"
@@ -79,7 +88,7 @@ function TransactionForm({
                 setFormData({ ...formData, account: e.target.value })
               }
               required
-            />
+            /> */}
           </div>
         )}
         <div

@@ -11,8 +11,9 @@ import {
 import { useState } from 'react'
 import AddAccountModal from './AddAccountModal'
 import { useUser } from '@clerk/nextjs'
+import useBudgetStore from '../stores/transactionStore'
 
-const accounts = [
+const dummyAccounts = [
   { name: 'Checking', balance: 1000 },
   { name: 'Savings', balance: 2000 },
   { name: 'Credit Card', balance: -500 },
@@ -22,7 +23,11 @@ function Sidebar() {
   const { user, isLoaded } = useUser()
   const [showDropdown, setShowDropdown] = useState(false)
   const [showAddAccountModal, setShowAddAccountModal] = useState(false)
-
+  const { accounts, getBalanceByAccount } = useBudgetStore()
+  const accountsWithBalance = accounts.map((account) => ({
+    ...account,
+    balance: getBalanceByAccount(account.name),
+  }))
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown)
   }
@@ -73,10 +78,16 @@ function Sidebar() {
             )}
             <div> BUDGET </div>
           </div>
-          <div className="pr-6"> $baltotal</div>
+          <div className="pr-6">
+            {' '}
+            {accountsWithBalance.reduce(
+              (acc, account) => acc + account.balance,
+              0
+            )}
+          </div>
         </button>
         {showDropdown &&
-          accounts.map((account, index) => (
+          accountsWithBalance.map((account, index) => (
             <div
               className="ml-2 mr-2 flex flex-row rounded-md py-1 text-xs hover:bg-[#374D9B]"
               key={index}

@@ -3,15 +3,27 @@ import Sidebar from './Sidebar'
 import AccountTable from './AccountTable'
 import BudgetTable from './BudgetTable'
 import TransactionRow from './TransactionRow'
-import { TransactionDetails } from '../types'
+import { AccountDetails, CategoryDetails, TransactionDetails } from '../types'
 import useBudgetStore from '../stores/transactionStore'
 import { useEffect } from 'react'
 
-function Sandbox({ transactions }: { transactions: TransactionDetails[] }) {
-  const { addTransaction } = useBudgetStore()
+interface SandboxProps {
+  transactions: TransactionDetails[]
+  accounts: AccountDetails[]
+  categories: CategoryDetails[]
+  payees: string[]
+}
+function Sandbox({ transactions, accounts, categories, payees }: SandboxProps) {
+  const { isLoaded, load, addTransaction, addAccount, addCategory, addPayee } =
+    useBudgetStore()
   useEffect(() => {
+    console.log('loading store')
+    if (isLoaded()) return
     transactions.forEach(addTransaction)
-    console.log(transactions)
+    accounts.forEach(addAccount)
+    categories.forEach(addCategory)
+    payees.forEach(addPayee)
+    load()
   }, [])
   return (
     <div className="flex">
