@@ -1,7 +1,7 @@
 'use server'
 import { transactionGetAllByUser } from './actions/controller'
 import Sandbox from './components/Sandbox'
-const MIN_LOADING_TIME = 3000
+const MIN_LOADING_TIME = 2000
 export default async function Home() {
   const time = new Date().getTime()
   const transactions = await transactionGetAllByUser()

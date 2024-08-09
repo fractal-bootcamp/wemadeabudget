@@ -4,13 +4,13 @@ import AccountTable from './AccountTable'
 import BudgetTable from './BudgetTable'
 import TransactionRow from './TransactionRow'
 import { TransactionDetails } from '../types'
-import useTransactionStore from '../stores/transactionStore'
+import useBudgetStore from '../stores/transactionStore'
 import { useEffect } from 'react'
 
 function Sandbox({ transactions }: { transactions: TransactionDetails[] }) {
-  const { addTransactions } = useTransactionStore()
+  const { addTransaction } = useBudgetStore()
   useEffect(() => {
-    addTransactions(transactions)
+    transactions.forEach(addTransaction)
     console.log(transactions)
   }, [])
   return (

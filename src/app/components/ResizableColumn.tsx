@@ -1,32 +1,45 @@
-import React, { useState } from 'react'
-import { Resizable, ResizeCallbackData } from 'react-resizable'
+import { Resizable, ResizeCallbackData, ResizeHandle } from 'react-resizable'
 import 'react-resizable/css/styles.css'
 
-type ResizableColumnProps = {
+interface ResizableColumnProps {
   width: number
   minWidth?: number
+  maxWidth: number
   onResize: (event: React.SyntheticEvent, data: ResizeCallbackData) => void
   children: React.ReactNode
 }
 
-const ResizableColumn = ({
+const ResizableColumn: React.FC<ResizableColumnProps> = ({
   width,
-  minWidth,
+  minWidth = 50,
+  maxWidth,
   onResize,
   children,
-}: ResizableColumnProps) => {
+}) => {
+  const handleResize = (
+    event: React.SyntheticEvent,
+    { size }: ResizeCallbackData
+  ) => {
+    const newWidth = Math.max(Math.min(size.width, maxWidth), minWidth)
+    onResize(event, {
+      size: { width: newWidth, height: size.height },
+      node: event.currentTarget as HTMLElement,
+      handle: null as unknown as ResizeHandle,
+    }) // Type assertion for handle
+  }
   return (
     <Resizable
       width={width}
       height={0}
-      minConstraints={[minWidth || width, 0]}
+      minConstraints={[minWidth, 0]}
+      maxConstraints={[maxWidth, 0]}
       handle={
         <div className="absolute bottom-0 right-0 top-0 w-1 cursor-col-resize" />
       }
-      onResize={onResize}
+      onResize={handleResize}
     >
       <div
-        style={{ width: width }}
+        style={{ width }}
         className="overflow-hidden border-r border-gray-300 pl-2 pr-2"
       >
         <div className="truncate">{children}</div>

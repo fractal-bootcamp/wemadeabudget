@@ -1,34 +1,67 @@
-import { Bookmark } from 'lucide-react'
+'use client'
+import { transactionAdd } from '../actions/controller'
+import { emptyTransaction, TransactionDetails } from '../types'
+import FlagToggle from './FlagToggle'
+import ClearedButton from './ClearedButton'
+import { useState } from 'react'
+import useBudgetStore from '../stores/transactionStore'
+
+const submitTransaction = (
+  formData: TransactionDetails,
+  storeSetter: (data: TransactionDetails) => void
+) => {
+  console.log(`Submitting transaction: ${JSON.stringify(formData)}`)
+  //send to db
+  transactionAdd(formData).then((res) => {
+    console.log(`Transaction added: ${JSON.stringify(res)}`)
+  })
+  //optimistic update to store
+  storeSetter(formData)
+}
 
 type TransactionFormProps = {
   columnWidths: { [key: string]: number }
   showAccount: boolean
-  onCancel: () => void
-  onSave: () => void
+  closeFunction: () => void
 }
 
 function TransactionForm({
   columnWidths,
   showAccount,
-  onCancel,
-  onSave,
+  closeFunction,
 }: TransactionFormProps) {
+  const [formData, setFormData] = useState<TransactionDetails>(emptyTransaction)
+  const [inflow, setInflow] = useState(0)
+  const [outflow, setOutflow] = useState(0)
+  const { addTransaction } = useBudgetStore()
   return (
     <form className="flex flex-col bg-indigo-100 text-xs">
       <div className="flex flex-row">
+        {/* dummy always selected checkbox */}
         <div
           className="flex items-center justify-center p-2"
-          style={{ width: columnWidths.flag }}
+          style={{ width: columnWidths.checkbox }}
         >
-          <input type="checkbox" className="rounded" />
+          <input
+            type="checkbox"
+            readOnly
+            className="pointer-events-none rounded"
+            checked={true}
+          />
         </div>
+        {/* Flag */}
         <div
           className="flex items-center justify-center p-2"
           style={{ width: columnWidths.flag }}
         >
-          <Bookmark
-            className="rotate-[270deg] transform text-gray-400"
-            size={16}
+          <FlagToggle
+            flag={formData.flag}
+            onToggle={() =>
+              setFormData((prev) => ({
+                ...prev,
+                flag: prev.flag === 'NONE' ? 'GREEN' : 'NONE',
+              }))
+            }
           />
         </div>
         {showAccount && (
@@ -36,64 +69,148 @@ function TransactionForm({
             style={{ width: columnWidths.account }}
             className="flex items-center truncate p-2 text-xs"
           >
-            <input type="text" placeholder="Account" className="mb-1 rounded" />
+            <input
+              type="text"
+              name="account"
+              placeholder="Account"
+              className="rounded px-2 py-1"
+              value={formData.account}
+              onChange={(e) =>
+                setFormData({ ...formData, account: e.target.value })
+              }
+              required
+            />
           </div>
         )}
         <div
           style={{ width: columnWidths.date }}
-          className="flex items-center truncate p-2 text-xs"
+          className="flex items-center p-2 text-xs"
         >
-          <input type="text" placeholder="Date" className="mb-1 rounded" />
+          <input
+            type="date"
+            name="date"
+            className="rounded px-2 py-1"
+            required
+            onChange={(e) => {
+              const [year, month, day] = e.target.value.split('-').map(Number)
+              setFormData({ ...formData, date: new Date(year, month - 1, day) })
+            }}
+          />
         </div>
         <div
           style={{ width: columnWidths.payee }}
           className="flex items-center truncate p-2 text-xs"
         >
-          <input type="text" placeholder="Payee" className="mb-1 rounded" />
+          <input
+            type="text"
+            name="payee"
+            placeholder="Payee"
+            className="rounded px-2 py-1"
+            value={formData.payee}
+            onChange={(e) =>
+              setFormData({ ...formData, payee: e.target.value })
+            }
+            required
+          />
         </div>
         <div
           style={{ width: columnWidths.category }}
           className="flex items-center truncate p-2 text-xs"
         >
-          <input type="text" placeholder="Category" className="mb-1 rounded" />
+          <input
+            type="text"
+            name="category"
+            placeholder="Category"
+            value={formData.category}
+            onChange={(e) =>
+              setFormData({ ...formData, category: e.target.value })
+            }
+            className="rounded px-2 py-1"
+          />
         </div>
         <div
           style={{ width: columnWidths.memo }}
           className="flex items-center truncate p-2 text-xs"
         >
-          <input type="text" placeholder="Memo" className="mb-1 rounded" />
-        </div>
-        <div
-          style={{ width: columnWidths.inflow }}
-          className="flex items-center justify-end truncate p-2 text-xs"
-        >
-          <input type="text" placeholder="Inflow" className="mb-1 rounded" />
+          <input
+            type="text"
+            name="memo"
+            placeholder="Memo"
+            value={formData.memo}
+            onChange={(e) => setFormData({ ...formData, memo: e.target.value })}
+            className="rounded px-2 py-1"
+          />
         </div>
         <div
           style={{ width: columnWidths.outflow }}
           className="flex items-center justify-end truncate p-2 text-xs"
         >
-          <input type="text" placeholder="Outflow" className="mb-1 rounded" />
+          <input
+            type="number"
+            name="outflow"
+            step="0.01"
+            placeholder="Outflow"
+            className="rounded px-2 py-1"
+            value={outflow || ''}
+            onChange={(e) => {
+              const cents = Math.floor(parseFloat(e.target.value) * 100)
+
+              setInflow(0)
+              setFormData({
+                ...formData,
+                cents: -cents,
+              })
+              setOutflow(cents / 100)
+            }}
+          />
         </div>
-        <button className="flex w-[50px] items-center justify-center p-2">
-          <div
-            className={`text-bold h-4 w-4 rounded-full border border-gray-400 bg-white text-center text-xs text-gray-600`}
-          >
-            C
-          </div>
-        </button>
+        <div
+          style={{ width: columnWidths.inflow }}
+          className="flex items-center justify-end truncate p-2 text-xs"
+        >
+          <input
+            type="number"
+            name="inflow"
+            placeholder="Inflow"
+            className="rounded px-2 py-1"
+            value={inflow || ''}
+            onChange={(e) => {
+              const cents = Math.floor(parseFloat(e.target.value) * 100)
+              setOutflow(0)
+              setFormData({
+                ...formData,
+                cents: cents,
+              })
+              setInflow(cents / 100)
+            }}
+          />
+        </div>
+        <div
+          style={{ width: columnWidths.cleared }}
+          className="flex items-center justify-end p-2"
+        >
+          <ClearedButton
+            cleared={formData.cleared}
+            onToggle={() =>
+              setFormData({ ...formData, cleared: !formData.cleared })
+            }
+          />
+        </div>
       </div>
       <div className="mb-2 mr-16 flex flex-row justify-end gap-2">
         <button
           className="rounded border border-indigo-600 px-2 py-1 text-indigo-600"
           type="button"
-          onClick={onCancel}
+          onClick={closeFunction}
         >
           Cancel
         </button>
         <button
           className="rounded bg-blue-600 px-2 py-1 text-white"
-          onClick={onSave}
+          onClick={() => {
+            closeFunction()
+            submitTransaction(formData, addTransaction)
+          }}
         >
           Save
         </button>

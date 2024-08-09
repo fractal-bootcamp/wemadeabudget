@@ -5,6 +5,7 @@ import { useState } from 'react'
 interface ColumnWidths {
   flag: number
   account: number
+  checkbox: number
   date: number
   payee: number
   category: number
@@ -26,8 +27,7 @@ interface TransactionRowProps {
   isEditing: boolean
   onSelect: () => void
   onClick: () => void
-  onCancel: () => void
-  onSave: () => void
+  closeFunction: () => void
   toggleCleared: () => void
   isCleared: boolean
 }
@@ -46,8 +46,7 @@ function TransactionRow({
   isSelected,
   onSelect,
   onClick,
-  onCancel,
-  onSave,
+  closeFunction,
   toggleCleared,
   isCleared,
 }: TransactionRowProps) {
@@ -63,12 +62,12 @@ function TransactionRow({
   })
   function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    onSave()
+    closeFunction()
   }
 
   return isEditing ? (
     //ugh i should def make this a component but i don't want to figure that out right now
-
+    //
     <form
       className="transaction-row flex flex-col bg-indigo-100 text-xs"
       onSubmit={onSubmit}
@@ -81,7 +80,7 @@ function TransactionRow({
           <input
             type="checkbox"
             className="rounded"
-            checked={isSelected}
+            checked={true}
             onChange={(e) => {
               e.stopPropagation()
               onSelect()
@@ -118,9 +117,8 @@ function TransactionRow({
           className="flex items-center truncate p-2 text-xs"
         >
           <input
-            type="text"
+            type="date"
             value={formData.date}
-            placeholder={date}
             className="mb-1 rounded"
             onChange={(e) => setFormData({ ...formData, date: e.target.value })}
           />
@@ -224,7 +222,7 @@ function TransactionRow({
       <div className="mb-2 mr-16 flex flex-row justify-end gap-2">
         <button
           className="rounded border border-indigo-600 px-2 py-1 text-indigo-600"
-          onClick={onCancel}
+          onClick={closeFunction}
           type="button"
         >
           Cancel
@@ -244,7 +242,7 @@ function TransactionRow({
     >
       <div
         className="flex flex-row items-center justify-center p-2"
-        style={{ width: columnWidths.flag }}
+        style={{ width: columnWidths.checkbox }}
       >
         <input
           type="checkbox"
