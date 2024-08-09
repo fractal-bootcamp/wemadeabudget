@@ -8,10 +8,13 @@ import {
 } from '../types'
 
 type budgetStore = {
+  loaded: boolean
   transactions: TransactionDetails[]
   accounts: AccountDetails[]
   payees: string[]
   categories: CategoryDetails[]
+  load: () => void
+  isLoaded: () => boolean
   getBalanceByAccount: (accountName: string) => number
   getBalanceByCategory: (categoryName: string) => number
   getTransactionsByAccount: (accountName: string) => TransactionDetails[]
@@ -28,10 +31,17 @@ type budgetStore = {
 }
 
 const useBudgetStore = create<budgetStore>((set, get) => ({
+  loaded: false,
   transactions: [],
   accounts: [],
   payees: [],
   categories: [],
+  load: () => {
+    set((state) => ({
+      loaded: true,
+    }))
+  },
+  isLoaded: () => get().loaded,
   /**Sums up all transactions for a given account */
   getBalanceByAccount: (accountName) =>
     get()
