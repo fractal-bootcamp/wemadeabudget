@@ -13,6 +13,7 @@ type budgetStore = {
   accounts: AccountDetails[]
   payees: string[]
   categories: CategoryDetails[]
+  getAllTransactions: () => TransactionDetails[]
   load: () => void
   isLoaded: () => boolean
   getBalanceByAccount: (accountName: string) => number
@@ -36,6 +37,7 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
   accounts: [],
   payees: [],
   categories: [],
+  getAllTransactions: () => get().transactions,
   load: () => {
     set((state) => ({
       loaded: true,

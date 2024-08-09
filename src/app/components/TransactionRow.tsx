@@ -15,7 +15,7 @@ interface ColumnWidths {
 }
 interface TransactionRowProps {
   account: string
-  date: string
+  date: Date
   payee: string
   category: string
   memo: string
@@ -118,9 +118,11 @@ function TransactionRow({
         >
           <input
             type="date"
-            value={formData.date}
+            value={formData.date.toLocaleDateString()}
             className="mb-1 rounded"
-            onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, date: new Date(e.target.value) })
+            }
           />
         </div>
         <div
@@ -276,7 +278,7 @@ function TransactionRow({
         style={{ width: columnWidths.date }}
         className="flex items-center truncate p-2 text-sm"
       >
-        <div className="truncate">{date}</div>
+        <div className="truncate">{date.toLocaleDateString()}</div>
       </div>
       <div
         style={{ width: columnWidths.payee }}

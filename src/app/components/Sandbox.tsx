@@ -1,6 +1,6 @@
 'use client'
 import Sidebar from './Sidebar'
-import AccountTable from './AccountTable'
+import AccountTable from './AccountTable/AccountTable'
 import BudgetTable from './BudgetTable'
 import TransactionRow from './TransactionRow'
 import { AccountDetails, CategoryDetails, TransactionDetails } from '../types'

@@ -1,19 +1,12 @@
 'use client'
-import TransactionRow from './TransactionRow'
-import {
-  Bookmark,
-  LucideSearch,
-  LucideUndo,
-  LucideRedo,
-  FileIcon,
-  PlusCircle,
-  SearchIcon,
-  ChevronDown,
-} from 'lucide-react'
-import ResizableColumn from './ResizableColumn'
-import TransactionForm from './TransactionForm'
-import { useState, useEffect } from 'react'
-
+import TransactionRow from '../TransactionRow'
+import { Bookmark } from 'lucide-react'
+import ResizableColumn from '../ResizableColumn'
+import TransactionForm from '../TransactionForm'
+import { useState, useEffect, useMemo } from 'react'
+import AccountsHeader from './AccountsHeader'
+import ActionBar from './ActionBar'
+import useBudgetStore from '../../stores/transactionStore'
 const defaultCategories = [
   'Restaurants',
   'Rent',
@@ -33,7 +26,7 @@ const dummyRows = [
   {
     id: '1',
     account: 'Checking',
-    date: '2023-01-01',
+    date: new Date('2023-01-01'),
     payee: 'Trader Joe',
     category: 'Food',
     memo: 'Groceries',
@@ -43,7 +36,7 @@ const dummyRows = [
   {
     id: '2',
     account: 'Savings',
-    date: '2023-01-02',
+    date: new Date('2023-01-02'),
     payee: 'Amazon',
     category: 'Shopping',
     memo: 'Books',
@@ -53,7 +46,7 @@ const dummyRows = [
   {
     id: '3',
     account: 'Credit Card',
-    date: '2023-01-03',
+    date: new Date('2023-01-03'),
     payee: 'Gas Station',
     category: 'Transport',
     memo: 'Fuel',
@@ -63,7 +56,7 @@ const dummyRows = [
   {
     id: '4',
     account: 'Checking',
-    date: '2023-01-04',
+    date: new Date('2023-01-04'),
     payee: 'Starbucks',
     category: 'Food',
     memo: 'Coffee',
@@ -73,7 +66,7 @@ const dummyRows = [
   {
     id: '5',
     account: 'Savings',
-    date: '2023-01-05',
+    date: new Date('2023-01-05'),
     payee: 'Netflix',
     category: 'Entertainment',
     memo: 'Subscription',
@@ -83,7 +76,7 @@ const dummyRows = [
   {
     id: '6',
     account: 'Checking',
-    date: '2023-01-06',
+    date: new Date('2023-01-06'),
     payee: 'Local Market',
     category: 'Food',
     memo: 'Fruits',
@@ -93,7 +86,7 @@ const dummyRows = [
   {
     id: '7',
     account: 'Checking',
-    date: '2023-01-07',
+    date: new Date('2023-01-07'),
     payee: 'Payroll',
     category: 'Income',
     memo: 'Salary',
@@ -103,7 +96,7 @@ const dummyRows = [
   {
     id: '8',
     account: 'Savings',
-    date: '2023-01-08',
+    date: new Date('2023-01-08'),
     payee: 'Interest',
     category: 'Interest',
     memo: 'Interest Payment',
@@ -112,84 +105,20 @@ const dummyRows = [
   },
 ]
 
-const AccountsHeader = () => {
-  return (
-    //TODO make these numbers dynamic
-    <div className="flex flex-col">
-      <div className="mx-4 my-2 text-xl font-semibold"> All Accounts</div>
-      <div className="flex w-full border-b border-t border-gray-300 p-2">
-        <div className="flex flex-col px-2">
-          <div> -$1400.00 </div>
-          <div className="flex items-center gap-1 text-[10px]">
-            <div className="flex h-3 w-3 items-center justify-center rounded-full bg-gray-800 font-bold text-white">
-              C
-            </div>
-            Cleared Balance
-          </div>
-        </div>
-        <div className="px-2"> + </div>
-        <div className="flex flex-col px-2">
-          <div className="text-green-600"> $1400.00 </div>
-          <div className="flex items-center gap-1 text-[10px]">
-            <div className="flex h-3 w-3 items-center justify-center rounded-full border border-gray-500 font-bold text-gray-500">
-              C
-            </div>
-            Uncleared Balance
-          </div>
-        </div>
-        <div className="px-2"> = </div>
-        <div className="flex flex-col px-2">
-          <div> $1400.00 </div>
-          <div className="text-[10px]"> Working Balance </div>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function ActionBar({ onAddTransaction }: { onAddTransaction: () => void }) {
-  return (
-    <div className="flex flex-row justify-between p-3 text-sm text-indigo-600">
-      <div className="flex flex-row gap-2">
-        <button className="flex items-center gap-1" onClick={onAddTransaction}>
-          <PlusCircle className="h-4 w-4" />
-          <span>Add Transaction</span>
-        </button>
-        <button className="flex items-center gap-1">
-          <FileIcon className="h-4 w-4" />
-          <span>File Import</span>
-        </button>
-        <button className="flex items-center gap-1">
-          <LucideUndo className="h-4 w-4" />
-          <span>Undo</span>
-        </button>
-        <button className="flex items-center gap-1">
-          <LucideRedo className="h-4 w-4" />
-          <span>Redo</span>
-        </button>
-      </div>
-      <div className="flex flex-row gap-2">
-        <button className="flex gap-1">
-          {' '}
-          View <ChevronDown className="h-4 w-4" />
-        </button>
-        <div className="flex items-center">
-          <SearchIcon className="mr-2 h-5 w-5" />
-          <input type="text" placeholder="Search" />
-        </div>
-      </div>
-    </div>
-  )
-}
-
 //truncate to prevent overflow
-
-function AccountTable() {
+interface AccountTableProps {
+  accountName: string | null
+}
+function AccountTable({ accountName }: AccountTableProps) {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
   const [clearedRows, setClearedRows] = useState<Set<string>>(new Set())
   const [editingRow, setEditingRow] = useState<string | null>(null)
   const [showAddTransactionRow, setShowAddTransactionRow] = useState(false)
-
+  const { getTransactionsByAccount, getAllTransactions } = useBudgetStore()
+  const transactionRows = accountName
+    ? getTransactionsByAccount(accountName)
+    : getAllTransactions()
+  const transactionsAndDummies = [...dummyRows, ...transactionRows]
   const [columnWidths, setColumnWidths] = useState({
     flag: 50,
     checkbox: 40,
@@ -259,8 +188,8 @@ function AccountTable() {
   function toggleSelectAll() {
     setSelectedRows((prev) => {
       const newSet = new Set(prev)
-      if (newSet.size < dummyRows.length) {
-        dummyRows.forEach((row) => newSet.add(row.id))
+      if (newSet.size < transactionsAndDummies.length) {
+        transactionsAndDummies.forEach((row) => newSet.add(row.id))
       } else {
         newSet.clear()
       }
@@ -416,7 +345,7 @@ function AccountTable() {
         />
       )}
       <div className="flex w-full flex-col">
-        {dummyRows.map((row) => (
+        {transactionsAndDummies.map((row) => (
           <TransactionRow
             key={row.id}
             {...row}

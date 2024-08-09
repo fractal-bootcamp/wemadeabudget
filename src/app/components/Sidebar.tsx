@@ -18,7 +18,12 @@ const dummyAccounts = [
   { name: 'Savings', balance: 2000 },
   { name: 'Credit Card', balance: -500 },
 ]
-
+const formatCurrency = (cents: number) => {
+  const dollars = cents / 100
+  const negative = cents < 0 ? '-' : ''
+  const strDollars = negative + '$' + Math.abs(dollars).toFixed(2)
+  return strDollars
+}
 function Sidebar() {
   const { user, isLoaded } = useUser()
   const [showDropdown, setShowDropdown] = useState(false)
@@ -26,7 +31,7 @@ function Sidebar() {
   const { accounts, getBalanceByAccount } = useBudgetStore()
   const accountsWithBalance = accounts.map((account) => ({
     ...account,
-    balance: getBalanceByAccount(account.name),
+    balance: getBalanceByAccount(account.name) ?? 0,
   }))
   const toggleDropdown = () => {
     setShowDropdown(!showDropdown)
@@ -80,9 +85,11 @@ function Sidebar() {
           </div>
           <div className="pr-6">
             {' '}
-            {accountsWithBalance.reduce(
-              (acc, account) => acc + account.balance,
-              0
+            {formatCurrency(
+              accountsWithBalance.reduce(
+                (acc, account) => acc + account.balance,
+                0
+              )
             )}
           </div>
         </button>
@@ -90,7 +97,7 @@ function Sidebar() {
           accountsWithBalance.map((account, index) => (
             <div
               className="ml-2 mr-2 flex flex-row rounded-md py-1 text-xs hover:bg-[#374D9B]"
-              key={index}
+              key={account.name}
             >
               <div className="group relative flex w-full flex-row justify-between pr-6 text-xs">
                 <Pen className="absolute left-2 top-1/2 mr-2 hidden h-3 w-3 -translate-y-1/2 transform group-hover:block" />
@@ -109,10 +116,7 @@ function Sidebar() {
                           }
                     }
                   >
-                    {account.balance > 0 ? '$' : '-$'}{' '}
-                    {account.balance > 0
-                      ? account.balance
-                      : account.balance.toString().slice(1)}
+                    {formatCurrency(account.balance)}
                   </div>
                 </button>
               </div>

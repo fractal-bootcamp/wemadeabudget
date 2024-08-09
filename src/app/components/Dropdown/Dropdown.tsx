@@ -2,10 +2,13 @@ import { useState } from 'react'
 import DropdownItem from './DropdownItem'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import DropdownSearch from './DropdownSearch'
+import AddOptionDropdownRow from './AddOptionDropdownRow'
 interface DropdownProps {
   options: string[]
   selected: string
   disabled?: boolean
+  addOptions?: boolean
+  addOptionCallback?: (option: string) => void
   setSelected: (selected: string) => void
 }
 const MAX_OPTION_LENGTH = 15
@@ -13,6 +16,8 @@ const Dropdown = ({
   options, //list of selectable options
   selected, //array of current selection passed in from parent state
   disabled = false,
+  addOptions = false,
+  addOptionCallback = () => {},
   setSelected, //selected setter function to update parent state
 }: DropdownProps) => {
   const [searchTerm, setSearchTerm] = useState('')
@@ -68,6 +73,15 @@ const Dropdown = ({
             setSearchTerm={setSearchTerm}
             setExpanded={setExpanded}
           />
+          {/* if anything has been entered into the search bar, display an option to add their query as a new option */}
+          {addOptions &&
+            searchTerm.length > 0 &&
+            !options.some((option) => option === searchTerm) && (
+              <AddOptionDropdownRow
+                addOptionCallback={addOptionCallback}
+                searchTerm={searchTerm}
+              />
+            )}
           {filteredOptions.length > 0 ? (
             filteredOptions.map((option, index) => (
               <DropdownItem
