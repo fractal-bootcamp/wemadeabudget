@@ -64,7 +64,7 @@ function TransactionRow({
     event.preventDefault()
     closeFunction()
   }
-
+  //TODO: Make edit mode show the same dropdowns as add mode
   return isEditing ? (
     //ugh i should def make this a component but i don't want to figure that out right now
     //
