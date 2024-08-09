@@ -4,7 +4,14 @@ export interface User {
   clerkId: string
 }
 export type AccountType = 'CHECKING' | 'CASH' | 'CREDIT_CARD'
-export type Flag = 'RED' | 'ORANGE' | 'YELLOW' | 'GREEN' | 'BLUE' | 'PURPLE'
+export type Flag =
+  | 'NONE'
+  | 'RED'
+  | 'ORANGE'
+  | 'YELLOW'
+  | 'GREEN'
+  | 'BLUE'
+  | 'PURPLE'
 export type TransactionDetails = {
   id: string
   account: string
