@@ -116,7 +116,7 @@ function Sidebar() {
         <CirclePlus className="h-3 w-3" /> Add Account{' '}
       </button>
       {showAddAccountModal && (
-        <AddAccountModal toggle={toggleAddAccountModal} />
+        <AddAccountModal toggleShowAccountModal={toggleAddAccountModal} />
       )}
     </div>
   )
