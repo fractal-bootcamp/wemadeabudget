@@ -2,8 +2,9 @@ import { X } from 'lucide-react'
 import { AccountDetails, AccountType, emptyAccount } from '../types'
 import { useState } from 'react'
 import { accountAdd } from '../actions/controller'
+import useBudgetStore from '../stores/transactionStore'
 
-const ACCOUNT_TYPES = [
+const ACCOUNT_TYPES: { label: string; value: AccountType }[] = [
   { label: 'Checking', value: 'CHECKING' },
   { label: 'Cash', value: 'CASH' },
   { label: 'Credit Card', value: 'CREDIT_CARD' },
@@ -22,11 +23,14 @@ const submitAccount = (
   storeSetter(acctData)
 }
 interface AddAccountModalProps {
-  toggle: () => void
+  toggleShowAccountModal: () => void
 }
 
-const AddAccountModal: React.FC<AddAccountModalProps> = ({ toggle }) => {
+const AddAccountModal: React.FC<AddAccountModalProps> = ({
+  toggleShowAccountModal,
+}) => {
   const [acctData, setAcctData] = useState<AccountDetails>(emptyAccount)
+  const { addAccount } = useBudgetStore()
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-black bg-opacity-20 font-semibold text-black">
       <div className="relative flex h-[400px] w-[300px] flex-col rounded bg-white text-sm shadow-2xl">
@@ -36,7 +40,7 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({ toggle }) => {
             Add Account{' '}
           </h1>
           <button
-            onClick={toggle}
+            onClick={toggleShowAccountModal}
             className="absolute right-3 top-3 text-indigo-700 hover:text-gray-800"
           >
             {' '}
@@ -82,7 +86,11 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({ toggle }) => {
           <button
             type="submit"
             className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-800"
-            onClick={() => submitAccount(acctData, addAccount)}
+            //TODO: add an initial balance transaction based on the blaance input
+            onClick={() => {
+              submitAccount(acctData, addAccount)
+              toggleShowAccountModal()
+            }}
           >
             {' '}
             Add Account{' '}
