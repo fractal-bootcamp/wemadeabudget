@@ -21,6 +21,7 @@ const submitAccount = (
   })
   //optimistic update to store
   storeSetter(acctData)
+  //TODO: verify and sync store after db call response
 }
 interface AddAccountModalProps {
   toggleShowAccountModal: () => void
