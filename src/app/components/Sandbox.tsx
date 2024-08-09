@@ -8,9 +8,9 @@ import useBudgetStore from '../stores/transactionStore'
 import { useEffect } from 'react'
 
 function Sandbox({ transactions }: { transactions: TransactionDetails[] }) {
-  const { addTransactions } = useBudgetStore()
+  const { addTransaction } = useBudgetStore()
   useEffect(() => {
-    addTransactions(transactions)
+    transactions.forEach(addTransaction)
     console.log(transactions)
   }, [])
   return (
