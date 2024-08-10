@@ -68,9 +68,8 @@ export default function AddCategoryModal({
         )}
       </div>
       <div className="flex justify-end gap-2">
-        <button onClick={onCancel} className="btn-secondary">
-          {' '}
-          Cancel{' '}
+        <button onClick={onCancel} className="mybtn mybtn-secondary">
+          Cancel
         </button>
         <button
           //   disabled={isDuplicate}
@@ -83,10 +82,9 @@ export default function AddCategoryModal({
               setSubmitStatus({ valid, message })
             }
           }}
-          className="btn-primary"
+          className="mybtn mybtn-primary"
         >
-          {' '}
-          OK{' '}
+          OK
         </button>
       </div>
     </div>
