@@ -56,7 +56,7 @@ function Sidebar({ setAccount }: SidebarProps) {
       <div className="flex w-full cursor-pointer flex-row items-center gap-2 rounded-md px-2 py-3 hover:bg-[#374D9B]">
         <Sprout className="h-[30px] w-[30px]" />
         {!collapsed && (
-          <div className="flex items-center">
+          <div className="flex max-h-[30px] items-center">
             <div className="flex flex-col">
               <div className="font-semibold">{firstNameDisplay} Budget</div>
               <div className="text-xs">
