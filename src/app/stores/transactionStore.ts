@@ -28,7 +28,7 @@ type budgetStore = {
   addPayee: (payee: string) => void
   removePayee: (payee: string) => void
   addCategory: (category: CategoryDetails) => void
-  removeCategory: (categoryName: string) => void
+  deleteCategory: (categoryName: string) => void
   editCategory: (
     oldName: CategoryDetails['name'],
     newDetails: CategoryDetails
@@ -104,7 +104,7 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
       }
       return { categories: [...state.categories, category] }
     }),
-  removeCategory: (categoryName) =>
+  deleteCategory: (categoryName) =>
     set((state) => ({
       categories: state.categories.filter(
         (category) => category.name !== categoryName
