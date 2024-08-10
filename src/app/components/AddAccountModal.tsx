@@ -93,7 +93,13 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
         <div className="flex justify-center border-t border-gray-400 p-4">
           <button
             className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-800"
-            //TODO: add an initial balance transaction based on the blaance input
+            /**TODO: add an initial balance transaction based on the blaance input
+             * this will involve:
+             * 1. create the account
+             * 2. create the transaction
+             *  --on the (presumably default included payee on any new account) "Initial Balance"
+             *  -- in the default category Ready To Assign
+             */
             onClick={() => {
               submitAccount(acctData, addAccount)
               toggleShowAccountModal()
