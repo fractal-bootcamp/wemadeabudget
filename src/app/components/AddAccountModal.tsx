@@ -49,7 +49,7 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
           </button>
         </div>
         <form className="flex flex-col gap-4 p-4">
-          <label> Let's go!</label>
+          <label> Let&apos;s go!</label>
           <label> Give it a nickname</label>
           <input
             className="border-gray-300px-2 rounded border px-2 py-1"

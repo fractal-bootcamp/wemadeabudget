@@ -5,7 +5,7 @@ import BudgetTable from './BudgetTable'
 import TransactionRow from './TransactionRow'
 import { AccountDetails, CategoryDetails, TransactionDetails } from '../types'
 import useBudgetStore from '../stores/transactionStore'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 interface SandboxProps {
   transactions: TransactionDetails[]
@@ -14,6 +14,7 @@ interface SandboxProps {
   payees: string[]
 }
 function Sandbox({ transactions, accounts, categories, payees }: SandboxProps) {
+  const [currentAccount, setCurrentAccount] = useState<string | null>(null)
   const { isLoaded, load, addTransaction, addAccount, addCategory, addPayee } =
     useBudgetStore()
   useEffect(() => {
@@ -27,8 +28,8 @@ function Sandbox({ transactions, accounts, categories, payees }: SandboxProps) {
   }, [])
   return (
     <div className="flex">
-      <Sidebar />
-      <AccountTable />
+      <Sidebar setAccount={setCurrentAccount} />
+      <AccountTable accountName={currentAccount} />
     </div>
   )
 }

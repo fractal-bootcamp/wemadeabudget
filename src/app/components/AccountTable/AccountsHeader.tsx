@@ -1,8 +1,14 @@
-const AccountsHeader = () => {
+interface AccountsHeaderProps {
+  accountName: string | null
+}
+const AccountsHeader = ({ accountName }: AccountsHeaderProps) => {
   return (
     //TODO make these numbers dynamic
     <div className="flex flex-col">
-      <div className="mx-4 my-2 text-xl font-semibold"> All Accounts</div>
+      <div className="mx-4 my-2 text-xl font-semibold">
+        {' '}
+        {accountName ?? 'All Accounts'}
+      </div>
       <div className="flex w-full border-b border-t border-gray-300 p-2">
         <div className="flex flex-col px-2">
           <div> -$1400.00 </div>

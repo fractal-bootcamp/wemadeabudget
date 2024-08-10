@@ -13,18 +13,18 @@ import AddAccountModal from './AddAccountModal'
 import { useUser } from '@clerk/nextjs'
 import useBudgetStore from '../stores/transactionStore'
 
-const dummyAccounts = [
-  { name: 'Checking', balance: 1000 },
-  { name: 'Savings', balance: 2000 },
-  { name: 'Credit Card', balance: -500 },
-]
 const formatCurrency = (cents: number) => {
   const dollars = cents / 100
   const negative = cents < 0 ? '-' : ''
   const strDollars = negative + '$' + Math.abs(dollars).toFixed(2)
   return strDollars
 }
-function Sidebar() {
+
+interface SidebarProps {
+  setAccount: (account: string | null) => void
+}
+
+function Sidebar({ setAccount }: SidebarProps) {
   const { user, isLoaded } = useUser()
   const [showDropdown, setShowDropdown] = useState(false)
   const [showAddAccountModal, setShowAddAccountModal] = useState(false)
@@ -46,8 +46,9 @@ function Sidebar() {
     : 'Your'
 
   return (
-    <div className="flex h-screen w-[300px] flex-col gap-4 bg-[#2c396a] pt-4 font-sans font-light text-white">
-      <div className="mx-2 flex flex-row items-center gap-2 rounded-md p-2 hover:bg-[#374D9B]">
+    <div className="flex h-screen w-[300px] flex-col items-start justify-start gap-4 bg-[#2c396a] px-2 py-4 font-sans font-light text-white">
+      {/* Top card */}
+      <div className="flex flex-row items-center gap-2 rounded-md hover:bg-[#374D9B]">
         <Sprout className="h-[30px] w-[30px]" />
         <div className="flex flex-col">
           <div className="font-semibold">{firstNameDisplay} Budget</div>
@@ -58,32 +59,39 @@ function Sidebar() {
         </div>
         <ChevronDown className="h-3 w-3" />
       </div>
-      <div className="mx-2 flex flex-row gap-3 rounded-md p-2 hover:bg-[#374D9B]">
+      <div className="flex flex-row gap-3 rounded-md hover:bg-[#374D9B]">
         <Inbox />
         <div> Budget</div>
       </div>
-      <div className="mx-2 flex flex-row gap-3 rounded-md p-2 hover:bg-[#374D9B]">
+      <div className="flex flex-row gap-3 rounded-md hover:bg-[#374D9B]">
         <ChartNoAxesCombined />
         <div> Reflect</div>
       </div>
-      <div className="mx-2 flex flex-row gap-3 rounded-md p-2 hover:bg-[#374D9B]">
+      <div
+        className="flex cursor-pointer flex-row gap-3 rounded-md hover:bg-[#374D9B]"
+        onClick={() => setAccount(null)}
+      >
         <Landmark />
         <div> All Accounts</div>
       </div>
-      <div>
+      {/* Budget box */}
+      <div className="w-full">
+        {/* Budget box header */}
         <button
-          className="flex- flex w-full justify-between rounded-md p-2 text-[12px] text-xs"
+          className="flex w-full justify-between rounded-md pr-2 text-[12px] text-xs"
           onClick={toggleDropdown}
         >
-          <div className="flex flex-row items-center gap-2">
-            {showDropdown ? (
-              <ChevronDown className="h-3 w-3" />
-            ) : (
-              <ChevronRight className="h-3 w-3" />
-            )}
+          <div className="flex flex-row items-center">
+            <div className="h-3 w-5">
+              {showDropdown ? (
+                <ChevronDown className="h-3 w-3" />
+              ) : (
+                <ChevronRight className="h-3 w-3" />
+              )}
+            </div>
             <div> BUDGET </div>
           </div>
-          <div className="pr-6">
+          <div className="text-xs">
             {' '}
             {formatCurrency(
               accountsWithBalance.reduce(
@@ -93,38 +101,47 @@ function Sidebar() {
             )}
           </div>
         </button>
-        {showDropdown &&
-          accountsWithBalance.map((account, index) => (
-            <div
-              className="ml-2 mr-2 flex flex-row rounded-md py-1 text-xs hover:bg-[#374D9B]"
-              key={account.name}
-            >
-              <div className="group relative flex w-full flex-row justify-between pr-6 text-xs">
-                <Pen className="absolute left-2 top-1/2 mr-2 hidden h-3 w-3 -translate-y-1/2 transform group-hover:block" />
-                <button className="flex w-full flex-row justify-between pl-7 text-xs">
-                  <div> {account.name} </div>
-                  <div
-                    className="flex px-1"
-                    style={
-                      account.balance > 0
-                        ? { color: 'white' }
-                        : {
-                            color: '#d10000',
-                            backgroundColor: 'white',
-                            borderRadius: 20,
-                            opacity: 0.8,
-                          }
-                    }
-                  >
-                    {formatCurrency(account.balance)}
-                  </div>
-                </button>
+        {/* Budget Accounts */}
+        <div className="flex flex-col gap-1 py-2">
+          {showDropdown &&
+            accountsWithBalance.map((account, index) => (
+              <div
+                className="group flex cursor-pointer flex-row items-center rounded-md text-xs hover:bg-[#374D9B]"
+                key={account.name}
+                onClick={() => setAccount(account.name)}
+              >
+                <div className="flex h-3 w-5 flex-row items-center justify-center">
+                  <Pen
+                    size={10}
+                    className="hidden transition-all duration-300 group-hover:block"
+                  />
+                </div>
+                <div className="flex w-full flex-row justify-between py-1 pr-2 text-xs">
+                  <button className="flex w-full flex-row justify-between text-xs">
+                    <div> {account.name} </div>
+                    <div
+                      className="flex px-1 text-xs"
+                      style={
+                        account.balance > 0
+                          ? { color: 'white' }
+                          : {
+                              color: '#d10000',
+                              backgroundColor: 'white',
+                              borderRadius: 20,
+                              opacity: 0.8,
+                            }
+                      }
+                    >
+                      {formatCurrency(account.balance)}
+                    </div>
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+        </div>
       </div>
       <button
-        className="ml-4 flex w-[150px] flex-row items-center justify-center gap-2 rounded-lg bg-white bg-opacity-20 p-2 text-xs hover:bg-opacity-30"
+        className="flex w-[125px] flex-row items-center justify-center gap-2 rounded-lg bg-white bg-opacity-20 px-2 py-1 text-xs hover:bg-opacity-30"
         onClick={toggleAddAccountModal}
       >
         {' '}

@@ -21,90 +21,6 @@ const defaultCategories = [
   'Stuff I Forgot to Budget For',
   'Celebrations',
 ]
-
-const dummyRows = [
-  {
-    id: '1',
-    account: 'Checking',
-    date: new Date('2023-01-01'),
-    payee: 'Trader Joe',
-    category: 'Food',
-    memo: 'Groceries',
-    cents: -1000,
-    cleared: true,
-  },
-  {
-    id: '2',
-    account: 'Savings',
-    date: new Date('2023-01-02'),
-    payee: 'Amazon',
-    category: 'Shopping',
-    memo: 'Books',
-    cents: -500,
-    cleared: false,
-  },
-  {
-    id: '3',
-    account: 'Credit Card',
-    date: new Date('2023-01-03'),
-    payee: 'Gas Station',
-    category: 'Transport',
-    memo: 'Fuel',
-    cents: -400,
-    cleared: true,
-  },
-  {
-    id: '4',
-    account: 'Checking',
-    date: new Date('2023-01-04'),
-    payee: 'Starbucks',
-    category: 'Food',
-    memo: 'Coffee',
-    cents: -100,
-    cleared: false,
-  },
-  {
-    id: '5',
-    account: 'Savings',
-    date: new Date('2023-01-05'),
-    payee: 'Netflix',
-    category: 'Entertainment',
-    memo: 'Subscription',
-    cents: -150,
-    cleared: true,
-  },
-  {
-    id: '6',
-    account: 'Checking',
-    date: new Date('2023-01-06'),
-    payee: 'Local Market',
-    category: 'Food',
-    memo: 'Fruits',
-    cents: -300,
-    cleared: false,
-  },
-  {
-    id: '7',
-    account: 'Checking',
-    date: new Date('2023-01-07'),
-    payee: 'Payroll',
-    category: 'Income',
-    memo: 'Salary',
-    cents: 5000,
-    cleared: true,
-  },
-  {
-    id: '8',
-    account: 'Savings',
-    date: new Date('2023-01-08'),
-    payee: 'Interest',
-    category: 'Interest',
-    memo: 'Interest Payment',
-    cents: 200,
-    cleared: true,
-  },
-]
-
 //truncate to prevent overflow
 interface AccountTableProps {
   accountName: string | null
@@ -118,7 +34,6 @@ function AccountTable({ accountName }: AccountTableProps) {
   const transactionRows = accountName
     ? getTransactionsByAccount(accountName)
     : getAllTransactions()
-  const transactionsAndDummies = [...dummyRows, ...transactionRows]
   const [columnWidths, setColumnWidths] = useState({
     flag: 50,
     checkbox: 40,
@@ -188,8 +103,8 @@ function AccountTable({ accountName }: AccountTableProps) {
   function toggleSelectAll() {
     setSelectedRows((prev) => {
       const newSet = new Set(prev)
-      if (newSet.size < transactionsAndDummies.length) {
-        transactionsAndDummies.forEach((row) => newSet.add(row.id))
+      if (newSet.size < transactionRows.length) {
+        transactionRows.forEach((row) => newSet.add(row.id))
       } else {
         newSet.clear()
       }
@@ -232,15 +147,11 @@ function AccountTable({ accountName }: AccountTableProps) {
     setShowAddTransactionRow(false)
   }
 
-  function handleCancelAddTransaction() {
-    setShowAddTransactionRow(false)
-  }
-
   return (
     // i think this code is very redundant and might simplify later, but works
     <div className="w-full overflow-x-auto">
       <div className="min-w-max">
-        <AccountsHeader />
+        <AccountsHeader accountName={accountName} />
         <ActionBar onAddTransaction={toggleShowAddTransactionRow} />
         <div className="flex flex-row items-stretch border-b border-l border-t border-gray-300 text-[10px] text-gray-500">
           <div
@@ -345,7 +256,7 @@ function AccountTable({ accountName }: AccountTableProps) {
         />
       )}
       <div className="flex w-full flex-col">
-        {transactionsAndDummies.map((row) => (
+        {transactionRows.map((row) => (
           <TransactionRow
             key={row.id}
             {...row}
