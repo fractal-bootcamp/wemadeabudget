@@ -29,6 +29,10 @@ type budgetStore = {
   removePayee: (payee: string) => void
   addCategory: (category: CategoryDetails) => void
   removeCategory: (categoryName: string) => void
+  editCategory: (
+    oldName: CategoryDetails['name'],
+    newDetails: CategoryDetails
+  ) => void
 }
 
 const useBudgetStore = create<budgetStore>((set, get) => ({
@@ -94,15 +98,28 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
       payees: state.payees.filter((p) => p !== payee),
     })),
   addCategory: (category) =>
-    set((state) => ({
-      categories: [...state.categories, category],
-    })),
+    set((state) => {
+      if (state.categories.find((c) => c.name === category.name)) {
+        throw new Error('Category already exists')
+      }
+      return { categories: [...state.categories, category] }
+    }),
   removeCategory: (categoryName) =>
     set((state) => ({
       categories: state.categories.filter(
         (category) => category.name !== categoryName
       ),
     })),
+  editCategory: (oldName, newDetails) => {
+    set((state) => ({
+      categories: state.categories.map((category) => {
+        if (category.name === oldName) {
+          return newDetails
+        }
+        return category
+      }),
+    }))
+  },
 }))
 
 export default useBudgetStore

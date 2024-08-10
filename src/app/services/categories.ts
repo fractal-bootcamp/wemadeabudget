@@ -25,7 +25,7 @@ const mutations = {
               id: userId,
             },
           },
-          allocated: 0,
+          allocated: details.allocated || 0,
         },
       })
       return newCategory

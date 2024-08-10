@@ -28,6 +28,7 @@ enum AccountType {
   CHECKING
   CASH
   CREDIT_CARD
+  SAVINGS
 }
 
 model User {
@@ -52,13 +53,13 @@ model Transaction {
   memo       String
   cleared    Boolean
   flag       Flag
-  user       User     @relation(fields: [userId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
-  category   Category @relation(fields: [categoryId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   categoryId String
-  account    Account  @relation(fields: [accountId], references: [id])
+  account    Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId  String
-  payee      Payee    @relation(fields: [payeeId], references: [id])
+  payee      Payee    @relation(fields: [payeeId], references: [id], onDelete: Cascade)
   payeeId    String
 }
 
@@ -67,11 +68,9 @@ model Category {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   name         String
-  allocated    Int
-  user         User          @relation(fields: [userId], references: [id])
+  allocated    Int           @default(0)
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String
-  // categoryGroup CategoryGroup @relation(fields: [categoryGroupId], references: [id])
-  // categoryGroupId String?
   transactions Transaction[]
 
   @@unique(name: "categoryId", fields: [userId, name])
@@ -83,7 +82,7 @@ model Account {
   updatedAt    DateTime      @updatedAt
   name         String
   type         AccountType
-  user         User          @relation(fields: [userId], references: [id])
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String
   transactions Transaction[]
 
@@ -95,7 +94,7 @@ model Payee {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   name         String
-  user         User          @relation(fields: [userId], references: [id])
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String
   transactions Transaction[]
 

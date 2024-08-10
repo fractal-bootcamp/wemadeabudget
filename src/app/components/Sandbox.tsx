@@ -1,12 +1,14 @@
 'use client'
 import Sidebar from './Sidebar'
 import AccountTable from './AccountTable/AccountTable'
-import BudgetTable from './BudgetTable'
+import BudgetTable from './BudgetTable/BudgetTable'
 import TransactionRow from './TransactionRow'
 import { AccountDetails, CategoryDetails, TransactionDetails } from '../types'
 import useBudgetStore from '../stores/transactionStore'
 import { useEffect, useState } from 'react'
+import Reflect from './ReflectPage/Reflect'
 
+const pages = ['budget', 'reflect', 'accounts']
 interface SandboxProps {
   transactions: TransactionDetails[]
   accounts: AccountDetails[]
@@ -15,6 +17,7 @@ interface SandboxProps {
 }
 function Sandbox({ transactions, accounts, categories, payees }: SandboxProps) {
   const [currentAccount, setCurrentAccount] = useState<string | null>(null)
+  const [currentPage, setCurrentPage] = useState('budget')
   const { isLoaded, load, addTransaction, addAccount, addCategory, addPayee } =
     useBudgetStore()
   useEffect(() => {
@@ -28,8 +31,23 @@ function Sandbox({ transactions, accounts, categories, payees }: SandboxProps) {
   }, [])
   return (
     <div className="flex">
-      <Sidebar setAccount={setCurrentAccount} />
-      <AccountTable accountName={currentAccount} />
+      <Sidebar
+        setCurrentAccount={(page: string | null) => {
+          setCurrentPage('account')
+          setCurrentAccount(page)
+        }}
+        setCurrentPage={setCurrentPage}
+      />
+      {(() => {
+        switch (currentPage) {
+          case 'account':
+            return <AccountTable accountName={currentAccount} />
+          case 'budget':
+            return <BudgetTable />
+          case 'reflect':
+            return <Reflect />
+        }
+      })()}
     </div>
   )
 }

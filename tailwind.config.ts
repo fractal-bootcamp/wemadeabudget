@@ -4,6 +4,9 @@ const config: Config = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
     extend: {
+      animation: {
+        'ping-slow': 'ping 4s cubic-bezier(0, 0, 0.2, 1) infinite',
+      },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
         'gradient-conic':
@@ -16,7 +19,7 @@ const config: Config = {
   },
   plugins: [daisyui],
   daisyui: {
-    themes: ['light'],
+    themes: [],
   },
 }
 export default config
