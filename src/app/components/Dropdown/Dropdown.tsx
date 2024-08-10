@@ -6,6 +6,7 @@ import AddOptionDropdownRow from './AddOptionDropdownRow'
 interface DropdownProps {
   options: string[]
   selected: string
+  label?: string
   disabled?: boolean
   addOptions?: boolean
   addOptionCallback?: (option: string) => void
@@ -15,6 +16,7 @@ const MAX_OPTION_LENGTH = 15
 const Dropdown = ({
   options, //list of selectable options
   selected, //array of current selection passed in from parent state
+  label,
   disabled = false,
   addOptions = false,
   addOptionCallback = () => {},
@@ -24,7 +26,7 @@ const Dropdown = ({
   const [expanded, setExpanded] = useState(false)
   const dropDownDisplayText = () => {
     if (!selected) {
-      return 'Select...'
+      return `${label ?? 'Select'}...`
     } else {
       return selected.length > MAX_OPTION_LENGTH
         ? selected.slice(0, MAX_OPTION_LENGTH) + '...'

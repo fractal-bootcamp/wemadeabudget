@@ -106,6 +106,7 @@ function TransactionForm({
             <Dropdown
               options={accounts.map((account) => account.name)}
               selected={formData.account}
+              label="Account"
               setSelected={(selection: string) => {
                 setFormData({ ...formData, account: selection })
               }}
@@ -135,6 +136,7 @@ function TransactionForm({
             options={payees}
             selected={formData.payee}
             addOptions={true}
+            label="Payee"
             addOptionCallback={(newPayeeName: string) =>
               addNewPayee(newPayeeName, addPayee)
             }
@@ -150,6 +152,7 @@ function TransactionForm({
           <Dropdown
             options={categories.map((category) => category.name)}
             selected={formData.category}
+            label="Category"
             addOptions={true}
             addOptionCallback={(newCategoryName: string) =>
               addNewCategory(newCategoryName, addCategory)
@@ -228,7 +231,7 @@ function TransactionForm({
           />
         </div>
       </div>
-      <div className="mb-2 mr-16 flex flex-row justify-end gap-2">
+      <div className="mr-2 flex flex-row justify-end gap-2">
         <button
           className="rounded border border-indigo-600 px-2 py-1 text-indigo-600"
           type="button"
