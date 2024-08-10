@@ -5,7 +5,7 @@ import BudgetActionBar from './BudgetActionBar'
 import { CategoryDetails } from '../../types'
 import { categoryAdd } from '../../actions/controller'
 import AddCategoryModal from './AddCategoryModal'
-
+//TODO: add handling for duplicates etc
 const saveNewCategory = async (
   name: string,
   storeSetter: (details: CategoryDetails) => void

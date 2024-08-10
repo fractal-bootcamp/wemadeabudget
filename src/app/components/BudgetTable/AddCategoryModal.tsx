@@ -18,9 +18,12 @@ export default function AddCategoryModal({
     addCategory: store.addCategory,
   }))
   const [categoryName, setCategoryName] = useState('')
+  const isDuplicate = categories.some(
+    (category) => category.name === categoryName
+  )
   const [showError, setShowError] = useState(false)
   return (
-    <div className="shadow-top absolute top-full -translate-x-1/4 translate-y-4 rounded-md border bg-white p-3 shadow-2xl">
+    <div className="shadow-top absolute top-full flex -translate-x-1/4 translate-y-4 flex-col gap-2 rounded-md border bg-white p-3 shadow-2xl">
       <div className="absolute -top-2 left-1/2 h-4 w-4 -translate-x-1/2 rotate-45 transform border-transparent border-b-white bg-white shadow-2xl" />
       <div
         className={`border ${showError ? `border-red-300` : `border-gray-200`} rounded p-2`}
@@ -37,17 +40,18 @@ export default function AddCategoryModal({
           The category name is required.
         </div>
       )}
-      <div className="mt-4 flex justify-end">
-        <button
-          onClick={onCancel}
-          className="rounded-lg bg-indigo-100 px-4 py-2 text-blue-600 hover:bg-indigo-200"
-        >
+      <div className="flex justify-end gap-2">
+        <button onClick={onCancel} className="btn-secondary">
           {' '}
           Cancel{' '}
         </button>
         <button
-          onClick={() => onSave(categoryName, addCategory)}
-          className="ml-2 rounded-lg bg-blue-600 px-4 py-2 text-white hover:bg-blue-800"
+          disabled={isDuplicate}
+          onClick={() => {
+            onSave(categoryName, addCategory)
+            onCancel()
+          }}
+          className="btn-primary"
         >
           {' '}
           OK{' '}
