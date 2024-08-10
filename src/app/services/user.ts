@@ -1,4 +1,5 @@
 import prisma from '../client'
+import { defaults } from '../types'
 const queries = {
   findUserByClerkId: async (clerkId: string) => {
     const user = await prisma.user.findUnique({
@@ -28,6 +29,15 @@ const mutations = {
         clerkId: clerkId,
         email: email ?? '',
         username: username ?? '',
+        accounts: {
+          create: defaults.accounts,
+        },
+        categories: {
+          create: defaults.categories,
+        },
+        payees: {
+          create: defaults.payees,
+        },
       },
     })
     return user
