@@ -150,7 +150,7 @@ function AccountTable({ accountName }: AccountTableProps) {
   return (
     // i think this code is very redundant and might simplify later, but works
     <div className="w-full overflow-x-auto">
-      <div className="min-w-max">
+      <div className="min-w-full">
         <AccountsHeader accountName={accountName} />
         <ActionBar onAddTransaction={toggleShowAddTransactionRow} />
         <div className="flex flex-row items-stretch border-b border-l border-t border-gray-300 text-[10px] text-gray-500">
