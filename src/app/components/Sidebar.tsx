@@ -46,9 +46,9 @@ function Sidebar({ setAccount }: SidebarProps) {
     : 'Your'
 
   return (
-    <div className="flex h-screen w-[300px] flex-col items-start justify-start gap-4 bg-[#2c396a] px-2 py-4 font-sans font-light text-white">
+    <div className="flex h-screen w-[300px] flex-col items-start justify-start gap-2 bg-[#2c396a] px-2 py-4 font-sans font-light text-white">
       {/* Top card */}
-      <div className="flex flex-row items-center gap-2 rounded-md hover:bg-[#374D9B]">
+      <div className="flex w-full cursor-pointer flex-row items-center gap-2 rounded-md px-2 py-3 hover:bg-[#374D9B]">
         <Sprout className="h-[30px] w-[30px]" />
         <div className="flex flex-col">
           <div className="font-semibold">{firstNameDisplay} Budget</div>
@@ -59,16 +59,16 @@ function Sidebar({ setAccount }: SidebarProps) {
         </div>
         <ChevronDown className="h-3 w-3" />
       </div>
-      <div className="flex flex-row gap-3 rounded-md hover:bg-[#374D9B]">
+      <div className="flex w-full cursor-pointer flex-row gap-3 rounded-md px-2 py-3 hover:bg-[#374D9B]">
         <Inbox />
         <div> Budget</div>
       </div>
-      <div className="flex flex-row gap-3 rounded-md hover:bg-[#374D9B]">
+      <div className="flex w-full cursor-pointer flex-row gap-3 rounded-md px-2 py-3 hover:bg-[#374D9B]">
         <ChartNoAxesCombined />
         <div> Reflect</div>
       </div>
       <div
-        className="flex cursor-pointer flex-row gap-3 rounded-md hover:bg-[#374D9B]"
+        className="flex w-full cursor-pointer flex-row gap-3 rounded-md px-2 py-3 hover:bg-[#374D9B]"
         onClick={() => setAccount(null)}
       >
         <Landmark />
@@ -106,14 +106,14 @@ function Sidebar({ setAccount }: SidebarProps) {
           {showDropdown &&
             accountsWithBalance.map((account, index) => (
               <div
-                className="group flex cursor-pointer flex-row items-center rounded-md text-xs hover:bg-[#374D9B]"
+                className="group flex cursor-pointer flex-row items-center rounded-md py-1 text-xs hover:bg-[#374D9B]"
                 key={account.name}
                 onClick={() => setAccount(account.name)}
               >
-                <div className="flex h-3 w-5 flex-row items-center justify-center">
+                <div className="flex h-3 w-6 flex-row items-center justify-start px-1 text-white opacity-50 hover:opacity-100">
                   <Pen
                     size={10}
-                    className="hidden transition-all duration-300 group-hover:block"
+                    className="hidden transition-all duration-200 group-hover:block"
                   />
                 </div>
                 <div className="flex w-full flex-row justify-between py-1 pr-2 text-xs">
