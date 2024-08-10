@@ -3,7 +3,7 @@ import useBudgetStore from '../../stores/transactionStore'
 import BudgetHeader from './BudgetHeader'
 import BudgetActionBar from './BudgetActionBar'
 import { CategoryDetails } from '../../types'
-import { categoryAdd } from '../../actions/controller'
+import { categoryAdd, categoryUpdate } from '../../actions/controller'
 import AddCategoryModal from './AddCategoryModal'
 //TODO: add handling for duplicates etc
 const saveNewCategory = async (
@@ -23,7 +23,7 @@ const updateExistingCategory = async (
   //update existing category in store
   storeUpdater(details)
   //update existing category in database
-  const updatedCategory = await categoryAdd(details)
+  const updatedCategory = await categoryUpdate(details)
   console.log(`Category updated: ${updatedCategory.name}`)
 }
 export default function BudgetTable() {
