@@ -73,7 +73,7 @@ export default function AddCategoryModal({
           Cancel{' '}
         </button>
         <button
-          disabled={isDuplicate}
+          //   disabled={isDuplicate}
           onClick={() => {
             const { valid, message } = checkSubmit(categoryName, categories)
             if (valid) {
