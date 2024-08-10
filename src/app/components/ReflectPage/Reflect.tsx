@@ -1,10 +1,13 @@
 import Image from 'next/image'
-
+import { Figtree } from 'next/font/google'
+const figtree = Figtree({ subsets: ['latin'], weight: '600' })
 export default function Reflect() {
   return (
-    <div className="flex w-full items-center justify-center">
-      <div className="flex flex-col items-center justify-center">
-        Reflect on your finances...
+    <div className="flex w-full items-center justify-center bg-white">
+      <div className="flex flex-col items-center justify-center gap-4">
+        <span className={`${figtree.className}`}>
+          Reflect on your finances...
+        </span>
         <div className="flex items-end justify-center">
           <Image src="/lotus.svg" alt="lotus" width={100} height={100} />
           <div className="relative flex flex-col items-center justify-center">
