@@ -3,7 +3,7 @@ export interface User {
   email: string
   clerkId: string
 }
-export type AccountType = 'CHECKING' | 'CASH' | 'CREDIT_CARD'
+export type AccountType = 'CHECKING' | 'CASH' | 'CREDIT_CARD' | 'SAVINGS'
 export type Flag =
   | 'NONE'
   | 'RED'
@@ -48,6 +48,7 @@ export type CategoryDetails = {
   allocated: number
   // categoryGroupName: string;
 }
+
 export interface AccountDetails {
   name: string
   type: AccountType
@@ -58,4 +59,39 @@ export const emptyAccount: AccountDetails = {
 }
 export interface Category {
   name: string
+}
+export interface PayeeDetails {
+  name: string
+}
+
+const defaultCategoryNames = [
+  'Restaurants',
+  'Rent',
+  'Utilities',
+  'Renters Insurance',
+  'Phone',
+  'Internet',
+  'Music',
+  'Groceries',
+  'Train/Bus Fare',
+  'Personal Care',
+  'Stuff I Forgot to Budget For',
+  'Celebrations',
+]
+const defaultAccounts: AccountDetails[] = [
+  { name: 'Checking', type: 'CHECKING' },
+  { name: 'Savings', type: 'SAVINGS' },
+  { name: 'Cash', type: 'CASH' },
+  { name: 'Credit Card', type: 'CREDIT_CARD' },
+]
+const defaultPayees = ['Starting balance']
+interface Defaults {
+  categories: CategoryDetails[]
+  accounts: AccountDetails[]
+  payees: PayeeDetails[]
+}
+export const defaults: Defaults = {
+  categories: defaultCategoryNames.map((name) => ({ name, allocated: 0 })),
+  accounts: defaultAccounts,
+  payees: defaultPayees.map((name) => ({ name })),
 }

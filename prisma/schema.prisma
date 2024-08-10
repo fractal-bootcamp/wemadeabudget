@@ -28,6 +28,7 @@ enum AccountType {
   CHECKING
   CASH
   CREDIT_CARD
+  SAVINGS
 }
 
 model User {
@@ -67,7 +68,7 @@ model Category {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   name         String
-  allocated    Int
+  allocated    Int           @default(0)
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String
   transactions Transaction[]
