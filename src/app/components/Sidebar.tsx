@@ -85,7 +85,7 @@ function Sidebar({ setAccount }: SidebarProps) {
         {!collapsed && <div> All Accounts</div>}
       </div>
       {!collapsed && (
-        <div>
+        <div className="w-full">
           {/* Budget box */}
           <div className="w-full">
             {/* Budget box header */}
