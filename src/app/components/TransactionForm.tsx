@@ -1,11 +1,38 @@
 'use client'
-import { transactionAdd } from '../actions/controller'
-import { emptyTransaction, TransactionDetails } from '../types'
+import { categoryAdd, payeeAdd, transactionAdd } from '../actions/controller'
+import { CategoryDetails, emptyTransaction, TransactionDetails } from '../types'
 import FlagToggle from './FlagToggle'
 import ClearedButton from './ClearedButton'
 import { useState } from 'react'
 import useBudgetStore from '../stores/transactionStore'
+import Dropdown from './Dropdown/Dropdown'
 
+const addNewPayee = (
+  newPayeeName: string,
+  storeSetter: (payeeName: string) => void
+) => {
+  console.log(`Adding new payee: ${newPayeeName}`)
+  //optimistic update to store
+  storeSetter(newPayeeName)
+  //send to db
+  payeeAdd(newPayeeName).then((res) => {
+    console.log(`Payee added: ${JSON.stringify(res)}`)
+  })
+}
+
+const addNewCategory = (
+  newCategoryName: string,
+  storeSetter: (details: CategoryDetails) => void
+) => {
+  const newCategory: CategoryDetails = { name: newCategoryName, allocated: 0 }
+  console.log(`Adding new category: ${newCategory}`)
+  //optimistic update to store
+  storeSetter(newCategory)
+  //send to db
+  categoryAdd(newCategory).then((res) => {
+    console.log(`Category added: ${JSON.stringify(res)}`)
+  })
+}
 const submitTransaction = (
   formData: TransactionDetails,
   storeSetter: (data: TransactionDetails) => void
@@ -30,10 +57,17 @@ function TransactionForm({
   showAccount,
   closeFunction,
 }: TransactionFormProps) {
+  const {
+    accounts,
+    payees,
+    categories,
+    addCategory,
+    addPayee,
+    addTransaction,
+  } = useBudgetStore()
   const [formData, setFormData] = useState<TransactionDetails>(emptyTransaction)
   const [inflow, setInflow] = useState(0)
   const [outflow, setOutflow] = useState(0)
-  const { addTransaction } = useBudgetStore()
   return (
     <form className="flex flex-col bg-indigo-100 text-xs">
       <div className="flex flex-row">
@@ -69,16 +103,12 @@ function TransactionForm({
             style={{ width: columnWidths.account }}
             className="flex items-center truncate p-2 text-xs"
           >
-            <input
-              type="text"
-              name="account"
-              placeholder="Account"
-              className="rounded px-2 py-1"
-              value={formData.account}
-              onChange={(e) =>
-                setFormData({ ...formData, account: e.target.value })
-              }
-              required
+            <Dropdown
+              options={accounts.map((account) => account.name)}
+              selected={formData.account}
+              setSelected={(selection: string) => {
+                setFormData({ ...formData, account: selection })
+              }}
             />
           </div>
         )}
@@ -101,31 +131,32 @@ function TransactionForm({
           style={{ width: columnWidths.payee }}
           className="flex items-center truncate p-2 text-xs"
         >
-          <input
-            type="text"
-            name="payee"
-            placeholder="Payee"
-            className="rounded px-2 py-1"
-            value={formData.payee}
-            onChange={(e) =>
-              setFormData({ ...formData, payee: e.target.value })
+          <Dropdown
+            options={payees}
+            selected={formData.payee}
+            addOptions={true}
+            addOptionCallback={(newPayeeName: string) =>
+              addNewPayee(newPayeeName, addPayee)
             }
-            required
+            setSelected={(selection: string) => {
+              setFormData({ ...formData, payee: selection })
+            }}
           />
         </div>
         <div
           style={{ width: columnWidths.category }}
           className="flex items-center truncate p-2 text-xs"
         >
-          <input
-            type="text"
-            name="category"
-            placeholder="Category"
-            value={formData.category}
-            onChange={(e) =>
-              setFormData({ ...formData, category: e.target.value })
+          <Dropdown
+            options={categories.map((category) => category.name)}
+            selected={formData.category}
+            addOptions={true}
+            addOptionCallback={(newCategoryName: string) =>
+              addNewCategory(newCategoryName, addCategory)
             }
-            className="rounded px-2 py-1"
+            setSelected={(selection: string) => {
+              setFormData({ ...formData, category: selection })
+            }}
           />
         </div>
         <div
