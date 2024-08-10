@@ -23,10 +23,11 @@ const formatCurrency = (cents: number) => {
 }
 
 interface SidebarProps {
-  setAccount: (account: string | null) => void
+  setCurrentAccount: (account: string | null) => void
+  setCurrentPage: (page: string) => void
 }
 
-function Sidebar({ setAccount }: SidebarProps) {
+function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
   const { user, isLoaded } = useUser()
   const [collapsed, setCollapsed] = useState(false) // hides the sidebar
   const [showBudgets, setShowBudgets] = useState(false)
@@ -69,17 +70,23 @@ function Sidebar({ setAccount }: SidebarProps) {
           </div>
         )}
       </div>
-      <div className="flex w-full cursor-pointer flex-row gap-3 rounded-md px-2 py-3 hover:bg-[#374D9B]">
+      <div
+        onClick={() => setCurrentPage('budget')}
+        className="flex w-full cursor-pointer flex-row gap-3 rounded-md px-2 py-3 hover:bg-[#374D9B]"
+      >
         <Inbox />
         {!collapsed && <div> Budget</div>}
       </div>
-      <div className="flex w-full cursor-pointer flex-row gap-3 rounded-md px-2 py-3 hover:bg-[#374D9B]">
+      <div
+        onClick={() => setCurrentPage('reflect')}
+        className="flex w-full cursor-pointer flex-row gap-3 rounded-md px-2 py-3 hover:bg-[#374D9B]"
+      >
         <ChartNoAxesCombined />
         {!collapsed && <div> Reflect</div>}
       </div>
       <div
         className="flex w-full cursor-pointer flex-row gap-3 rounded-md px-2 py-3 hover:bg-[#374D9B]"
-        onClick={() => setAccount(null)}
+        onClick={() => setCurrentAccount(null)}
       >
         <Landmark />
         {!collapsed && <div> All Accounts</div>}
@@ -120,7 +127,7 @@ function Sidebar({ setAccount }: SidebarProps) {
                   <div
                     className="group flex cursor-pointer flex-row items-center rounded-md py-1 text-xs hover:bg-[#374D9B]"
                     key={account.name}
-                    onClick={() => setAccount(account.name)}
+                    onClick={() => setCurrentAccount(account.name)}
                   >
                     <div className="flex h-3 w-6 flex-row items-center justify-start px-1 text-white opacity-50 hover:opacity-100">
                       <Pen
