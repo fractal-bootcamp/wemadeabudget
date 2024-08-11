@@ -1,3 +1,4 @@
+import { UserButton } from "@clerk/nextjs"
 interface AccountsHeaderProps {
   accountName: string | null
 }
@@ -5,9 +6,10 @@ const AccountsHeader = ({ accountName }: AccountsHeaderProps) => {
   return (
     //TODO make these numbers dynamic
     <div className="flex flex-col">
-      <div className="mx-4 my-2 text-xl font-semibold">
+      <div className="mx-4 my-2 text-xl font-semibold flex justify-between">
         {' '}
         {accountName ?? 'All Accounts'}
+        <UserButton />
       </div>
       <div className="flex w-full border-b border-t border-gray-300 p-2">
         <div className="flex flex-col px-2">

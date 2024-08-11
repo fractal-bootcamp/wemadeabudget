@@ -108,13 +108,17 @@ function TransactionForm({
             onChange={(date: Date | null) =>
               setFormData({ ...formData, date: date || new Date() })
             }
-            dateFormat="yyyy-MM-dd"
+            dateFormat="MM-dd-yyyy"
             customInput={
               <div className="relative">
                 <input
                   value={
                     formData.date
-                      ? formData.date.toLocaleDateString('en-CA')
+                      ? formData.date.toLocaleDateString('en-US', {
+                          month: '2-digit',
+                          day: '2-digit',
+                          year: 'numeric',
+                        })
                       : ''
                   }
                   readOnly
