@@ -8,7 +8,7 @@ export default function SignUpOrIn() {
     <div
       className={`${figtree.className} flex h-screen w-screen flex-col items-center justify-center gap-5 bg-slate-100 text-indigo-700`}
     >
-      <span className="animate-[fadeIn_2s_forwards] text-5xl opacity-0">
+      <span className="animate-[fadeIn_2s_forwards] text-center text-5xl opacity-0">
         🌱 We Need A Budget
       </span>
       <SignInButton mode="modal">
