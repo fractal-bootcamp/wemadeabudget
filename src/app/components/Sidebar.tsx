@@ -14,13 +14,7 @@ import { useState } from 'react'
 import AddAccountModal from './AddAccountModal'
 import { useUser } from '@clerk/nextjs'
 import useBudgetStore from '../stores/transactionStore'
-
-const formatCurrency = (cents: number) => {
-  const dollars = cents / 100
-  const negative = cents < 0 ? '-' : ''
-  const strDollars = negative + '$' + Math.abs(dollars).toFixed(2)
-  return strDollars
-}
+import { centsToDollarString } from '../util/utils'
 
 interface SidebarProps {
   setCurrentAccount: (account: string | null) => void
@@ -112,7 +106,7 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
               </div>
               <div className="text-xs">
                 {' '}
-                {formatCurrency(
+                {centsToDollarString(
                   accountsWithBalance.reduce(
                     (acc, account) => acc + account.balance,
                     0
@@ -151,7 +145,7 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
                                 }
                           }
                         >
-                          {formatCurrency(account.balance)}
+                          {centsToDollarString(account.balance)}
                         </div>
                       </button>
                     </div>

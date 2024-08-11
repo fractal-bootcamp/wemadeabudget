@@ -2,24 +2,30 @@
 import { Bookmark } from 'lucide-react'
 import { useState } from 'react'
 import { categoryAdd, payeeAdd, transactionAdd } from '../actions/controller'
-import { CategoryDetails, emptyTransaction, TransactionDetails, Flag } from '../types'
+import {
+  CategoryDetails,
+  emptyTransaction,
+  TransactionDetails,
+  Flag,
+} from '../types'
 import useBudgetStore from '../stores/transactionStore'
 import Dropdown from './Dropdown/Dropdown'
 import FlagToggle from './FlagToggle'
 import ClearedButton from './ClearedButton'
 import TransactionForm from './TransactionForm'
+import { centsToDollarString } from '../util/utils'
 
 interface ColumnWidths {
-  [key: string]: number;
-  flag: number;
-  account: number;
-  checkbox: number;
-  date: number;
-  payee: number;
-  category: number;
-  memo: number;
-  outflow: number;
-  inflow: number;
+  [key: string]: number
+  flag: number
+  account: number
+  checkbox: number
+  date: number
+  payee: number
+  category: number
+  memo: number
+  outflow: number
+  inflow: number
 }
 interface TransactionRowProps {
   id: string
@@ -117,21 +123,21 @@ function TransactionRow({
   //TODO: Make edit mode show the same dropdowns as add mode
   return isEditing ? (
     <TransactionForm
-    columnWidths={columnWidths}
-    showAccount={showAccount}
-    closeFunction={closeFunction}
-    existingTransaction={{
-      id,
-      account,
-      date,
-      payee,
-      category,
-      memo,
-      cents,
-      cleared,
-      flag,
-    }}
-  />
+      columnWidths={columnWidths}
+      showAccount={showAccount}
+      closeFunction={closeFunction}
+      existingTransaction={{
+        id,
+        account,
+        date,
+        payee,
+        category,
+        memo,
+        cents,
+        cleared,
+        flag,
+      }}
+    />
   ) : (
     <div
       className={`transaction-row flex ${isSelected ? 'bg-indigo-100' : ''}`}
@@ -198,7 +204,7 @@ function TransactionRow({
         className="flex items-center justify-end truncate p-2 text-sm"
       >
         <div className="truncate">
-          {cents < 0 ? `-$${Math.abs(cents / 100).toFixed(2)}` : ''}
+          {cents < 0 ? centsToDollarString(cents) : ''}
         </div>
       </div>
       <div
@@ -206,7 +212,7 @@ function TransactionRow({
         className="flex items-center justify-end truncate p-2 text-sm"
       >
         <div className="truncate">
-          {cents > 0 ? `$${(cents / 100).toFixed(2)}` : ''}
+          {cents > 0 ? centsToDollarString(cents) : ''}
         </div>
       </div>
       <button
@@ -226,4 +232,3 @@ function TransactionRow({
 }
 
 export default TransactionRow
-
