@@ -57,11 +57,10 @@ export default function BudgetTable() {
     editCategory: store.editCategory,
     getTransactionsByCategory: store.getTransactionsByCategory,
   }))
-  const [sortedCategories, setSortedCategories] = useState(
-    categories.sort((a, b) =>
-      a.name.toLocaleLowerCase() < b.name.toLocaleLowerCase() ? -1 : 1
-    )
+  const sortedCategories = [...categories].sort((a, b) =>
+    a.name.toLocaleLowerCase() < b.name.toLocaleLowerCase() ? -1 : 1
   )
+
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false)
   const [currentEditCategory, setCurrentEditCategory] = useState('')
   const [selectedCategories, setSelectedCategories] = useState(new Set())
@@ -103,7 +102,7 @@ export default function BudgetTable() {
       {/* Model underly */}
       {(currentEditCategory !== '' || showAddCategoryModal) && (
         <div
-          className="bg=transparent fixed inset-0 z-50 h-full w-full"
+          className="fixed inset-0 z-50 h-full w-full bg-transparent"
           onClick={(e) => {
             e.stopPropagation()
             setCurrentEditCategory('')
