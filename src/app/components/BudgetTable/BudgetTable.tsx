@@ -1,10 +1,15 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import useBudgetStore from '../../stores/transactionStore'
 import BudgetHeader from './BudgetHeader'
 import BudgetActionBar from './BudgetActionBar'
 import { CategoryDetails } from '../../types'
-import { categoryAdd, categoryUpdate } from '../../actions/controller'
+import {
+  categoryAdd,
+  categoryDelete,
+  categoryUpdate,
+} from '../../actions/controller'
 import AddCategoryModal from './AddCategoryModal'
+import BudgetTableRow from './BudgetTableRow'
 //TODO: add handling for duplicates etc
 const saveNewCategory = async (
   name: string,
@@ -26,6 +31,16 @@ const updateExistingCategory = async (
   const updatedCategory = await categoryUpdate(details)
   console.log(`Category updated: ${updatedCategory.name}`)
 }
+const deleteCategory = async (
+  categoryName: string,
+  storeDeleter: (categoryName: string) => void
+) => {
+  //delete category from store
+  storeDeleter(categoryName)
+  //delete category from database
+  const deletedCategory = await categoryDelete(categoryName)
+  console.log(`Category deleted: ${deletedCategory.name}`)
+}
 export default function BudgetTable() {
   const {
     categories,
@@ -34,14 +49,25 @@ export default function BudgetTable() {
     editCategory,
     getTransactionsByCategory,
   } = useBudgetStore((store) => ({
-    categories: store.categories,
+    categories: store.categories.reverse(),
     addCategory: store.addCategory,
-    removeCategory: store.removeCategory,
+    removeCategory: store.deleteCategory,
     editCategory: store.editCategory,
     getTransactionsByCategory: store.getTransactionsByCategory,
   }))
-  const [selectedCategories, setSelectedCategories] = useState(new Set())
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false)
+  const [currentEditCategory, setCurrentEditCategory] = useState('')
+  const [selectedCategories, setSelectedCategories] = useState(new Set())
+  const selectAllRef = useRef<HTMLInputElement>(null)
+  //we control the master checkbox with a ref bc we need to use indeterminate
+  useEffect(() => {
+    if (!selectAllRef.current) return
+    //set to checked if all are now selected
+    selectAllRef.current.checked = selectedCategories.size === categories.length
+    //set to indeterminate if any but not all are selected
+    selectAllRef.current.indeterminate =
+      selectedCategories.size > 0 && selectedCategories.size < categories.length
+  }, [selectedCategories])
   /**Returns total of all transactions for a given category in cents */
   const categoryActivity = (categoryName: string) => {
     const transactions = getTransactionsByCategory(categoryName)
@@ -51,20 +77,33 @@ export default function BudgetTable() {
     )
     return totalCents
   }
-  const toggleCategory = (category: string) => () => {
+  const categorySelectionToggle = (category: string) => () => {
     setSelectedCategories((prev) => {
       const newSet = new Set(prev)
-      if (newSet.has(category)) {
-        newSet.delete(category)
-      } else {
-        newSet.add(category)
-      }
+      newSet.has(category) ? newSet.delete(category) : newSet.add(category)
       return newSet
     })
+  }
+  const toggleSelectAll = () => {
+    const anySelected = selectedCategories.size > 0
+    setSelectedCategories(
+      anySelected ? new Set() : new Set(categories.map((c) => c.name))
+    )
   }
 
   return (
     <div className="flex w-full flex-col text-xs">
+      {/* Model underly */}
+      {(currentEditCategory !== '' || showAddCategoryModal) && (
+        <div
+          className="bg=transparent fixed inset-0 z-50 h-full w-full"
+          onClick={(e) => {
+            e.stopPropagation()
+            setCurrentEditCategory('')
+            setShowAddCategoryModal(false)
+          }}
+        />
+      )}
       <BudgetHeader />
       <div className="relative">
         <BudgetActionBar
@@ -75,7 +114,12 @@ export default function BudgetTable() {
       </div>
       <div className="flex items-stretch border-b border-l border-t border-gray-300 text-gray-500">
         <div className="flex w-[40px] items-center justify-center border-r border-gray-300 p-2">
-          <input type="checkbox" className="h-3 w-3" />
+          <input
+            type="checkbox"
+            ref={selectAllRef}
+            className="h-3 w-3"
+            onChange={toggleSelectAll}
+          />
         </div>
         <div className="flex w-[55%] p-2">CATEGORY</div>
         <div className="flex w-[15%] justify-end p-2 pr-3">ASSIGNED</div>
@@ -83,44 +127,22 @@ export default function BudgetTable() {
         <div className="flex w-[15%] justify-end p-2 pr-3">AVAILABLE</div>
       </div>
 
-      {categories.map((category, index) => {
-        const activityCents = categoryActivity(category.name)
-        const availableCents = category.allocated - activityCents
-        return (
-          <div
-            key={index}
-            className="flex items-stretch border-b border-gray-300 py-2 pr-4"
-          >
-            <div className="flex w-[40px] items-center justify-center">
-              <input
-                type="checkbox"
-                className="h-3 w-3"
-                checked={selectedCategories.has(category.name)}
-                onChange={toggleCategory(category.name)}
-              />
-            </div>
-            <div className="w-[55%] truncate"> {category.name} </div>
-            <div className="w-[15%] truncate text-right">
-              {' '}
-              {category.allocated >= 0
-                ? `$${(category.allocated / 100).toFixed(2)}`
-                : `-$${(-category.allocated / 100).toFixed(2)}`}{' '}
-            </div>
-            <div className="w-[15%] truncate text-right">
-              {' '}
-              {activityCents >= 0
-                ? `$${(activityCents / 100).toFixed(2)}`
-                : `-$${(-activityCents / 100).toFixed(2)}`}{' '}
-            </div>
-            <div className="w-[15%] truncate text-right">
-              {' '}
-              {availableCents >= 0
-                ? `$${(availableCents / 100).toFixed(2)}`
-                : `-$${(-availableCents / 100).toFixed(2)}`}{' '}
-            </div>
-          </div>
-        )
-      })}
+      {categories.map((category, index) => (
+        <BudgetTableRow
+          key={category.name}
+          name={category.name}
+          allocated={category.allocated}
+          editing={currentEditCategory === category.name}
+          toggleEdit={() =>
+            setCurrentEditCategory(
+              currentEditCategory === category.name ? '' : category.name
+            )
+          }
+          selected={selectedCategories.has(category.name)}
+          toggleSelect={categorySelectionToggle(category.name)}
+          activityCents={categoryActivity(category.name)}
+        />
+      ))}
     </div>
   )
 }
