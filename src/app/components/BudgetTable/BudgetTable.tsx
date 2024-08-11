@@ -51,12 +51,17 @@ export default function BudgetTable() {
     editCategory,
     getTransactionsByCategory,
   } = useBudgetStore((store) => ({
-    categories: store.categories.reverse(),
+    categories: store.categories,
     addCategory: store.addCategory,
     removeCategory: store.deleteCategory,
     editCategory: store.editCategory,
     getTransactionsByCategory: store.getTransactionsByCategory,
   }))
+  const [sortedCategories, setSortedCategories] = useState(
+    categories.sort((a, b) =>
+      a.name.toLocaleLowerCase() < b.name.toLocaleLowerCase() ? -1 : 1
+    )
+  )
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false)
   const [currentEditCategory, setCurrentEditCategory] = useState('')
   const [selectedCategories, setSelectedCategories] = useState(new Set())
@@ -129,7 +134,7 @@ export default function BudgetTable() {
         <div className="flex w-[15%] justify-end p-2 pr-3">AVAILABLE</div>
       </div>
 
-      {categories.map((category, index) => (
+      {sortedCategories.map((category, index) => (
         <BudgetTableRow
           key={category.name}
           name={category.name}
