@@ -52,17 +52,21 @@ const mutations = {
     })
     return deletedCategory
   },
-  updateCategory: async (userId: string, details: CategoryDetails) => {
+  updateCategory: async (
+    userId: string,
+    oldName: string,
+    newDetails: CategoryDetails
+  ) => {
     const updatedCategory = await prisma.category.update({
       where: {
         categoryId: {
-          name: details.name,
+          name: oldName,
           userId: userId,
         },
       },
       data: {
-        name: details.name,
-        allocated: details.allocated,
+        name: newDetails.name,
+        allocated: newDetails.allocated,
       },
     })
     return updatedCategory
@@ -74,8 +78,8 @@ const categoryServices = {
     mutations.addCategory(userId, details),
   delete: (userId: string, categoryName: string) =>
     mutations.deleteCategory(userId, categoryName),
-  update: (userId: string, details: CategoryDetails) =>
-    mutations.updateCategory(userId, details),
+  update: (userId: string, oldName: string, newDetails: CategoryDetails) =>
+    mutations.updateCategory(userId, oldName, newDetails),
 }
 
 export default categoryServices
