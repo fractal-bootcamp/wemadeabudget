@@ -21,16 +21,18 @@ const saveNewCategory = async (
   const newCategory = await categoryAdd({ name, allocated: 0 })
   console.log(`New category added: ${newCategory}`)
 }
-const updateExistingCategory = async (
-  details: CategoryDetails,
-  storeUpdater: (details: CategoryDetails) => void
-) => {
-  //update existing category in store
-  storeUpdater(details)
-  //update existing category in database
-  const updatedCategory = await categoryUpdate(details)
-  console.log(`Category updated: ${updatedCategory.name}`)
-}
+// TODO: decide if we want thi defined here or in the modal as it is now
+// const updateExistingCategory = async (
+//   oldName: string,
+//   newDetails: CategoryDetails,
+//   storeUpdater: (oldName: string, newDetails: CategoryDetails) => void
+// ) => {
+//   //update existing category in store
+//   storeUpdater(oldName, newDetails)
+//   //update existing category in database
+//   const updatedCategory = await categoryUpdate(oldName, newDetails)
+//   console.log(`Category updated: ${updatedCategory.name}`)
+// }
 const deleteCategory = async (
   categoryName: string,
   storeDeleter: (categoryName: string) => void
