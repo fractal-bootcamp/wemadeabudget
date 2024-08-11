@@ -150,11 +150,11 @@ function TransactionForm({
          <DatePicker
             selected={formData.date}
             onChange={(date: Date | null) => setFormData({ ...formData, date: date || new Date() })}
-            dateFormat="yyyy-MM-dd"
+            dateFormat="MM-dd-yyyy"
             customInput={
                 <div className="relative">
                     <input
-                    value={formData.date ? formData.date.toLocaleDateString('en-CA') : ''}
+                    value={formData.date ? formData.date.toLocaleDateString('en-US', { month: '2-digit', day: '2-digit', year: 'numeric' }) : ''}
                     readOnly
                     className={`${formData.date ? 'text-black' : 'text-gray-400'} bg-white flex w-full items-center justify-between rounded-md border border-blue-700 py-1 px-2`}
                     style={{ width: '100%', maxWidth: '150px' }}
@@ -268,7 +268,7 @@ function TransactionForm({
           />
         </div>
       </div>
-      <div className="mr-16 flex flex-row justify-end gap-2">
+      <div className="mr-16 flex flex-row justify-end mb-2 gap-2">
         <button
           className="rounded border border-indigo-600 px-2 py-1 text-indigo-600"
           type="button"

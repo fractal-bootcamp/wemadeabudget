@@ -164,38 +164,38 @@ function TransactionRow({
       {showAccount && (
         <div
           style={{ width: columnWidths.account }}
-          className="flex items-center truncate p-2 text-sm"
+          className="flex items-center truncate p-2 text-xs"
         >
           <div className="truncate">{account}</div>
         </div>
       )}
       <div
         style={{ width: columnWidths.date }}
-        className="flex items-center truncate p-2 text-sm"
+        className="flex items-center truncate p-2 text-xs"
       >
         <div className="truncate">{date.toLocaleDateString()}</div>
       </div>
       <div
         style={{ width: columnWidths.payee }}
-        className="flex items-center truncate p-2 text-sm"
+        className="flex items-center truncate p-2 text-xs"
       >
         <div className="truncate">{payee}</div>
       </div>
       <div
         style={{ width: columnWidths.category }}
-        className="flex items-center truncate p-2 text-sm"
+        className="flex items-center truncate p-2 text-xs"
       >
         <div className="truncate">{category}</div>
       </div>
       <div
         style={{ width: columnWidths.memo }}
-        className="flex items-center truncate p-2 text-sm"
+        className="flex items-center truncate p-2 text-xs"
       >
         <div className="truncate">{memo}</div>
       </div>
       <div
         style={{ width: columnWidths.outflow }}
-        className="flex items-center justify-end truncate p-2 text-sm"
+        className="flex items-center justify-end truncate p-2 text-xs"
       >
         <div className="truncate">
           {cents < 0 ? `-$${Math.abs(cents / 100).toFixed(2)}` : ''}
@@ -203,7 +203,7 @@ function TransactionRow({
       </div>
       <div
         style={{ width: columnWidths.inflow }}
-        className="flex items-center justify-end truncate p-2 text-sm"
+        className="flex items-center justify-end truncate p-2 text-xs"
       >
         <div className="truncate">
           {cents > 0 ? `$${(cents / 100).toFixed(2)}` : ''}

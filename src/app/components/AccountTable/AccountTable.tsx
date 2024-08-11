@@ -38,7 +38,7 @@ function AccountTable({ accountName }: AccountTableProps) {
     flag: 50,
     checkbox: 40,
     account: 150,
-    date: 120,
+    date: 130,
     payee: 200,
     category: 300,
     memo: 350,
