@@ -140,6 +140,7 @@ function AccountTable({ accountName }: AccountTableProps) {
   function toggleShowAddTransactionRow() {
     setShowAddTransactionRow((prev) => !prev)
     setSelectedRows(new Set())
+    setEditingRow(null)
   }
 
   const closeEditingRow = () => {
