@@ -65,6 +65,7 @@ export interface PayeeDetails {
 }
 
 const defaultCategoryNames = [
+  'Ready To Assign',
   'Restaurants',
   'Rent',
   'Utilities',
