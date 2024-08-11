@@ -85,7 +85,7 @@ const defaultAccounts: AccountDetails[] = [
   { name: 'Cash', type: 'CASH' },
   { name: 'Credit Card', type: 'CREDIT_CARD' },
 ]
-const defaultPayees = ['Starting balance']
+const defaultPayees = ['Starting Balance']
 interface Defaults {
   categories: CategoryDetails[]
   accounts: AccountDetails[]
