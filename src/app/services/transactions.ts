@@ -121,10 +121,17 @@ const mutations = {
           },
         },
         category: {
-          connect: {
-            categoryId: {
-              userId: userId,
+          connectOrCreate: {
+            where: {
+              categoryId: {
+                userId: userId,
+                name: details.category,
+              },
+            },
+            create: {
               name: details.category,
+              userId: userId,
+              allocated: 0,
             },
           },
         },
