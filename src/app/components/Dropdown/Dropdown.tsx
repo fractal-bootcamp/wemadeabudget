@@ -10,7 +10,8 @@ interface DropdownProps {
   disabled?: boolean
   addOptions?: boolean
   addOptionCallback?: (option: string) => void
-  setSelected: (selected: string) => void
+  setSelected: (selected: string) => void,
+  className?: string
 }
 const MAX_OPTION_LENGTH = 15
 const Dropdown = ({
@@ -20,7 +21,8 @@ const Dropdown = ({
   disabled = false,
   addOptions = false,
   addOptionCallback = () => {},
-  setSelected, //selected setter function to update parent state
+  setSelected, //selected setter function to update parent state,
+  className = ''
 }: DropdownProps) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [expanded, setExpanded] = useState(false)
@@ -45,14 +47,14 @@ const Dropdown = ({
   }
   return (
     <div
-      className="cursor-pointer text-xs"
-      // tabIndex makes the dropdown focusable so that onBlur can close it
+      className={`cursor-pointer text-xs w-full ${className}`} 
+    // tabIndex makes the dropdown focusable so that onBlur can close it
       tabIndex={0}
       onBlur={() => setExpanded(false)}
     >
       {/* Dropdown header/unexpanded display */}
       <div
-        className={`${selected.length === 0 ? 'text-gray-400' : 'text-black'} ${disabled ? 'bg-slate-200 text-gray-400' : 'bg-white'} flex w-[150px] items-center justify-between rounded-lg border border-slate-500 py-2 pl-4 pr-2`}
+        className={`${selected.length === 0 ? 'text-gray-400' : 'text-black'} ${disabled ? 'bg-slate-200 text-gray-400' : 'bg-white'} flex w-full items-center justify-between rounded-md border border-blue-700 py-1 pl-2 pr-2`}
         onClick={() => !disabled && setExpanded(!expanded)}
       >
         <div className="overflow-hidden text-nowrap">

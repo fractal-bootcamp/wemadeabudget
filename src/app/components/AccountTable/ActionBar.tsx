@@ -14,21 +14,21 @@ function ActionBar({ onAddTransaction }: { onAddTransaction: () => void }) {
           <PlusCircle className="h-4 w-4" />
           <span>Add Transaction</span>
         </button>
-        <button className="flex items-center gap-1">
+        <button className="flex items-center gap-1 text-indigo-300">
           <FileIcon className="h-4 w-4" />
           <span>File Import</span>
         </button>
-        <button className="flex items-center gap-1">
+        <button className="flex items-center gap-1 text-indigo-300">
           <LucideUndo className="h-4 w-4" />
           <span>Undo</span>
         </button>
-        <button className="flex items-center gap-1">
+        <button className="flex items-center gap-1 text-indigo-300">
           <LucideRedo className="h-4 w-4" />
           <span>Redo</span>
         </button>
       </div>
       <div className="flex flex-row gap-2">
-        <button className="flex gap-1">
+        <button className="flex gap-1 text-indigo-300">
           {' '}
           View <ChevronDown className="h-4 w-4" />
         </button>
