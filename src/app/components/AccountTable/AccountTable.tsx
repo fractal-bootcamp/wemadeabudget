@@ -37,13 +37,13 @@ function AccountTable({ accountName }: AccountTableProps) {
   const [columnWidths, setColumnWidths] = useState({
     flag: 50,
     checkbox: 40,
-    account: 100,
-    date: 100,
-    payee: 120,
-    category: 120,
-    memo: 210,
-    outflow: 80,
-    inflow: 80,
+    account: 150,
+    date: 120,
+    payee: 200,
+    category: 300,
+    memo: 350,
+    outflow: 120,
+    inflow: 120,
     cleared: 50,
   })
 
@@ -140,6 +140,7 @@ function AccountTable({ accountName }: AccountTableProps) {
   function toggleShowAddTransactionRow() {
     setShowAddTransactionRow((prev) => !prev)
     setSelectedRows(new Set())
+    setEditingRow(null)
   }
 
   const closeEditingRow = () => {
@@ -149,7 +150,7 @@ function AccountTable({ accountName }: AccountTableProps) {
 
   return (
     // i think this code is very redundant and might simplify later, but works
-    <div className="w-full overflow-x-auto">
+    <div className="w-full h-full overflow-x-scroll min-w-[750px]">
       <div className="min-w-full">
         <AccountsHeader accountName={accountName} />
         <ActionBar onAddTransaction={toggleShowAddTransactionRow} />
