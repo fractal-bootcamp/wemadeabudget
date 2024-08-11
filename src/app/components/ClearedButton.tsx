@@ -13,8 +13,7 @@ export default function ClearedButton({
   return (
     <button
       onClick={onToggle}
-      className={`flex h-2 w-2 items-center justify-center rounded-full border border-gray-400 font-bold ${cleared ? 'bg-green-400' : 'bg-white'} p-2 text-center text-xs text-gray-600`}
-    >
+      className={`h-4 w-4 rounded-full ${cleared ? 'bg-green-600 text-white' : 'border border-gray-400 bg-white text-gray-600'} text-bold text-center text-xs`}    >
       C
       <input type="hidden" name="cleared" value="false" />
     </button>
