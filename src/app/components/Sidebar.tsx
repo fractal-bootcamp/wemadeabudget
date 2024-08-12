@@ -16,6 +16,7 @@ import EditAccountModal from './EditAccountModal'
 import { useUser } from '@clerk/nextjs'
 import useBudgetStore from '../stores/transactionStore'
 import { formatCentsToDollarString } from '../util/utils'
+import { AccountDetails } from '../types'
 
 interface SidebarProps {
   setCurrentAccount: (account: string | null) => void
@@ -27,8 +28,9 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false) // hides the sidebar
   const [showBudgets, setShowBudgets] = useState(false)
   const [showAddAccountModal, setShowAddAccountModal] = useState(false)
-  const [showEditAccountModal, setShowEditAccountModal] = useState(false)
-  const [editingAccount, setEditingAccount] = useState<string | null>(null)
+  const [editingAccount, setEditingAccount] = useState<AccountDetails | null>(
+    null
+  )
   const { accounts, getBalanceByAccount } = useBudgetStore()
   const accountsWithBalance = accounts.map((account) => ({
     ...account,
@@ -43,10 +45,6 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
     console.log('toggleAddAccountModal')
   }
 
-  const toggleEditAccountModal = (accountName: string | null) => {
-    setShowEditAccountModal((prev) => !prev)
-    setEditingAccount(accountName)
-  } 
   const firstNameDisplay = isLoaded
     ? `${user?.firstName ?? user?.username}'s`
     : 'Your'
@@ -133,7 +131,10 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
                   >
                     <div className="flex h-3 w-6 flex-row items-center justify-start px-1 text-white opacity-50 hover:opacity-100">
                       <Pen
-                        onClick={() => toggleEditAccountModal(account.name)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          setEditingAccount(account)
+                        }}
                         size={10}
                         className="hidden transition-all duration-200 group-hover:block"
                       />
@@ -173,8 +174,12 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
           {showAddAccountModal && (
             <AddAccountModal toggleShowAccountModal={toggleAddAccountModal} />
           )}
-          {showEditAccountModal && (
-            <EditAccountModal toggleEditAccountModal={toggleEditAccountModal} accountName={editingAccount} />
+          {editingAccount && (
+            <EditAccountModal
+              closeModal={() => setEditingAccount(null)}
+              setCurrentAccount={setCurrentAccount}
+              account={editingAccount}
+            />
           )}
         </div>
       )}
