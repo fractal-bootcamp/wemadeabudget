@@ -34,9 +34,9 @@ interface UpdateParams<T> {
 export const updateStoreAndDb = <T>(params: UpdateParams<T>) => {
   const { dbFunction, storeFunction, payload, method } = params
   const messages: Record<Method, string> = {
-    [METHODS.ADD]: `adding: ${payload}`,
-    [METHODS.UPDATE]: `updating: ${payload}`,
-    [METHODS.DELETE]: `deleting: ${payload}`,
+    [METHODS.ADD]: `adding ${JSON.stringify(payload)}`,
+    [METHODS.UPDATE]: `updating ${JSON.stringify(payload)}`,
+    [METHODS.DELETE]: `deleting ${JSON.stringify(payload)}`,
   }
   console.log(`Database: ${messages[method]}`)
   dbFunction(payload).then((res) => {
