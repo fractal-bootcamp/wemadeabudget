@@ -64,8 +64,7 @@ export interface PayeeDetails {
   name: string
 }
 
-const defaultCategoryNames = [
-  'Ready To Assign',
+const defaultCategories = [
   'Restaurants',
   'Rent',
   'Utilities',
@@ -78,8 +77,8 @@ const defaultCategoryNames = [
   'Personal Care',
   'Stuff I Forgot to Budget For',
   'Celebrations',
-  'Uncategorized',
 ]
+const defaultPermanetCategories = ['Uncategorized', 'Ready To Assign']
 const defaultAccounts: AccountDetails[] = [
   { name: 'Checking', type: 'CHECKING' },
   { name: 'Savings', type: 'SAVINGS' },
@@ -88,12 +87,14 @@ const defaultAccounts: AccountDetails[] = [
 ]
 const defaultPayees = ['Starting Balance']
 interface Defaults {
-  categories: CategoryDetails[]
+  categories: string[]
+  permanentCategories: string[]
   accounts: AccountDetails[]
   payees: PayeeDetails[]
 }
 export const defaults: Defaults = {
-  categories: defaultCategoryNames.map((name) => ({ name, allocated: 0 })),
+  categories: defaultCategories,
+  permanentCategories: defaultPermanetCategories,
   accounts: defaultAccounts,
   payees: defaultPayees.map((name) => ({ name })),
 }

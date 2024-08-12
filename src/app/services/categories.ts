@@ -10,7 +10,6 @@ const queries = {
         },
       },
     })
-    return categories
   },
 }
 
@@ -28,7 +27,6 @@ const mutations = {
           allocated: 0,
         },
       })
-      return newCategory
     } catch (error) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
@@ -42,6 +40,49 @@ const mutations = {
     }
   },
   deleteCategory: async (userId: string, categoryName: string) => {
+    const permanent = await prisma.category.findUnique({
+      where: {
+        categoryId: {
+          name: categoryName,
+          userId: userId,
+        },
+      },
+      select: {
+        permanent: true,
+      },
+    })
+    if (permanent) {
+      throw new Error('Cannot delete a permanent category.')
+    }
+    // Upsert the Uncategorized category
+    const uncategorizedCategory = await prisma.category.upsert({
+      where: {
+        categoryId: {
+          name: 'Uncategorized',
+          userId: userId,
+        },
+      },
+      update: {}, // No updates needed if it exists
+      create: {
+        name: 'Uncategorized',
+        userId: userId,
+        allocated: 0,
+      },
+    })
+    //Move all transactions in the category to the Uncategorized category
+    await prisma.transaction.updateMany({
+      where: {
+        category: {
+          name: categoryName,
+          userId: userId,
+        },
+      },
+      data: {
+        categoryId: uncategorizedCategory.id,
+      },
+    })
+
+    // Then, delete the category
     const deletedCategory = await prisma.category.delete({
       where: {
         categoryId: {
@@ -50,7 +91,6 @@ const mutations = {
         },
       },
     })
-    return deletedCategory
   },
   updateCategory: async (
     userId: string,
@@ -68,7 +108,6 @@ const mutations = {
         allocated: categoryUpdatePayload.newDetails.allocated,
       },
     })
-    return updatedCategory
   },
 }
 type CategoryUpdatePayload = {

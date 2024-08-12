@@ -33,7 +33,14 @@ const mutations = {
           create: defaults.accounts,
         },
         categories: {
-          create: defaults.categories,
+          create: [
+            ...defaults.categories.map((name) => ({ name, allocated: 0 })),
+            ...defaults.permanentCategories.map((name) => ({
+              name,
+              allocated: 0,
+              permanent: true,
+            })),
+          ],
         },
         payees: {
           create: defaults.payees,
