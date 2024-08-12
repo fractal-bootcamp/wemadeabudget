@@ -12,7 +12,7 @@ import Dropdown from '../Dropdown/Dropdown'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { ChevronDown, CircleAlert } from 'lucide-react'
-import { submitStatus, updateStoreAndDb } from '../../util/utils'
+import { METHODS, submitStatus, updateStoreAndDb } from '../../util/utils'
 import {
   dbCategoryAdd,
   dbPayeeAdd,
@@ -306,7 +306,7 @@ function TransactionForm({
               dbFunction: dbFunc,
               storeFunction: storeFunc,
               payload: formData,
-              method: 'ADD',
+              method: existingTransaction ? METHODS.UPDATE : METHODS.ADD,
             })
             closeFunction()
           }}
