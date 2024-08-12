@@ -40,9 +40,7 @@ export const updateStoreAndDb = <T>(params: UpdateParams<T>) => {
   }
   console.log(`Database: ${messages[method]}`)
   dbFunction(payload).then((res) => {
-    console.log(
-      `Database response: ${JSON.stringify(res.status.ok ? res.status : res.status.error)}`
-    )
+    console.log(`Database response: ${JSON.stringify(res)}`)
   })
   console.log(`Store: ${messages[method]}`)
   storeFunction(payload)
