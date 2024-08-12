@@ -260,8 +260,8 @@ function AccountTable({ accountName }: AccountTableProps) {
         {transactionRows.map((row) => (
           <TransactionRow
             key={row.id}
-            {...row}
-            showAccount={true}
+            transactionDetails={row}
+            showAccount={!!accountName}
             columnWidths={columnWidths}
             isSelected={selectedRows.has(row.id)}
             isEditing={editingRow === row.id}
@@ -269,7 +269,6 @@ function AccountTable({ accountName }: AccountTableProps) {
             onClick={() => handleRowClick(row.id)}
             closeFunction={closeEditingRow}
             toggleCleared={() => toggleCleared(row.id)}
-            isCleared={clearedRows.has(row.id)}
           />
         ))}
       </div>
