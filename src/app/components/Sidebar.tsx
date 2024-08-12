@@ -29,7 +29,7 @@ interface SidebarProps {
 function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
   const { user, isLoaded } = useUser()
   const [collapsed, setCollapsed] = useState(false) // hides the sidebar
-  const [showBudgets, setShowBudgets] = useState(false)
+  const [showBudgets, setShowBudgets] = useState(true)
   const [showAddAccountModal, setShowAddAccountModal] = useState(false)
   const [showUserDropdown, setShowUserDropdown] = useState(false)
   const [editingAccount, setEditingAccount] = useState<AccountDetails | null>(
@@ -112,7 +112,7 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
                       fill={isUserIconHovered ? 'gray' : 'black'}
                     />
                   </div>
-                  {!collapsed && <div>Manage Account</div>}
+                  {!collapsed && <div>Account</div>}
                 </div>
                 <div className="absolute inset-0 h-full w-full rounded-md bg-transparent">
                   <UserButton
