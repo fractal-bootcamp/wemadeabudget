@@ -54,11 +54,12 @@ function TransactionForm({
   const dbFunc = existingTransaction ? dbTransactionUpdate : dbTransactionAdd
   const storeFunc = existingTransaction ? updateTransaction : addTransaction
   return (
-    <div className="flex flex-col bg-indigo-100 text-xs">
-      <div className="flex flex-row">
+    <div className="flex flex-col gap-1 bg-indigo-100 p-2 text-xs">
+      {/* Details/edit fields */}
+      <div className="flex flex-row gap-2">
         {/* dummy always selected checkbox */}
         <div
-          className="flex items-center justify-center px-1 py-2"
+          className="flex items-center justify-center"
           style={{ width: columnWidths.checkbox }}
         >
           <input
@@ -70,7 +71,7 @@ function TransactionForm({
         </div>
         {/* Flag */}
         <div
-          className="flex items-center justify-center px-1 py-2"
+          className="flex items-center justify-center"
           style={{ width: columnWidths.flag }}
         >
           <FlagToggle
@@ -86,7 +87,7 @@ function TransactionForm({
         {showAccount && (
           <div
             style={{ width: columnWidths.account }}
-            className="flex w-full items-center truncate px-1 py-2 text-xs"
+            className="flex w-full items-center truncate text-xs"
           >
             <Dropdown
               options={accounts.map((account) => account.name)}
@@ -100,7 +101,7 @@ function TransactionForm({
         )}
         <div
           style={{ width: columnWidths.date }}
-          className="flex items-center px-1 py-2 text-xs"
+          className="flex items-center text-xs"
         >
           <DatePicker
             selected={formData.date}
@@ -127,7 +128,7 @@ function TransactionForm({
         </div>
         <div
           style={{ width: columnWidths.payee }}
-          className="flex items-center truncate px-1 py-2 text-xs"
+          className="flex items-center truncate text-xs"
         >
           <Dropdown
             options={payees}
@@ -149,7 +150,7 @@ function TransactionForm({
         </div>
         <div
           style={{ width: columnWidths.category }}
-          className="flex items-center truncate px-1 py-2 text-xs"
+          className="flex items-center truncate text-xs"
         >
           <Dropdown
             options={categories.map((category) => category.name)}
@@ -171,7 +172,7 @@ function TransactionForm({
         </div>
         <div
           style={{ width: columnWidths.memo }}
-          className="flex items-center truncate px-1 py-2 text-xs"
+          className="flex items-center truncate text-xs"
         >
           <input
             type="text"
@@ -184,7 +185,7 @@ function TransactionForm({
         </div>
         <div
           style={{ width: columnWidths.outflow }}
-          className="flex items-center justify-end truncate px-1 py-2 text-xs"
+          className="flex items-center justify-end truncate text-xs"
         >
           <input
             type="number"
@@ -207,7 +208,7 @@ function TransactionForm({
         </div>
         <div
           style={{ width: columnWidths.inflow }}
-          className="flex items-center justify-end truncate px-1 py-2 text-xs"
+          className="flex items-center justify-end truncate text-xs"
         >
           <input
             type="number"
@@ -228,7 +229,7 @@ function TransactionForm({
         </div>
         <div
           style={{ width: columnWidths.cleared }}
-          className="flex items-center justify-center px-1 py-2"
+          className="flex items-center justify-center"
         >
           <ClearedButton
             cleared={formData.cleared}
@@ -238,16 +239,17 @@ function TransactionForm({
           />
         </div>
       </div>
-      <div className="mr-16 flex flex-row justify-end gap-2">
+      {/* Buttons */}
+      <div className="flex w-[150px] flex-row justify-start gap-2 self-end">
         <button
-          className="rounded border border-indigo-600 px-2 py-1 text-indigo-600"
+          className="rounded-lg border border-indigo-600 px-4 py-1 text-indigo-600"
           type="button"
           onClick={closeFunction}
         >
           Cancel
         </button>
         <button
-          className="rounded bg-blue-600 px-2 py-1 text-white"
+          className="rounded-lg bg-blue-600 px-4 py-1 text-white"
           onClick={() => {
             updateStoreAndDb({
               dbFunction: dbFunc,
