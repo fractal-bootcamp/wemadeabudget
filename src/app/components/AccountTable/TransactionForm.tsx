@@ -11,8 +11,8 @@ import useBudgetStore from '../../stores/transactionStore'
 import Dropdown from '../Dropdown/Dropdown'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
-import { ChevronDown } from 'lucide-react'
-import { updateStoreAndDb } from '../../util/utils'
+import { ChevronDown, CircleAlert } from 'lucide-react'
+import { submitStatus, updateStoreAndDb } from '../../util/utils'
 import {
   dbCategoryAdd,
   dbPayeeAdd,
@@ -27,7 +27,23 @@ type TransactionFormProps = {
   existingTransaction?: TransactionDetails
   accountName?: string
 }
-
+const validateTransactionSubmission = (
+  newTransaction: TransactionDetails
+): submitStatus => {
+  if (newTransaction.account === '') {
+    return { valid: false, message: 'Account is required' }
+  }
+  if (newTransaction.date === null) {
+    return { valid: false, message: 'Date is required' }
+  }
+  if (newTransaction.payee === '') {
+    return { valid: false, message: 'Payee is required' }
+  }
+  if (newTransaction.category === '') {
+    return { valid: false, message: 'Category is required' }
+  }
+  return { valid: true, message: '' }
+}
 function TransactionForm({
   columnWidths,
   showAccount,
@@ -47,7 +63,10 @@ function TransactionForm({
   const [formData, setFormData] = useState<TransactionDetails>(
     existingTransaction || { ...emptyTransaction, account: accountName || '' }
   )
-
+  const [errorStatus, setErrorStatus] = useState<submitStatus>({
+    valid: true,
+    message: '',
+  })
   const [inflow, setInflow] = useState(
     formData.cents > 0 ? formData.cents / 100 : 0
   )
@@ -57,7 +76,10 @@ function TransactionForm({
   const dbFunc = existingTransaction ? dbTransactionUpdate : dbTransactionAdd
   const storeFunc = existingTransaction ? updateTransaction : addTransaction
   return (
-    <div className="flex flex-col gap-1 bg-indigo-100 px-0 py-2 text-xs">
+    <div
+      className="flex flex-col gap-1 bg-indigo-100 px-0 py-2 text-xs"
+      onClick={() => setErrorStatus({ valid: true, message: '' })}
+    >
       {/* Details/edit fields */}
       <div className="flex flex-row gap-0 px-1">
         {/* dummy always selected checkbox */}
@@ -255,9 +277,15 @@ function TransactionForm({
       </div>
       {/* Buttons */}
       <div
-        className="flex flex-row justify-end gap-2"
+        className="flex flex-row justify-end gap-2 self-end"
         style={{ marginRight: `${columnWidths.cleared}px` }}
       >
+        {!errorStatus.valid && (
+          <div className="flex items-center justify-center gap-1 rounded bg-red-300 px-2 text-sm text-black">
+            <CircleAlert size={18} />
+            {errorStatus.message}
+          </div>
+        )}
         <button
           className="rounded-lg border border-indigo-600 px-4 py-1 text-indigo-600"
           type="button"
@@ -267,7 +295,13 @@ function TransactionForm({
         </button>
         <button
           className="rounded-lg bg-blue-600 px-4 py-1 text-white"
-          onClick={() => {
+          onClick={(e) => {
+            e.stopPropagation()
+            const status = validateTransactionSubmission(formData)
+            if (!status.valid) {
+              setErrorStatus(status)
+              return
+            }
             updateStoreAndDb({
               dbFunction: dbFunc,
               storeFunction: storeFunc,
