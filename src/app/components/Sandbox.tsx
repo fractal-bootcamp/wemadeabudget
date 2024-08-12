@@ -25,7 +25,7 @@ function Sandbox({ transactions, accounts, categories, payees }: SandboxProps) {
     if (isLoaded()) return
     transactions.forEach(addTransaction)
     accounts.forEach(addAccount)
-    categories.forEach(addCategory)
+    categories.forEach((category) => addCategory(category.name))
     payees.forEach(addPayee)
     load()
   }, [])

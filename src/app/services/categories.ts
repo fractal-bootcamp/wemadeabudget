@@ -15,17 +15,17 @@ const queries = {
 }
 
 const mutations = {
-  addCategory: async (userId: string, details: CategoryDetails) => {
+  addCategory: async (userId: string, name: string) => {
     try {
       const newCategory = await prisma.category.create({
         data: {
-          name: details.name,
+          name: name,
           user: {
             connect: {
               id: userId,
             },
           },
-          allocated: details.allocated || 0,
+          allocated: 0,
         },
       })
       return newCategory
@@ -54,32 +54,34 @@ const mutations = {
   },
   updateCategory: async (
     userId: string,
-    oldName: string,
-    newDetails: CategoryDetails
+    categoryUpdatePayload: CategoryUpdatePayload
   ) => {
     const updatedCategory = await prisma.category.update({
       where: {
         categoryId: {
-          name: oldName,
+          name: categoryUpdatePayload.oldName,
           userId: userId,
         },
       },
       data: {
-        name: newDetails.name,
-        allocated: newDetails.allocated,
+        name: categoryUpdatePayload.newDetails.name,
+        allocated: categoryUpdatePayload.newDetails.allocated,
       },
     })
     return updatedCategory
   },
 }
+type CategoryUpdatePayload = {
+  oldName: string
+  newDetails: CategoryDetails
+}
 const categoryServices = {
   getAllByUser: (userId: string) => queries.getCategories(userId),
-  add: (userId: string, details: CategoryDetails) =>
-    mutations.addCategory(userId, details),
+  add: (userId: string, name: string) => mutations.addCategory(userId, name),
   delete: (userId: string, categoryName: string) =>
     mutations.deleteCategory(userId, categoryName),
-  update: (userId: string, oldName: string, newDetails: CategoryDetails) =>
-    mutations.updateCategory(userId, oldName, newDetails),
+  update: (userId: string, categoryUpdatePayload: CategoryUpdatePayload) =>
+    mutations.updateCategory(userId, categoryUpdatePayload),
 }
 
 export default categoryServices

@@ -14,7 +14,7 @@ import { useState } from 'react'
 import AddAccountModal from './AddAccountModal'
 import { useUser } from '@clerk/nextjs'
 import useBudgetStore from '../stores/transactionStore'
-import { centsToDollarString } from '../util/utils'
+import { formatCentsToDollarString } from '../util/utils'
 
 interface SidebarProps {
   setCurrentAccount: (account: string | null) => void
@@ -106,7 +106,7 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
               </div>
               <div className="text-xs">
                 {' '}
-                {centsToDollarString(
+                {formatCentsToDollarString(
                   accountsWithBalance.reduce(
                     (acc, account) => acc + account.balance,
                     0
@@ -145,7 +145,7 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
                                 }
                           }
                         >
-                          {centsToDollarString(account.balance)}
+                          {formatCentsToDollarString(account.balance)}
                         </div>
                       </button>
                     </div>

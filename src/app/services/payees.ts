@@ -41,20 +41,28 @@ const mutations = {
     })
     return deletedPayee
   },
-  updatePayee: async (userId: string, oldName: string, newName: string) => {
+  updatePayee: async (
+    userId: string,
+    payeeUpdatePayload: PayeeUpdatePayload
+  ) => {
     const updatedPayee = await prisma.payee.update({
       where: {
         payeeId: {
-          name: oldName,
+          name: payeeUpdatePayload.oldName,
           userId: userId,
         },
       },
       data: {
-        name: newName,
+        name: payeeUpdatePayload.newName,
       },
     })
     return updatedPayee
   },
+}
+
+type PayeeUpdatePayload = {
+  oldName: string
+  newName: string
 }
 
 const payeeServices = {
@@ -62,8 +70,8 @@ const payeeServices = {
   add: (userId: string, name: string) => mutations.addPayee(userId, name),
   delete: (userId: string, payeeName: string) =>
     mutations.deletePayee(userId, payeeName),
-  update: (userId: string, oldName: string, newName: string) =>
-    mutations.updatePayee(userId, oldName, newName),
+  update: (userId: string, payeeUpdatePayload: PayeeUpdatePayload) =>
+    mutations.updatePayee(userId, payeeUpdatePayload),
 }
 
 export default payeeServices

@@ -45,23 +45,27 @@ const mutations = {
   },
   updateAccount: async (
     userId: string,
-    oldName: string,
-    newDetails: AccountDetails
+    accountUpdatePayload: AccountUpdatePayload
   ) => {
     const updatedAccount = await prisma.account.update({
       where: {
         accountId: {
-          name: oldName,
+          name: accountUpdatePayload.oldName,
           userId: userId,
         },
       },
       data: {
-        name: newDetails.name,
-        type: newDetails.type,
+        name: accountUpdatePayload.newDetails.name,
+        type: accountUpdatePayload.newDetails.type,
       },
     })
     return updatedAccount
   },
+}
+
+type AccountUpdatePayload = {
+  oldName: string
+  newDetails: AccountDetails
 }
 
 const accountServices = {
@@ -70,8 +74,8 @@ const accountServices = {
     mutations.addAccount(userId, details),
   delete: (userId: string, accountName: string) =>
     mutations.deleteAccount(userId, accountName),
-  update: (userId: string, oldName: string, newDetails: AccountDetails) =>
-    mutations.updateAccount(userId, oldName, newDetails),
+  update: (userId: string, accountUpdatePayload: AccountUpdatePayload) =>
+    mutations.updateAccount(userId, accountUpdatePayload),
 }
 
 export default accountServices

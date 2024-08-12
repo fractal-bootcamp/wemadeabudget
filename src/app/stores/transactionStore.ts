@@ -13,26 +13,65 @@ type budgetStore = {
   accounts: AccountDetails[]
   payees: string[]
   categories: CategoryDetails[]
+  /** Retrieves the entire transaction array */
   getAllTransactions: () => TransactionDetails[]
+  /** Sets the loaded state to true */
   load: () => void
+  /** Checks if the store is loaded */
   isLoaded: () => boolean
+  /** Sums up all transactions for a given account */
   getBalanceByAccount: (accountName: string) => number
+  /** Sums up all transactions for a given category */
   getBalanceByCategory: (categoryName: string) => number
+  /** Retrieves all transactions for a given account */
   getTransactionsByAccount: (accountName: string) => TransactionDetails[]
+  /** Retrieves all transactions for a given payee */
   getTransactionsByPayee: (payeeName: string) => TransactionDetails[]
+  /** Retrieves all transactions for a given category */
   getTransactionsByCategory: (categoryName: string) => TransactionDetails[]
+  /** Sums up the amounts from every transaction */
+  netBalanceCents: () => number
+  /** Sums up all allocated amounts in every category */
+  totalAssigned: () => number
+  /** Adds a new account to the store */
   addAccount: (account: AccountDetails) => void
+  /** Removes an account from the store by its name */
   removeAccount: (accountName: string) => void
+  /** Updates an existing account in the store */
+  updateAccount: (accountUpdatePayload: AccountUpdatePayload) => void
+  /** Adds a new transaction to the store */
   addTransaction: (transaction: TransactionDetails) => void
+  /** Removes a transaction from the store by its ID */
   removeTransaction: (transactionId: string) => void
+  /** Updates an existing transaction in the store */
+  updateTransaction: (newDetails: TransactionDetails) => void
+  /** Adds a new payee to the store */
   addPayee: (payee: string) => void
+  /** Removes a payee from the store */
   removePayee: (payee: string) => void
-  addCategory: (category: CategoryDetails) => void
+  /** Updates an existing payee in the store */
+  updatePayee: (payeeUpdatePayload: PayeeUpdatePayload) => void
+  /** Adds a new category to the store */
+  addCategory: (categoryName: string) => void
+  /** Deletes a category from the store by its name */
   deleteCategory: (categoryName: string) => void
-  editCategory: (
-    oldName: CategoryDetails['name'],
-    newDetails: CategoryDetails
-  ) => void
+  /** Edits an existing category in the store identified by its old name */
+  updateCategory: (categoryUpdatePayload: CategoryUpdatePayload) => void
+}
+
+type CategoryUpdatePayload = {
+  oldName: string
+  newDetails: CategoryDetails
+}
+
+type AccountUpdatePayload = {
+  oldName: string
+  newDetails: AccountDetails
+}
+
+type PayeeUpdatePayload = {
+  oldName: string
+  newName: string
 }
 
 const useBudgetStore = create<budgetStore>((set, get) => ({
@@ -68,6 +107,12 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
     get().transactions.filter(
       (transaction) => transaction.category === categoryName
     ),
+  /**Sums up the amounts from every transaction */
+  netBalanceCents: () =>
+    get().transactions.reduce((acc, transaction) => acc + transaction.cents, 0),
+  /**Sums up all allocated amounts in every category */
+  totalAssigned: () =>
+    get().categories.reduce((acc, category) => acc + category.allocated, 0),
 
   addAccount: (account) =>
     set((state) => ({
@@ -79,6 +124,15 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
         (account) => account.name !== accountName
       ),
     })),
+  updateAccount: (accountUpdatePayload) =>
+    set((state) => ({
+      accounts: state.accounts.map((account) => {
+        if (account.name === accountUpdatePayload.oldName) {
+          return accountUpdatePayload.newDetails
+        }
+        return account
+      }),
+    })),
   addTransaction: (transaction) =>
     set((state) => ({
       transactions: [...state.transactions, transaction],
@@ -89,6 +143,15 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
         (transaction) => transaction.id !== transactionId
       ),
     })),
+  updateTransaction: (updatedTransactionDetails) =>
+    set((state) => ({
+      transactions: state.transactions.map((transaction) => {
+        if (transaction.id === updatedTransactionDetails.id) {
+          return updatedTransactionDetails
+        }
+        return transaction
+      }),
+    })),
   addPayee: (payee) =>
     set((state) => ({
       payees: [...state.payees, payee],
@@ -97,12 +160,22 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
     set((state) => ({
       payees: state.payees.filter((p) => p !== payee),
     })),
-  addCategory: (category) =>
+  updatePayee: (payeeUpdatePayload) =>
+    set((state) => ({
+      payees: state.payees.map((payee) => {
+        if (payee === payeeUpdatePayload.oldName) {
+          return payeeUpdatePayload.newName
+        }
+        return payee
+      }),
+    })),
+  addCategory: (categoryName) =>
     set((state) => {
-      if (state.categories.find((c) => c.name === category.name)) {
+      if (state.categories.find((c) => c.name === categoryName)) {
         throw new Error('Category already exists')
       }
-      return { categories: [...state.categories, category] }
+      const newCategory: CategoryDetails = { name: categoryName, allocated: 0 }
+      return { categories: [...state.categories, newCategory] }
     }),
   deleteCategory: (categoryName) =>
     set((state) => ({
@@ -110,11 +183,11 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
         (category) => category.name !== categoryName
       ),
     })),
-  editCategory: (oldName, newDetails) => {
+  updateCategory: (categoryUpdatePayload) => {
     set((state) => ({
       categories: state.categories.map((category) => {
-        if (category.name === oldName) {
-          return newDetails
+        if (category.name === categoryUpdatePayload.oldName) {
+          return categoryUpdatePayload.newDetails
         }
         return category
       }),

@@ -1,38 +1,27 @@
 import { useRef, useState } from 'react'
 import { CategoryDetails } from '../../types'
-interface submitStatus {
-  valid: boolean
-  message: string
-}
-const checkSubmit = (
-  name: string,
-  existing: CategoryDetails[]
-): submitStatus => {
-  if (name.length === 0) {
-    return { valid: false, message: 'Name is required' }
-  }
-  if (name.trim().length === 0) {
-    return { valid: false, message: 'Name cannot be only spaces' }
-  }
-  if (existing.some((category) => category.name === name)) {
-    return { valid: false, message: 'Category already exists' }
-  }
-  return { valid: true, message: '' }
-}
+import {
+  checkSubmittedName,
+  METHODS,
+  submitStatus,
+  updateStoreAndDb,
+} from '../../util/utils'
+import { dbCategoryUpdate } from '../../actions/controller'
+import useBudgetStore from '../../stores/transactionStore'
+
 interface EditCategoryModalProps {
   originalName: string
   categories: CategoryDetails[]
-  onSave: (name: string) => void
   closeModal: () => void
   onDelete: () => void
 }
 export default function EditCategoryModal({
   originalName,
   categories,
-  onSave,
   closeModal,
   onDelete,
 }: EditCategoryModalProps) {
+  const { updateCategory } = useBudgetStore()
   const [categoryName, setCategoryName] = useState(originalName)
   const [submitStatus, setSubmitStatus] = useState<submitStatus>({
     valid: true,
@@ -53,7 +42,7 @@ export default function EditCategoryModal({
           className={`border ${!submitStatus.valid ? `rounded-t border-red-300` : `rounded border-gray-200`} p-2`}
           onChange={(e) => {
             setCategoryName(e.target.value)
-            setSubmitStatus({ ...submitStatus, valid: true, message: '' })
+            setSubmitStatus({ valid: true, message: '' })
           }}
         />
         {!submitStatus.valid && (
@@ -74,13 +63,25 @@ export default function EditCategoryModal({
             </button>
             <button
               onClick={() => {
-                const { valid, message } = checkSubmit(categoryName, categories)
-                if (valid) {
-                  onSave(categoryName)
-                  closeModal()
-                } else {
+                const { valid, message } = checkSubmittedName(
+                  categoryName,
+                  categories.map((c) => c.name)
+                )
+                if (!valid) {
                   setSubmitStatus({ valid, message })
+                  return
                 }
+                const newDetails: CategoryDetails = {
+                  name: categoryName,
+                  allocated: 0,
+                }
+                updateStoreAndDb({
+                  dbFunction: dbCategoryUpdate,
+                  storeFunction: updateCategory,
+                  payload: { oldName: originalName, newDetails },
+                  method: METHODS.UPDATE,
+                })
+                closeModal()
               }}
               className="mybtn mybtn-primary"
             >

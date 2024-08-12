@@ -5,23 +5,38 @@ import payeeServices from '../services/payees'
 import transactionServices from '../services/transactions'
 import accountServices from '../services/accounts'
 
-const attachUserId =
-  <T extends any[], R>(callback: (userId: string, ...args: T) => Promise<R>) =>
-  async (...details: T): Promise<R> => {
+type CallbackWithPayload<T, R> = (userId: string, payload: T) => Promise<R>
+type CallbackWithoutPayload<R> = (userId: string) => Promise<R>
+
+function attachUserId<R>(callback: CallbackWithoutPayload<R>): () => Promise<R>
+function attachUserId<T, R>(
+  callback: CallbackWithPayload<T, R>
+): (payload: T) => Promise<R>
+function attachUserId<T, R>(
+  callback: CallbackWithPayload<T, R> | CallbackWithoutPayload<R>
+) {
+  return async (payload?: T): Promise<R> => {
+    // get the userId from the clerk context
     const { authenticated, user } = await clerkHandler()
     if (!authenticated || user === null) {
       throw new Error('User is not authenticated')
     }
-    return await callback(user.id, ...details)
+    // call the db function with the userId and the payload if provided
+    if (payload !== undefined) {
+      return await (callback as CallbackWithPayload<T, R>)(user.id, payload)
+    } else {
+      return await (callback as CallbackWithoutPayload<R>)(user.id)
+    }
   }
+}
 
 const clientController = {
   transaction: {
     add: attachUserId(transactionServices.add),
     delete: attachUserId(transactionServices.delete),
+    update: attachUserId(transactionServices.update),
     getById: attachUserId(transactionServices.getById),
     getAllByUser: attachUserId(transactionServices.getAllByUser),
-    update: attachUserId(transactionServices.update),
     getByCategory: attachUserId(transactionServices.getByCategory),
     getByPayee: attachUserId(transactionServices.getByPayee),
     getByAccount: attachUserId(transactionServices.getByAccount),
@@ -35,38 +50,40 @@ const clientController = {
   payee: {
     add: attachUserId(payeeServices.add),
     delete: attachUserId(payeeServices.delete),
-    getAllByUser: attachUserId(payeeServices.getAllByUser),
     update: attachUserId(payeeServices.update),
+    getAllByUser: attachUserId(payeeServices.getAllByUser),
   },
   account: {
     add: attachUserId(accountServices.add),
     delete: attachUserId(accountServices.delete),
-    getAllByUser: attachUserId(accountServices.getAllByUser),
     update: attachUserId(accountServices.update),
+    getAllByUser: attachUserId(accountServices.getAllByUser),
   },
 }
 
-export const transactionAdd = clientController.transaction.add
-export const transactionDelete = clientController.transaction.delete
-export const transactionGetById = clientController.transaction.getById
-export const transactionGetAllByUser = clientController.transaction.getAllByUser
-export const transactionUpdate = clientController.transaction.update
-export const transactionGetByCategory =
+export const dbTransactionAdd = clientController.transaction.add
+export const dbTransactionDelete = clientController.transaction.delete
+export const dbTransactionGetById = clientController.transaction.getById
+export const dbTransactionGetAllByUser =
+  clientController.transaction.getAllByUser
+export const dbTransactionUpdate = clientController.transaction.update
+export const dbTransactionGetByCategory =
   clientController.transaction.getByCategory
-export const transactionGetByPayee = clientController.transaction.getByPayee
-export const transactionGetByAccount = clientController.transaction.getByAccount
+export const dbTransactionGetByPayee = clientController.transaction.getByPayee
+export const dbTransactionGetByAccount =
+  clientController.transaction.getByAccount
 
-export const categoryAdd = clientController.category.add
-export const categoryDelete = clientController.category.delete
-export const categoryGetAllByUser = clientController.category.getAllByUser
-export const categoryUpdate = clientController.category.update
+export const dbCategoryAdd = clientController.category.add
+export const dbCategoryDelete = clientController.category.delete
+export const dbCategoryGetAllByUser = clientController.category.getAllByUser
+export const dbCategoryUpdate = clientController.category.update
 
-export const payeeAdd = clientController.payee.add
-export const payeeDelete = clientController.payee.delete
-export const payeeGetAllByUser = clientController.payee.getAllByUser
-export const payeeUpdate = clientController.payee.update
+export const dbPayeeAdd = clientController.payee.add
+export const dbPayeeDelete = clientController.payee.delete
+export const dbPayeeGetAllByUser = clientController.payee.getAllByUser
+export const dbPayeeUpdate = clientController.payee.update
 
-export const accountAdd = clientController.account.add
-export const accountDelete = clientController.account.delete
-export const accountGetAllByUser = clientController.account.getAllByUser
-export const accountUpdate = clientController.account.update
+export const dbAccountAdd = clientController.account.add
+export const dbAccountDelete = clientController.account.delete
+export const dbAccountGetAllByUser = clientController.account.getAllByUser
+export const dbAccountUpdate = clientController.account.update
