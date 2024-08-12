@@ -96,7 +96,7 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
             )}
           </div>
           {showUserDropdown && (
-            <div className="absolute left-1/4 top-full z-50 flex w-fit flex-row items-center justify-between gap-2 text-nowrap rounded-md border border-indigo-400 bg-white p-3 text-black shadow-2xl">
+            <div className="absolute left-2 top-full z-50 flex w-fit flex-row items-center justify-between gap-2 text-nowrap rounded-md bg-white p-3 text-black shadow-2xl">
               <div className="shrink-0">
                 <User size={20} strokeWidth={2} fill={'gray'} />
               </div>
