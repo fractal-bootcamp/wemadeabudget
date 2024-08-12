@@ -58,10 +58,15 @@ export default function AddCategoryModal({
               categories.map((category) => category.name)
             )
             if (valid) {
+              const newCategory: CategoryDetails = {
+                name: categoryName,
+                allocated: 0,
+                permanent: false,
+              }
               updateStoreAndDb({
                 dbFunction: dbCategoryAdd,
                 storeFunction: addCategory,
-                payload: categoryName,
+                payload: newCategory,
                 method: 'ADD',
               })
               closeFunction()
