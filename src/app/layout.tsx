@@ -9,7 +9,7 @@ import Loading from './loading'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'WNAB',
+  title: 'WMAB',
   description: 'An App',
 }
 
