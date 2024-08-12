@@ -73,7 +73,7 @@ const EditAccountModal: React.FC<EditAccountModalProps> = ({
           </h1>
           <button
             onClick={closeModal}
-            className="absolute right-3 top-3 text-indigo-700 hover:text-gray-800"
+            className="absolute right-1 top-1 rounded-full p-1 text-black hover:bg-slate-200"
           >
             {' '}
             <X />

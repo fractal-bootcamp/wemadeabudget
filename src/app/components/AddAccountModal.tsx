@@ -45,7 +45,10 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
       }}
       className="fixed inset-0 z-40 flex flex-col items-center justify-center bg-black bg-opacity-20 font-semibold text-black"
     >
-      <div className="relative z-50 flex w-[300px] flex-col rounded-xl bg-white text-sm shadow-2xl">
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="relative z-50 flex w-[300px] flex-col rounded-xl bg-white text-sm shadow-2xl"
+      >
         <div className="border-b border-gray-300 p-2">
           <h1 className="pb-4 text-center text-lg font-semibold">
             {' '}
@@ -53,7 +56,7 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
           </h1>
           <button
             onClick={toggleShowAccountModal}
-            className="absolute right-3 top-3 text-indigo-700 hover:text-gray-800"
+            className="absolute right-1 top-1 rounded-full p-1 text-black hover:bg-slate-200"
           >
             {' '}
             <X />
