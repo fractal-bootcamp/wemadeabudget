@@ -52,6 +52,10 @@ export default function BudgetTable() {
     )
   }
 
+  const handleRowInputSelect = (name: string) => {
+    setSelectedCategories(new Set([name]))
+  }
+
   return (
     <div className="flex w-full flex-col text-xs">
       {/* Model underly */}
@@ -99,6 +103,7 @@ export default function BudgetTable() {
           }
           selected={selectedCategories.has(category.name)}
           toggleSelect={categorySelectionToggle(category.name)}
+          onSelect={handleRowInputSelect}
         />
       ))}
     </div>
