@@ -8,6 +8,7 @@ import {
   AccountUpdatePayload,
   PayeeUpdatePayload,
 } from '../types'
+import { Category } from '@prisma/client'
 
 type budgetStore = {
   loaded: boolean
@@ -54,7 +55,7 @@ type budgetStore = {
   /** Updates an existing payee in the store */
   updatePayee: (payeeUpdatePayload: PayeeUpdatePayload) => void
   /** Adds a new category to the store */
-  addCategory: (categoryName: string) => void
+  addCategory: (category: CategoryDetails) => void
   /** Deletes a category from the store by its name */
   deleteCategory: (categoryName: string) => void
   /** Edits an existing category in the store identified by its old name */
@@ -159,17 +160,12 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
         return payee
       }),
     })),
-  addCategory: (categoryName) =>
+  addCategory: (category) =>
     set((state) => {
-      if (state.categories.find((c) => c.name === categoryName)) {
+      if (state.categories.find((c) => c.name === category.name)) {
         throw new Error('Category already exists')
       }
-      const newCategory: CategoryDetails = {
-        name: categoryName,
-        allocated: 0,
-        permanent: false,
-      }
-      return { categories: [...state.categories, newCategory] }
+      return { categories: [...state.categories, category] }
     }),
   deleteCategory: (categoryName) =>
     set((state) => {

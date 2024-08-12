@@ -14,17 +14,17 @@ const queries = {
 }
 
 const mutations = {
-  addCategory: async (userId: string, name: string) => {
+  addCategory: async (userId: string, category: CategoryDetails) => {
     try {
       const newCategory = await prisma.category.create({
         data: {
-          name: name,
+          name: category.name,
           user: {
             connect: {
               id: userId,
             },
           },
-          allocated: 0,
+          allocated: category.allocated || 0,
         },
       })
     } catch (error) {
@@ -113,7 +113,8 @@ const mutations = {
 
 const categoryServices = {
   getAllByUser: (userId: string) => queries.getCategories(userId),
-  add: (userId: string, name: string) => mutations.addCategory(userId, name),
+  add: (userId: string, newCategory: CategoryDetails) =>
+    mutations.addCategory(userId, newCategory),
   delete: (userId: string, categoryName: string) =>
     mutations.deleteCategory(userId, categoryName),
   update: (userId: string, categoryUpdatePayload: CategoryUpdatePayload) =>

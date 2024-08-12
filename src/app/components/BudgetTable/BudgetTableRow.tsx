@@ -25,6 +25,7 @@ export default function BudgetTableRow({
   toggleSelect,
   onSelect,
 }: BudgetTableRowProps) {
+  const [editAllocation, setEditAllocation] = useState(false)
   const { categories, getBalanceByCategory, updateCategory } = useBudgetStore()
   const allocated = categories.find((c) => c.name === name)?.allocated || 0
   const activityCents = getBalanceByCategory(name)
@@ -52,12 +53,13 @@ export default function BudgetTableRow({
   }
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && editAllocation) {
         submitNewAllocation()
         // updateCategoryAllocation(name, Math.round(newValue * 100))
         //replace with real setter function
         console.log('allocation updated')
         inputRef.current?.blur()
+        setEditAllocation(false)
       }
     },
     [editAllocatedInput, name]
@@ -109,23 +111,32 @@ export default function BudgetTableRow({
         </div>
       </div>
       <div className="flex w-[15%] justify-end">
-        <input
-          ref={inputRef}
-          type="number"
-          className={`w-full truncate rounded px-2 text-right ${selected ? 'cursor-text border border-indigo-500' : 'hover:cursor-text hover:border hover:border-indigo-500'}`}
-          value={editAllocatedInput}
-          onChange={(e) => {
-            const cents = Math.floor(parseFloat(e.target.value) * 100)
-            setEditAllocatedInput(cents / 100)
-          }}
-          onKeyDown={handleKeyDown}
-          onBlur={() => {
-            submitNewAllocation()
-            toggleSelect()
-          }}
-          onClick={handleInputClick}
-          onFocus={(e) => e.target.select()}
-        />
+        {editAllocation ? (
+          <input
+            ref={inputRef}
+            type="number"
+            className={`w-full truncate rounded px-2 text-right hover:cursor-text hover:border hover:border-indigo-500`}
+            value={editAllocatedInput}
+            onChange={(e) => {
+              const cents = Math.floor(parseFloat(e.target.value) * 100)
+              setEditAllocatedInput(cents / 100)
+            }}
+            onKeyDown={handleKeyDown}
+            onBlur={() => {
+              submitNewAllocation()
+              setEditAllocation(false)
+            }}
+            onClick={handleInputClick}
+            onFocus={(e) => e.target.select()}
+          />
+        ) : (
+          <div
+            className={`z-20 w-full truncate rounded px-2 text-right hover:cursor-text hover:border hover:border-indigo-500 hover:bg-white`}
+            onClick={() => setEditAllocation(true)}
+          >
+            {formatCentsToDollarString(allocated)}
+          </div>
+        )}
       </div>
       <div className="flex w-[15%] justify-end">
         <div className="truncate px-2 py-0.5">
