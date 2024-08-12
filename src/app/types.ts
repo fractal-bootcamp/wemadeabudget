@@ -6,14 +6,12 @@ export interface User {
 const AccountTypes = ['CHECKING', 'CASH', 'CREDIT_CARD', 'SAVINGS'] as const
 
 export type AccountType = (typeof AccountTypes)[number]
-
-export const AccountTypeDetails: { type: AccountType; display: string }[] = [
-  { type: 'CHECKING', display: 'Checking' },
-  { type: 'CASH', display: 'Cash' },
-  { type: 'CREDIT_CARD', display: 'Credit Card' },
-  { type: 'SAVINGS', display: 'Savings' },
-]
-
+export const AccountTypeDetails: Record<AccountType, { display: string }> = {
+  CHECKING: { display: 'Checking' },
+  CASH: { display: 'Cash' },
+  CREDIT_CARD: { display: 'Credit Card' },
+  SAVINGS: { display: 'Savings' },
+}
 const Flags = [
   'NONE',
   'RED',
@@ -23,17 +21,25 @@ const Flags = [
   'BLUE',
   'PURPLE',
 ] as const
-
 export type Flag = (typeof Flags)[number]
-export const FlagDetails: { type: Flag; display: string; hexCode: string }[] = [
-  { type: 'NONE', display: 'None', hexCode: '#f0f0f0' },
-  { type: 'RED', display: 'Red', hexCode: '#ff0000' },
-  { type: 'ORANGE', display: 'Orange', hexCode: '#ff7f00' },
-  { type: 'YELLOW', display: 'Yellow', hexCode: '#ffff00' },
-  { type: 'GREEN', display: 'Green', hexCode: '#00ff00' },
-  { type: 'BLUE', display: 'Blue', hexCode: '#0000ff' },
-  { type: 'PURPLE', display: 'Purple', hexCode: '#7f00ff' },
-]
+export const FlagDetails: Record<Flag, { display: string; hexCode: string }> = {
+  NONE: { display: 'None', hexCode: '#f0f0f0' },
+  RED: { display: 'Red', hexCode: '#ff0000' },
+  ORANGE: { display: 'Orange', hexCode: '#ff7f00' },
+  YELLOW: { display: 'Yellow', hexCode: '#ffff00' },
+  GREEN: { display: 'Green', hexCode: '#00ff00' },
+  BLUE: { display: 'Blue', hexCode: '#0000ff' },
+  PURPLE: { display: 'Purple', hexCode: '#7f00ff' },
+}
+/** Mapes a type details obj to an array for mapped access to all type details
+ * e.g. to write out all Account types: typeDetailsArray(AccountTypeDetails).map(acctType => acctType.display)
+ * whereas e.g. to access the color code for a provided flag: FlagDetails[flag].hexCode
+ */
+//prettier-ignore
+export const typeDetailsArray = <T extends string, S extends {display: string}>(detailsObj: Record<T, S>) => {
+  return Object.keys(detailsObj).map(key => ({ type: key as T, ...detailsObj[key as T] }))
+}
+
 export type TransactionDetails = {
   id: string
   account: string

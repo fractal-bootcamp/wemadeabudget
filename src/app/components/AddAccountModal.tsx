@@ -5,6 +5,7 @@ import {
   AccountTypeDetails,
   emptyAccount,
   startingBalanceTransaction,
+  typeDetailsArray,
 } from '../types'
 import { useState } from 'react'
 import useBudgetStore from '../stores/transactionStore'
@@ -91,7 +92,7 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
               setAcctData({ ...acctData, type: e.target.value as AccountType })
             }
           >
-            {AccountTypeDetails.map((acctType, index) => (
+            {typeDetailsArray(AccountTypeDetails).map((acctType, index) => (
               <option
                 key={acctData.type + index.toString()}
                 value={acctType.type}
