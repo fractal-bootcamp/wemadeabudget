@@ -2,7 +2,7 @@
 import { Bookmark } from 'lucide-react'
 import TransactionForm from './TransactionForm'
 import { formatCentsToDollarString } from '../../util/utils'
-import { Flag, flagColors, TransactionDetails } from '../../types'
+import { FlagDetails, TransactionDetails } from '../../types'
 
 interface ColumnWidths {
   [key: string]: number
@@ -76,7 +76,7 @@ function TransactionRow({
         <Bookmark
           className="rotate-[270deg] transform text-gray-400"
           size={16}
-          fill={flagColors[flag]}
+          fill={FlagDetails[flag].hexCode}
         />
       </div>
       {showAccount && (
