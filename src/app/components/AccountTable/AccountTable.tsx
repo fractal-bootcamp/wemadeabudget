@@ -7,20 +7,7 @@ import { useState, useEffect, useMemo } from 'react'
 import AccountsHeader from './AccountsHeader'
 import ActionBar from './ActionBar'
 import useBudgetStore from '../../stores/transactionStore'
-const defaultCategories = [
-  'Restaurants',
-  'Rent',
-  'Utilities',
-  'Renters Insurance',
-  'Phone',
-  'Internet',
-  'Music',
-  'Groceries',
-  'Train/Bus Fare',
-  'Personal Care',
-  'Stuff I Forgot to Budget For',
-  'Celebrations',
-]
+
 //truncate to prevent overflow
 interface AccountTableProps {
   accountName: string | null
@@ -161,7 +148,7 @@ function AccountTable({ accountName }: AccountTableProps) {
           >
             <input
               type="checkbox"
-              className="h-4 w-4"
+              className=""
               onChange={() => toggleSelectAll()}
             />
           </div>

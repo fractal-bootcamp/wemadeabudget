@@ -55,7 +55,7 @@ model Transaction {
   flag       Flag
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id])
   categoryId String
   account    Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId  String
@@ -69,6 +69,7 @@ model Category {
   updatedAt    DateTime      @updatedAt
   name         String
   allocated    Int           @default(0)
+  permanent    Boolean       @default(false)
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId       String
   transactions Transaction[]

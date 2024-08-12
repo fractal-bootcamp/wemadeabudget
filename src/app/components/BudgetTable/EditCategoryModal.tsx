@@ -74,6 +74,7 @@ export default function EditCategoryModal({
                 const newDetails: CategoryDetails = {
                   name: categoryName,
                   allocated: 0,
+                  permanent: false,
                 }
                 updateStoreAndDb({
                   dbFunction: dbCategoryUpdate,

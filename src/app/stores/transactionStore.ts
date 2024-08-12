@@ -4,7 +4,9 @@ import {
   AccountDetails,
   TransactionDetails,
   CategoryDetails,
-  Category,
+  CategoryUpdatePayload,
+  AccountUpdatePayload,
+  PayeeUpdatePayload,
 } from '../types'
 
 type budgetStore = {
@@ -36,7 +38,7 @@ type budgetStore = {
   /** Adds a new account to the store */
   addAccount: (account: AccountDetails) => void
   /** Removes an account from the store by its name */
-  removeAccount: (accountName: string) => void
+  deleteAccount: (accountName: string) => void
   /** Updates an existing account in the store */
   updateAccount: (accountUpdatePayload: AccountUpdatePayload) => void
   /** Adds a new transaction to the store */
@@ -57,21 +59,6 @@ type budgetStore = {
   deleteCategory: (categoryName: string) => void
   /** Edits an existing category in the store identified by its old name */
   updateCategory: (categoryUpdatePayload: CategoryUpdatePayload) => void
-}
-
-type CategoryUpdatePayload = {
-  oldName: string
-  newDetails: CategoryDetails
-}
-
-type AccountUpdatePayload = {
-  oldName: string
-  newDetails: AccountDetails
-}
-
-type PayeeUpdatePayload = {
-  oldName: string
-  newName: string
 }
 
 const useBudgetStore = create<budgetStore>((set, get) => ({
@@ -118,10 +105,13 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
     set((state) => ({
       accounts: [...state.accounts, account],
     })),
-  removeAccount: (accountName) =>
+  deleteAccount: (accountName) =>
     set((state) => ({
       accounts: state.accounts.filter(
         (account) => account.name !== accountName
+      ),
+      transactions: state.transactions.filter(
+        (transaction) => transaction.account !== accountName
       ),
     })),
   updateAccount: (accountUpdatePayload) =>
@@ -174,15 +164,33 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
       if (state.categories.find((c) => c.name === categoryName)) {
         throw new Error('Category already exists')
       }
-      const newCategory: CategoryDetails = { name: categoryName, allocated: 0 }
+      const newCategory: CategoryDetails = {
+        name: categoryName,
+        allocated: 0,
+        permanent: false,
+      }
       return { categories: [...state.categories, newCategory] }
     }),
   deleteCategory: (categoryName) =>
-    set((state) => ({
-      categories: state.categories.filter(
-        (category) => category.name !== categoryName
-      ),
-    })),
+    set((state) => {
+      //If category is permanent, throw an error
+      const category = state.categories.find((c) => c.name === categoryName)
+      if (category?.permanent) {
+        throw new Error('Cannot delete a permanent category.')
+      }
+      ///otherwise, move all transactions in the category to the Uncategorized category then delete the category
+      return {
+        categories: state.categories.filter(
+          (category) => category.name !== categoryName
+        ),
+        transactions: state.transactions.map((transaction) => {
+          if (transaction.category === categoryName) {
+            return { ...transaction, category: 'Uncategorized' }
+          }
+          return transaction
+        }),
+      }
+    }),
   updateCategory: (categoryUpdatePayload) => {
     set((state) => ({
       categories: state.categories.map((category) => {

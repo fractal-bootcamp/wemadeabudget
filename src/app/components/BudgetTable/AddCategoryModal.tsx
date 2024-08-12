@@ -19,9 +19,7 @@ export default function AddCategoryModal({
     addCategory: store.addCategory,
   }))
   const [categoryName, setCategoryName] = useState('')
-  const isDuplicate = categories.some(
-    (category) => category.name === categoryName
-  )
+
   const [submitStatus, setSubmitStatus] = useState<submitStatus>({
     valid: true,
     message: '',

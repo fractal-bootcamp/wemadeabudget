@@ -46,26 +46,35 @@ export const emptyTransaction: TransactionDetails = {
 export type CategoryDetails = {
   name: string
   allocated: number
+  permanent: boolean
   // categoryGroupName: string;
 }
-
+export interface CategoryUpdatePayload {
+  oldName: string
+  newDetails: CategoryDetails
+}
 export interface AccountDetails {
   name: string
   type: AccountType
 }
+export interface AccountUpdatePayload {
+  oldName: string
+  newDetails: AccountDetails
+}
+
 export const emptyAccount: AccountDetails = {
   name: '',
   type: 'CHECKING',
 }
-export interface Category {
-  name: string
-}
 export interface PayeeDetails {
   name: string
 }
+export interface PayeeUpdatePayload {
+  oldName: string
+  newName: string
+}
 
-const defaultCategoryNames = [
-  'Ready To Assign',
+const defaultCategories = [
   'Restaurants',
   'Rent',
   'Utilities',
@@ -79,6 +88,7 @@ const defaultCategoryNames = [
   'Stuff I Forgot to Budget For',
   'Celebrations',
 ]
+const defaultPermanetCategories = ['Uncategorized', 'Ready to Assign']
 const defaultAccounts: AccountDetails[] = [
   { name: 'Checking', type: 'CHECKING' },
   { name: 'Savings', type: 'SAVINGS' },
@@ -87,12 +97,14 @@ const defaultAccounts: AccountDetails[] = [
 ]
 const defaultPayees = ['Starting Balance']
 interface Defaults {
-  categories: CategoryDetails[]
+  categories: string[]
+  permanentCategories: string[]
   accounts: AccountDetails[]
   payees: PayeeDetails[]
 }
 export const defaults: Defaults = {
-  categories: defaultCategoryNames.map((name) => ({ name, allocated: 0 })),
+  categories: defaultCategories,
+  permanentCategories: defaultPermanetCategories,
   accounts: defaultAccounts,
   payees: defaultPayees.map((name) => ({ name })),
 }
@@ -103,7 +115,7 @@ export const startingBalanceTransaction = (
 ): TransactionDetails => ({
   id: '',
   account: accountName,
-  category: 'Ready To Assign',
+  category: 'Ready to Assign',
   payee: 'Starting Balance',
   date: new Date(),
   cents,

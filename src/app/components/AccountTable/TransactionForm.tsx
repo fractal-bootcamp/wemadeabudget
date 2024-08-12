@@ -52,10 +52,10 @@ function TransactionForm({
   return (
     <div className="flex flex-col gap-1 bg-indigo-100 px-0 py-2 text-xs">
       {/* Details/edit fields */}
-      <div className="flex flex-row gap-1">
+      <div className="flex flex-row gap-0 px-1">
         {/* dummy always selected checkbox */}
         <div
-          className="flex items-center justify-center"
+          className="flex items-center justify-center px-1"
           style={{ width: columnWidths.checkbox }}
         >
           <input
@@ -67,7 +67,7 @@ function TransactionForm({
         </div>
         {/* Flag */}
         <div
-          className="flex items-center justify-center"
+          className="flex items-center justify-center px-1"
           style={{ width: columnWidths.flag }}
         >
           <FlagToggle
@@ -83,7 +83,7 @@ function TransactionForm({
         {showAccount && (
           <div
             style={{ width: columnWidths.account }}
-            className="flex w-full items-center truncate text-xs"
+            className="flex w-full items-center truncate px-1 text-xs"
           >
             <Dropdown
               options={accounts.map((account) => account.name)}
@@ -97,7 +97,7 @@ function TransactionForm({
         )}
         <div
           style={{ width: columnWidths.date }}
-          className="flex items-center text-xs"
+          className="flex items-center px-1 text-xs"
         >
           <DatePicker
             selected={formData.date}
@@ -128,21 +128,22 @@ function TransactionForm({
         </div>
         <div
           style={{ width: columnWidths.payee }}
-          className="flex items-center truncate text-xs"
+          className="flex items-center truncate px-1 text-xs"
         >
           <Dropdown
             options={payees}
             selected={formData.payee}
             addOptions={true}
             label="Payee"
-            addOptionCallback={(newPayeeName: string) =>
+            addOptionCallback={(newPayeeName: string) => {
               updateStoreAndDb({
                 dbFunction: dbPayeeAdd,
                 storeFunction: addPayee,
                 payload: newPayeeName,
                 method: 'ADD',
               })
-            }
+              setFormData({ ...formData, payee: newPayeeName })
+            }}
             setSelected={(selection: string) => {
               setFormData({ ...formData, payee: selection })
             }}
@@ -150,21 +151,22 @@ function TransactionForm({
         </div>
         <div
           style={{ width: columnWidths.category }}
-          className="flex items-center truncate text-xs"
+          className="flex items-center truncate px-1 text-xs"
         >
           <Dropdown
             options={categories.map((category) => category.name)}
             selected={formData.category}
             label="Category"
             addOptions={true}
-            addOptionCallback={(newCategoryName: string) =>
+            addOptionCallback={(newCategoryName: string) => {
               updateStoreAndDb({
                 dbFunction: dbCategoryAdd,
                 storeFunction: addCategory,
                 payload: newCategoryName,
                 method: 'ADD',
               })
-            }
+              setFormData({ ...formData, category: newCategoryName })
+            }}
             setSelected={(selection: string) => {
               setFormData({ ...formData, category: selection })
             }}
@@ -172,7 +174,7 @@ function TransactionForm({
         </div>
         <div
           style={{ width: columnWidths.memo }}
-          className="flex items-center truncate text-xs"
+          className="flex items-center truncate px-1 text-xs"
         >
           <input
             type="text"
@@ -185,7 +187,7 @@ function TransactionForm({
         </div>
         <div
           style={{ width: columnWidths.outflow }}
-          className="flex items-center justify-end truncate text-xs"
+          className="flex items-center justify-end truncate px-1 text-xs"
         >
           <input
             type="number"
@@ -208,7 +210,7 @@ function TransactionForm({
         </div>
         <div
           style={{ width: columnWidths.inflow }}
-          className="flex items-center justify-end truncate text-xs"
+          className="flex items-center justify-end truncate px-1 text-xs"
         >
           <input
             type="number"
@@ -229,7 +231,7 @@ function TransactionForm({
         </div>
         <div
           style={{ width: columnWidths.cleared }}
-          className="flex items-center justify-center"
+          className="flex items-center justify-center px-1"
         >
           <ClearedButton
             cleared={formData.cleared}
@@ -240,7 +242,10 @@ function TransactionForm({
         </div>
       </div>
       {/* Buttons */}
-      <div className="flex w-[150px] flex-row justify-start gap-2 self-end">
+      <div
+        className="flex flex-row justify-end gap-2"
+        style={{ marginRight: `${columnWidths.cleared}px` }}
+      >
         <button
           className="rounded-lg border border-indigo-600 px-4 py-1 text-indigo-600"
           type="button"

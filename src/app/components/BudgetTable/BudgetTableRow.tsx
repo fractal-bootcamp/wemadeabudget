@@ -1,6 +1,13 @@
 import EditCategoryModal from './EditCategoryModal'
 import useBudgetStore from '../../stores/transactionStore'
-import { formatCentsToDollarString } from '../../util/utils'
+import {
+  formatCentsToDollarString,
+  METHODS,
+  updateStoreAndDb,
+} from '../../util/utils'
+import { useState, useCallback, useRef } from 'react'
+import { dbCategoryUpdate } from '../../actions/controller'
+import { CategoryDetails, CategoryUpdatePayload } from '../../types'
 
 interface BudgetTableRowProps {
   name: string
@@ -8,6 +15,7 @@ interface BudgetTableRowProps {
   editing: boolean
   toggleEdit: () => void
   toggleSelect: () => void
+  onSelect: (name: string) => void
 }
 export default function BudgetTableRow({
   name,
@@ -15,11 +23,45 @@ export default function BudgetTableRow({
   editing,
   toggleEdit,
   toggleSelect,
+  onSelect,
 }: BudgetTableRowProps) {
-  const { categories, getBalanceByCategory } = useBudgetStore()
+  const { categories, getBalanceByCategory, updateCategory } = useBudgetStore()
   const allocated = categories.find((c) => c.name === name)?.allocated || 0
   const activityCents = getBalanceByCategory(name)
   const availableCents = allocated + activityCents
+  const [editAllocatedInput, setEditAllocatedInput] = useState(allocated / 100)
+
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  const handleInputClick = (e: React.MouseEvent<HTMLInputElement>) => {
+    e.stopPropagation()
+    onSelect(name)
+  }
+  const submitNewAllocation = () => {
+    const newDetails: CategoryDetails = {
+      name: name,
+      allocated: Math.round(editAllocatedInput * 100),
+      permanent: false,
+    }
+    updateStoreAndDb({
+      dbFunction: dbCategoryUpdate,
+      storeFunction: updateCategory,
+      payload: { oldName: name, newDetails: newDetails },
+      method: METHODS.UPDATE,
+    })
+  }
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        submitNewAllocation()
+        // updateCategoryAllocation(name, Math.round(newValue * 100))
+        //replace with real setter function
+        console.log('allocation updated')
+        inputRef.current?.blur()
+      }
+    },
+    [editAllocatedInput, name]
+  )
   return (
     <div
       className={`flex items-stretch border-b border-gray-300 py-2 pr-4 ${selected ? 'bg-indigo-200' : 'bg-white'}`}
@@ -67,17 +109,27 @@ export default function BudgetTableRow({
         </div>
       </div>
       <div className="flex w-[15%] justify-end">
-        <div className="truncate px-2 py-0.5">
-          {allocated >= 0
-            ? `$${(allocated / 100).toFixed(2)}`
-            : `-$${(-allocated / 100).toFixed(2)}`}
-        </div>
+        <input
+          ref={inputRef}
+          type="number"
+          className={`w-full truncate rounded px-2 text-right ${selected ? 'cursor-text border border-indigo-500' : 'hover:cursor-text hover:border hover:border-indigo-500'}`}
+          value={editAllocatedInput}
+          onChange={(e) => {
+            const cents = Math.floor(parseFloat(e.target.value) * 100)
+            setEditAllocatedInput(cents / 100)
+          }}
+          onKeyDown={handleKeyDown}
+          onBlur={() => {
+            submitNewAllocation()
+            toggleSelect()
+          }}
+          onClick={handleInputClick}
+          onFocus={(e) => e.target.select()}
+        />
       </div>
       <div className="flex w-[15%] justify-end">
         <div className="truncate px-2 py-0.5">
-          {activityCents >= 0
-            ? `$${(activityCents / 100).toFixed(2)}`
-            : `-$${(-activityCents / 100).toFixed(2)}`}
+          {formatCentsToDollarString(activityCents)}
         </div>
       </div>
       <div className="flex w-[15%] justify-end">

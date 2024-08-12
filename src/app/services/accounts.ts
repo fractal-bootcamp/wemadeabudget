@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
 import prisma from '../client'
-import { AccountDetails } from '../types'
+import { AccountDetails, AccountUpdatePayload } from '../types'
 
 const queries = {
   /** Retrieve all accounts for a user */
@@ -61,11 +61,6 @@ const mutations = {
     })
     return updatedAccount
   },
-}
-
-type AccountUpdatePayload = {
-  oldName: string
-  newDetails: AccountDetails
 }
 
 const accountServices = {
