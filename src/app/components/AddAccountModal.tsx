@@ -41,6 +41,7 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
     <div
       onClick={(e) => {
         e.stopPropagation()
+        toggleShowAccountModal()
       }}
       className="fixed inset-0 z-40 flex flex-col items-center justify-center bg-black bg-opacity-20 font-semibold text-black"
     >

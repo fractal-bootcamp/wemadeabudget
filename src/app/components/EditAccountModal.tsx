@@ -61,6 +61,7 @@ const EditAccountModal: React.FC<EditAccountModalProps> = ({
     <div
       onClick={(e) => {
         e.stopPropagation()
+        closeModal()
       }}
       className="fixed inset-0 z-40 flex flex-col items-center justify-center bg-black bg-opacity-20 font-semibold text-black"
     >
