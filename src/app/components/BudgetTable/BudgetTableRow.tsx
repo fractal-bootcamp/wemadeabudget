@@ -9,6 +9,7 @@ interface BudgetTableRowProps {
   editing: boolean
   toggleEdit: () => void
   toggleSelect: () => void
+  onSelect: (name: string) => void
 }
 export default function BudgetTableRow({
   name,
@@ -17,6 +18,7 @@ export default function BudgetTableRow({
   editing,
   toggleEdit,
   toggleSelect,
+  onSelect, 
 }: BudgetTableRowProps) {
   const { categories, getBalanceByCategory } = useBudgetStore()
   const allocated = categories.find((c) => c.name === name)?.allocated || 0
@@ -26,6 +28,10 @@ export default function BudgetTableRow({
 
   const inputRef = useRef<HTMLInputElement>(null)
 
+  const handleInputClick = (e: React.MouseEvent<HTMLInputElement>) => {
+    e.stopPropagation()
+    onSelect(name)
+  }
 
   const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -95,7 +101,7 @@ export default function BudgetTableRow({
           }}
           onKeyDown={handleKeyDown}
           onBlur={() => setEditAllocatedInput((allocated / 100).toFixed(2))}
-          onClick={(e) => e.stopPropagation()}
+          onClick={handleInputClick}
           onFocus={(e) => e.target.select()}
         />
       </div>
