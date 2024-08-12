@@ -56,7 +56,7 @@ type budgetStore = {
   updatePayee: (payeeUpdatePayload: PayeeUpdatePayload) => void
   /** Adds a new category to the store */
   addCategory: (category: CategoryDetails) => void
-  /** Deletes a category from the store by its name */
+  /** Deletes a category from the store by its name, moving its transactions to "Uncategorized" (unless it is permanent) */
   deleteCategory: (categoryName: string) => void
   /** Edits an existing category in the store identified by its old name */
   updateCategory: (categoryUpdatePayload: CategoryUpdatePayload) => void

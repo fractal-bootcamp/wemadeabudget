@@ -6,7 +6,7 @@ import {
   updateStoreAndDb,
 } from '../../util/utils'
 import { useState, useCallback, useRef } from 'react'
-import { dbCategoryUpdate } from '../../actions/controller'
+import { dbCategoryDelete, dbCategoryUpdate } from '../../actions/controller'
 import { CategoryDetails, CategoryUpdatePayload } from '../../types'
 
 interface BudgetTableRowProps {
@@ -26,7 +26,8 @@ export default function BudgetTableRow({
   onSelect,
 }: BudgetTableRowProps) {
   const [editAllocation, setEditAllocation] = useState(false)
-  const { categories, getBalanceByCategory, updateCategory } = useBudgetStore()
+  const { categories, getBalanceByCategory, updateCategory, deleteCategory } =
+    useBudgetStore()
   const allocated = categories.find((c) => c.name === name)?.allocated || 0
   const activityCents = getBalanceByCategory(name)
   const availableCents = allocated + activityCents
@@ -99,7 +100,12 @@ export default function BudgetTableRow({
                   toggleEdit()
                 }}
                 onDelete={() => {
-                  toggleEdit()
+                  updateStoreAndDb({
+                    dbFunction: dbCategoryDelete,
+                    storeFunction: deleteCategory,
+                    payload: name,
+                    method: METHODS.DELETE,
+                  })
                 }}
               />
             )}
