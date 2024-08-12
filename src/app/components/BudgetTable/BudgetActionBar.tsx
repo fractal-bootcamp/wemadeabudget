@@ -18,10 +18,10 @@ export default function BudgetActionBar({
           </button>
           {showModal && <AddCategoryModal toggleShowModal={toggleShowModal} />}
         </div>
-        <button className="flex gap-1 text-xs">
+        <button className="flex gap-1 text-xs text-indigo-300">
           <LucideUndo className="h-4 w-4" /> Undo{' '}
         </button>
-        <button className="flex gap-1 text-xs">
+        <button className="flex gap-1 text-xs text-indigo-300">
           <LucideRedo className="h-4 w-4" /> Redo{' '}
         </button>
       </div>
