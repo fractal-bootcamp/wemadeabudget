@@ -99,7 +99,7 @@ const Dropdown = ({
               />
             ))
           ) : (
-            <div className="px-4 py-2 text-center text-gray-400">
+            <div className="bg-white px-4 py-2 text-center text-gray-400">
               No matches
             </div>
           )}
