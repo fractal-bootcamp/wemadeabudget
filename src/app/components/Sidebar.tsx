@@ -57,6 +57,8 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
     ? `${user?.firstName ?? user?.username}'s`
     : 'Your'
 
+  const [isUserIconHovered, setIsUserIconHovered] = useState(false)
+
   return (
     <>
       {/* Underlay to close modal */}
@@ -96,12 +98,34 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
             )}
           </div>
           {showUserDropdown && (
-            <div className="absolute left-2 top-full z-50 flex w-fit flex-row items-center justify-between gap-2 text-nowrap rounded-md bg-white p-3 text-slate-500 shadow-2xl">
-              <div className="shrink-0">
-                <User size={20} strokeWidth={2} fill={'gray'} />
+            <div
+              className="absolute left-2 top-full z-50 rounded-md bg-white text-slate-800 shadow-2xl hover:text-slate-500"
+              onMouseEnter={() => setIsUserIconHovered(true)}
+              onMouseLeave={() => setIsUserIconHovered(false)}
+            >
+              <div className="relative">
+                <div className="flex w-fit flex-row items-center justify-between gap-5 text-nowrap p-3 px-4">
+                  <div className="shrink-0">
+                    <User
+                      size={20}
+                      strokeWidth={2}
+                      fill={isUserIconHovered ? 'gray' : 'black'}
+                    />
+                  </div>
+                  {!collapsed && <div>Manage Account</div>}
+                </div>
+                <div className="absolute inset-0 h-full w-full rounded-md bg-transparent">
+                  <UserButton
+                    appearance={{
+                      elements: {
+                        userButtonBox: 'hidden',
+                        userButtonTrigger:
+                          'absolute inset-0 rounded-none w-full h-full justify-end p-2 rounded-md bg-transparent',
+                      },
+                    }}
+                  />
+                </div>
               </div>
-              {!collapsed && <div>Manage Account</div>}
-              <UserButton />
             </div>
           )}
         </div>
