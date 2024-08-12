@@ -25,6 +25,7 @@ type TransactionFormProps = {
   showAccount: boolean
   closeFunction: () => void
   existingTransaction?: TransactionDetails
+  accountName?: string
 }
 
 function TransactionForm({
@@ -32,6 +33,7 @@ function TransactionForm({
   showAccount,
   closeFunction,
   existingTransaction,
+  accountName,
 }: TransactionFormProps) {
   const {
     accounts,
@@ -43,8 +45,9 @@ function TransactionForm({
     updateTransaction,
   } = useBudgetStore()
   const [formData, setFormData] = useState<TransactionDetails>(
-    existingTransaction || emptyTransaction
+    existingTransaction || { ...emptyTransaction, account: accountName || '' }
   )
+
   const [inflow, setInflow] = useState(
     formData.cents > 0 ? formData.cents / 100 : 0
   )

@@ -247,7 +247,8 @@ function AccountTable({ accountName }: AccountTableProps) {
       {showAddTransactionRow && (
         <TransactionForm
           columnWidths={columnWidths}
-          showAccount={true}
+          showAccount={!accountName}
+          accountName={accountName || ''}
           closeFunction={closeEditingRow}
         />
       )}
