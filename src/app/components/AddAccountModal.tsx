@@ -3,74 +3,24 @@ import {
   AccountDetails,
   AccountType,
   emptyAccount,
+  startingBalanceTransaction,
   TransactionDetails,
 } from '../types'
 import { useState } from 'react'
-import { accountAdd, transactionAdd } from '../actions/controller'
 import useBudgetStore from '../stores/transactionStore'
+import {
+  checkSubmittedName,
+  submitStatus,
+  updateStoreAndDb,
+} from '../util/utils'
+import { dbAccountAdd, dbTransactionAdd } from '../actions/controller'
+import { start } from 'repl'
 
 const ACCOUNT_TYPES: { label: string; value: AccountType }[] = [
   { label: 'Checking', value: 'CHECKING' },
   { label: 'Cash', value: 'CASH' },
   { label: 'Credit Card', value: 'CREDIT_CARD' },
 ]
-
-interface submitStatus {
-  valid: boolean
-  message: string
-}
-const checkNewAccountSubmit = (
-  name: string,
-  existingNames: string[]
-): submitStatus => {
-  if (name.length === 0) {
-    return { valid: false, message: 'Account name must not be blank' }
-  }
-  if (name.trim().length === 0) {
-    return { valid: false, message: 'Name cannot be only spaces' }
-  }
-  if (existingNames.some((existingName) => existingName === name)) {
-    return { valid: false, message: 'Account with that name already exists' }
-  }
-  return { valid: true, message: '' }
-}
-
-const submitAccount = (
-  acctData: AccountDetails,
-  storeSetter: (data: AccountDetails) => void
-) => {
-  console.log(`Submitting account: ${JSON.stringify(acctData)}`)
-  //send to db
-  accountAdd(acctData).then((res) => {
-    console.log(`Account added: ${JSON.stringify(res)}`)
-  })
-  //optimistic update to store
-  storeSetter(acctData)
-  //TODO: verify and sync store after db call response
-}
-const submitInitialBalance = (
-  amount: number,
-  newAccountName: string,
-  storeAdder: (details: TransactionDetails) => void
-) => {
-  const transactionDetails: TransactionDetails = {
-    id: '',
-    account: newAccountName,
-    category: 'Ready To Assign',
-    payee: 'Starting Balance',
-    date: new Date(),
-    cents: amount,
-    memo: 'Account starting balance (entered automatically)',
-    flag: 'NONE',
-    cleared: true,
-  }
-  storeAdder(transactionDetails)
-  transactionAdd(transactionDetails).then((transactionDbRes) => {
-    console.log(
-      `Initial transaction added: ${JSON.stringify(transactionDbRes)}`
-    )
-  })
-}
 interface AddAccountModalProps {
   toggleShowAccountModal: () => void
 }
@@ -165,7 +115,7 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
           <button
             className="rounded-lg bg-blue-600 px-4 py-2 font-semibold text-white hover:bg-blue-800"
             onClick={() => {
-              const { valid, message } = checkNewAccountSubmit(
+              const { valid, message } = checkSubmittedName(
                 acctData.name,
                 accounts.map((account) => account.name)
               )
@@ -173,12 +123,25 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
                 setSubmitStatus({ valid, message })
                 return
               }
-              submitAccount(acctData, addAccount)
-              submitInitialBalance(
-                parseFloat(initialBalanceDollarString) * 100,
+              const initTransactionDetails = startingBalanceTransaction(
                 acctData.name,
-                addTransaction
+                parseFloat(initialBalanceDollarString) * 100
               )
+              //add account and its initial balance to db and store
+              updateStoreAndDb({
+                dbFunction: dbAccountAdd,
+                storeFunction: addAccount,
+                payload: acctData,
+                method: 'ADD',
+              })
+              updateStoreAndDb({
+                dbFunction: dbTransactionAdd,
+                storeFunction: addTransaction,
+                payload: initTransactionDetails,
+                method: 'ADD',
+              })
+              //
+              //hide modal after submission
               toggleShowAccountModal()
             }}
           >

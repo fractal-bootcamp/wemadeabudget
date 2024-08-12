@@ -3,46 +3,8 @@ import useBudgetStore from '../../stores/transactionStore'
 import BudgetHeader from './BudgetHeader'
 import BudgetActionBar from './BudgetActionBar'
 import { CategoryDetails } from '../../types'
-import {
-  categoryAdd,
-  categoryDelete,
-  categoryUpdate,
-} from '../../actions/controller'
-import AddCategoryModal from './AddCategoryModal'
 import BudgetTableRow from './BudgetTableRow'
-//TODO: add handling for duplicates etc
-const saveNewCategory = async (
-  name: string,
-  storeSetter: (details: CategoryDetails) => void
-) => {
-  //add new category to store
-  storeSetter({ name, allocated: 0 })
-  //add new category to database
-  const newCategory = await categoryAdd({ name, allocated: 0 })
-  console.log(`New category added: ${newCategory}`)
-}
-// TODO: decide if we want thi defined here or in the modal as it is now
-// const updateExistingCategory = async (
-//   oldName: string,
-//   newDetails: CategoryDetails,
-//   storeUpdater: (oldName: string, newDetails: CategoryDetails) => void
-// ) => {
-//   //update existing category in store
-//   storeUpdater(oldName, newDetails)
-//   //update existing category in database
-//   const updatedCategory = await categoryUpdate(oldName, newDetails)
-//   console.log(`Category updated: ${updatedCategory.name}`)
-// }
-const deleteCategory = async (
-  categoryName: string,
-  storeDeleter: (categoryName: string) => void
-) => {
-  //delete category from store
-  storeDeleter(categoryName)
-  //delete category from database
-  const deletedCategory = await categoryDelete(categoryName)
-  console.log(`Category deleted: ${deletedCategory.name}`)
-}
+
 export default function BudgetTable() {
   const {
     categories,
@@ -54,12 +16,14 @@ export default function BudgetTable() {
     categories: store.categories,
     addCategory: store.addCategory,
     removeCategory: store.deleteCategory,
-    editCategory: store.editCategory,
+    editCategory: store.updateCategory,
     getTransactionsByCategory: store.getTransactionsByCategory,
   }))
-  const sortedCategories = [...categories].sort((a, b) =>
-    a.name.toLocaleLowerCase() < b.name.toLocaleLowerCase() ? -1 : 1
-  )
+  const sortedCategories = [...categories]
+    .sort((a, b) =>
+      a.name.toLocaleLowerCase() < b.name.toLocaleLowerCase() ? -1 : 1
+    )
+    .filter((c) => c.name !== 'Ready to Assign')
 
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false)
   const [currentEditCategory, setCurrentEditCategory] = useState('')
@@ -74,15 +38,6 @@ export default function BudgetTable() {
     selectAllRef.current.indeterminate =
       selectedCategories.size > 0 && selectedCategories.size < categories.length
   }, [selectedCategories])
-  /**Returns total of all transactions for a given category in cents */
-  const categoryActivity = (categoryName: string) => {
-    const transactions = getTransactionsByCategory(categoryName)
-    const totalCents = transactions.reduce(
-      (acc, transaction) => acc + transaction.cents,
-      0
-    )
-    return totalCents
-  }
   const categorySelectionToggle = (category: string) => () => {
     setSelectedCategories((prev) => {
       const newSet = new Set(prev)
@@ -115,7 +70,6 @@ export default function BudgetTable() {
         <BudgetActionBar
           showModal={showAddCategoryModal}
           toggleShowModal={() => setShowAddCategoryModal(!showAddCategoryModal)}
-          onSave={saveNewCategory}
         />
       </div>
       <div className="flex items-stretch border-b border-l border-t border-gray-300 text-gray-500">
@@ -137,7 +91,6 @@ export default function BudgetTable() {
         <BudgetTableRow
           key={category.name}
           name={category.name}
-          allocated={category.allocated}
           editing={currentEditCategory === category.name}
           toggleEdit={() =>
             setCurrentEditCategory(
@@ -146,7 +99,6 @@ export default function BudgetTable() {
           }
           selected={selectedCategories.has(category.name)}
           toggleSelect={categorySelectionToggle(category.name)}
-          activityCents={categoryActivity(category.name)}
         />
       ))}
     </div>

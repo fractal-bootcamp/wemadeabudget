@@ -1,19 +1,8 @@
 'use client'
 import { Bookmark } from 'lucide-react'
-import { useState } from 'react'
-import { categoryAdd, payeeAdd, transactionAdd } from '../actions/controller'
-import {
-  CategoryDetails,
-  emptyTransaction,
-  TransactionDetails,
-  Flag,
-} from '../types'
-import useBudgetStore from '../stores/transactionStore'
-import Dropdown from './Dropdown/Dropdown'
-import FlagToggle from './FlagToggle'
-import ClearedButton from './ClearedButton'
 import TransactionForm from './TransactionForm'
-import { centsToDollarString } from '../util/utils'
+import { formatCentsToDollarString } from '../util/utils'
+import { Flag } from '../types'
 
 interface ColumnWidths {
   [key: string]: number
@@ -48,46 +37,6 @@ interface TransactionRowProps {
   flag: Flag
 }
 
-const addNewPayee = (
-  newPayeeName: string,
-  storeSetter: (payeeName: string) => void
-) => {
-  console.log(`Adding new payee: ${newPayeeName}`)
-  //optimistic update to store
-  storeSetter(newPayeeName)
-  //send to db
-  payeeAdd(newPayeeName).then((res) => {
-    console.log(`Payee added: ${JSON.stringify(res)}`)
-  })
-}
-
-const addNewCategory = (
-  newCategoryName: string,
-  storeSetter: (details: CategoryDetails) => void
-) => {
-  const newCategory: CategoryDetails = { name: newCategoryName, allocated: 0 }
-  console.log(`Adding new category: ${newCategory}`)
-  //optimistic update to store
-  storeSetter(newCategory)
-  //send to db
-  categoryAdd(newCategory).then((res) => {
-    console.log(`Category added: ${JSON.stringify(res)}`)
-  })
-}
-
-const submitTransaction = (
-  formData: TransactionDetails,
-  storeSetter: (data: TransactionDetails) => void
-) => {
-  console.log(`Submitting transaction: ${JSON.stringify(formData)}`)
-  //send to db
-  transactionAdd(formData).then((res) => {
-    console.log(`Transaction added: ${JSON.stringify(res)}`)
-  })
-  //optimistic update to store
-  storeSetter(formData)
-}
-
 function TransactionRow({
   id,
   account,
@@ -108,18 +57,6 @@ function TransactionRow({
   isCleared,
   flag,
 }: TransactionRowProps) {
-  const {
-    accounts,
-    payees,
-    categories,
-    addCategory,
-    addPayee,
-    addTransaction,
-  } = useBudgetStore()
-  const [formData, setFormData] = useState<TransactionDetails>(emptyTransaction)
-  const [inflow, setInflow] = useState(cents > 0 ? cents / 100 : 0)
-  const [outflow, setOutflow] = useState(cents < 0 ? Math.abs(cents) / 100 : 0)
-
   //TODO: Make edit mode show the same dropdowns as add mode
   return isEditing ? (
     <TransactionForm
@@ -204,7 +141,7 @@ function TransactionRow({
         className="flex items-center justify-end truncate p-2 text-sm"
       >
         <div className="truncate">
-          {cents < 0 ? centsToDollarString(cents) : ''}
+          {cents < 0 ? formatCentsToDollarString(cents) : ''}
         </div>
       </div>
       <div
@@ -212,7 +149,7 @@ function TransactionRow({
         className="flex items-center justify-end truncate p-2 text-sm"
       >
         <div className="truncate">
-          {cents > 0 ? centsToDollarString(cents) : ''}
+          {cents > 0 ? formatCentsToDollarString(cents) : ''}
         </div>
       </div>
       <button

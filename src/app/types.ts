@@ -96,3 +96,18 @@ export const defaults: Defaults = {
   accounts: defaultAccounts,
   payees: defaultPayees.map((name) => ({ name })),
 }
+
+export const startingBalanceTransaction = (
+  accountName: string,
+  cents: number
+): TransactionDetails => ({
+  id: '',
+  account: accountName,
+  category: 'Ready To Assign',
+  payee: 'Starting Balance',
+  date: new Date(),
+  cents,
+  memo: 'Account starting balance (entered automatically)',
+  flag: 'NONE',
+  cleared: true,
+})

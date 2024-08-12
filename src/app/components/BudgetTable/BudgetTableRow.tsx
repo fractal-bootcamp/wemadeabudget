@@ -1,56 +1,25 @@
-import { useState } from 'react'
 import EditCategoryModal from './EditCategoryModal'
-import { CategoryDetails } from '../../types'
-import { categoryDelete, categoryUpdate } from '../../actions/controller'
 import useBudgetStore from '../../stores/transactionStore'
+import { formatCentsToDollarString } from '../../util/utils'
 
-const confirmEditCategoryOnClick = async (
-  oldName: string,
-  newDetails: CategoryDetails,
-  storeSetter: (oldName: string, newDetails: CategoryDetails) => void
-) => {
-  //add to store
-  storeSetter(oldName, newDetails)
-  //add to database
-  const result = await categoryUpdate(oldName, newDetails)
-  console.log(result)
-}
-const deleteCategoryOnClick = async (
-  name: string,
-  storeDeleter: (name: string) => void
-) => {
-  //add to store
-  storeDeleter(name)
-  //add to database
-  const result = await categoryDelete(name)
-  console.log(result)
-}
 interface BudgetTableRowProps {
   name: string
-  allocated: number
   selected: boolean
   editing: boolean
   toggleEdit: () => void
   toggleSelect: () => void
-  activityCents: number
 }
 export default function BudgetTableRow({
   name,
-  allocated,
   selected,
-  activityCents,
   editing,
   toggleEdit,
   toggleSelect,
 }: BudgetTableRowProps) {
-  const { categories, editCategory, deleteCategory } = useBudgetStore(
-    (store) => ({
-      categories: store.categories,
-      editCategory: store.editCategory,
-      deleteCategory: store.deleteCategory,
-    })
-  )
-  const availableCents = allocated - activityCents
+  const { categories, getBalanceByCategory } = useBudgetStore()
+  const allocated = categories.find((c) => c.name === name)?.allocated || 0
+  const activityCents = getBalanceByCategory(name)
+  const availableCents = allocated + activityCents
   return (
     <div
       className={`flex items-stretch border-b border-gray-300 py-2 pr-4 ${selected ? 'bg-indigo-200' : 'bg-white'}`}
@@ -85,14 +54,6 @@ export default function BudgetTableRow({
               <EditCategoryModal
                 originalName={name}
                 categories={categories}
-                onSave={(newName) => {
-                  toggleSelect()
-                  confirmEditCategoryOnClick(
-                    name,
-                    { name: newName, allocated: allocated },
-                    editCategory
-                  )
-                }}
                 closeModal={() => {
                   toggleEdit()
                 }}
@@ -123,9 +84,7 @@ export default function BudgetTableRow({
         <div
           className={`truncate px-2 py-0.5 ${availableCents >= 0 ? 'rounded-full bg-green-300' : availableCents < 0 ? 'rounded-full bg-red-300' : ''}`}
         >
-          {availableCents >= 0
-            ? `$${(availableCents / 100).toFixed(2)}`
-            : `-$${(-availableCents / 100).toFixed(2)}`}
+          {formatCentsToDollarString(availableCents)}
         </div>
       </div>
     </div>

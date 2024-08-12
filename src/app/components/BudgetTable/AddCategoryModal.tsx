@@ -1,37 +1,18 @@
 import { useState } from 'react'
 import useBudgetStore from '../../stores/transactionStore'
 import { CategoryDetails } from '../../types'
-
-interface submitStatus {
-  valid: boolean
-  message: string
-}
-const checkSubmit = (
-  name: string,
-  existing: CategoryDetails[]
-): submitStatus => {
-  if (name.length === 0) {
-    return { valid: false, message: 'Name is required' }
-  }
-  if (name.trim().length === 0) {
-    return { valid: false, message: 'Name cannot be only spaces' }
-  }
-  if (existing.some((category) => category.name === name)) {
-    return { valid: false, message: 'Category already exists' }
-  }
-  return { valid: true, message: '' }
-}
+import {
+  checkSubmittedName,
+  submitStatus,
+  updateStoreAndDb,
+} from '../../util/utils'
+import { dbCategoryAdd } from '../../actions/controller'
 
 interface AddCategoryModalProps {
-  onCancel: () => void
-  onSave: (
-    name: string,
-    storeSetter: (details: CategoryDetails) => void
-  ) => void
+  toggleShowModal: () => void
 }
 export default function AddCategoryModal({
-  onCancel,
-  onSave,
+  toggleShowModal: closeFunction,
 }: AddCategoryModalProps) {
   const { categories, addCategory } = useBudgetStore((store) => ({
     categories: store.categories,
@@ -68,16 +49,24 @@ export default function AddCategoryModal({
         )}
       </div>
       <div className="flex justify-end gap-2">
-        <button onClick={onCancel} className="mybtn mybtn-secondary">
+        <button onClick={closeFunction} className="mybtn mybtn-secondary">
           Cancel
         </button>
         <button
           //   disabled={isDuplicate}
           onClick={() => {
-            const { valid, message } = checkSubmit(categoryName, categories)
+            const { valid, message } = checkSubmittedName(
+              categoryName,
+              categories.map((category) => category.name)
+            )
             if (valid) {
-              onSave(categoryName, addCategory)
-              onCancel()
+              updateStoreAndDb({
+                dbFunction: dbCategoryAdd,
+                storeFunction: addCategory,
+                payload: categoryName,
+                method: 'ADD',
+              })
+              closeFunction()
             } else {
               setSubmitStatus({ valid, message })
             }

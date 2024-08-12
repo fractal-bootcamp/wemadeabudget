@@ -4,14 +4,9 @@ import AddCategoryModal from './AddCategoryModal'
 interface BudgetActionBarProps {
   showModal: boolean
   toggleShowModal: () => void
-  onSave: (
-    name: string,
-    storeSetter: (details: CategoryDetails) => void
-  ) => void
 }
 export default function BudgetActionBar({
   toggleShowModal,
-  onSave,
   showModal,
 }: BudgetActionBarProps) {
   return (
@@ -21,9 +16,7 @@ export default function BudgetActionBar({
           <button onClick={toggleShowModal} className="flex gap-1 text-xs">
             <PlusCircle className="h-4 w-4" /> Category{' '}
           </button>
-          {showModal && (
-            <AddCategoryModal onCancel={toggleShowModal} onSave={onSave} />
-          )}
+          {showModal && <AddCategoryModal toggleShowModal={toggleShowModal} />}
         </div>
         <button className="flex gap-1 text-xs">
           <LucideUndo className="h-4 w-4" /> Undo{' '}
