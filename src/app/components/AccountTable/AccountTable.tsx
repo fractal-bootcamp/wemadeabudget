@@ -3,7 +3,7 @@ import TransactionRow from './TransactionRow'
 import { Bookmark } from 'lucide-react'
 import ResizableColumn from '../ResizableColumn'
 import TransactionForm from './TransactionForm'
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useRef } from 'react'
 import AccountsHeader from './AccountsHeader'
 import ActionBar from './ActionBar'
 import useBudgetStore from '../../stores/transactionStore'
@@ -15,6 +15,7 @@ interface AccountTableProps {
 function AccountTable({ accountName }: AccountTableProps) {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
   const [clearedRows, setClearedRows] = useState<Set<string>>(new Set())
+  const selectAllRef = useRef<HTMLInputElement>(null)
   const [editingRow, setEditingRow] = useState<string | null>(null)
   const [showAddTransactionRow, setShowAddTransactionRow] = useState(false)
   const { getTransactionsByAccount, getAllTransactions } = useBudgetStore()
@@ -87,16 +88,11 @@ function AccountTable({ accountName }: AccountTableProps) {
     })
   }
 
-  function toggleSelectAll() {
-    setSelectedRows((prev) => {
-      const newSet = new Set(prev)
-      if (newSet.size < transactionRows.length) {
-        transactionRows.forEach((row) => newSet.add(row.id))
-      } else {
-        newSet.clear()
-      }
-      return newSet
-    })
+  const toggleSelectAll = () => {
+    const anySelected = selectedRows.size > 0
+    setSelectedRows(
+      anySelected ? new Set() : new Set(transactionRows.map((c) => c.id))
+    )
   }
 
   function handleRowClick(id: string) {
@@ -135,6 +131,15 @@ function AccountTable({ accountName }: AccountTableProps) {
     setShowAddTransactionRow(false)
   }
 
+  useEffect(() => {
+    if (!selectAllRef.current) return
+    //set to checked if all are now selected
+    selectAllRef.current.checked = selectedRows.size === transactionRows.length
+    //set to indeterminate if any but not all are selected
+    selectAllRef.current.indeterminate =
+      selectedRows.size > 0 && selectedRows.size < transactionRows.length
+  }, [selectedRows])
+
   return (
     // i think this code is very redundant and might simplify later, but works
     <div className="h-full w-full min-w-[750px] overflow-x-scroll">
@@ -147,9 +152,10 @@ function AccountTable({ accountName }: AccountTableProps) {
             style={{ width: columnWidths.checkbox }}
           >
             <input
+              ref={selectAllRef}
               type="checkbox"
               className=""
-              onChange={() => toggleSelectAll()}
+              onChange={toggleSelectAll}
             />
           </div>
           <div
