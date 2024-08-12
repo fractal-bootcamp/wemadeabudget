@@ -7,6 +7,7 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import AccountsHeader from './AccountsHeader'
 import ActionBar from './ActionBar'
 import useBudgetStore from '../../stores/transactionStore'
+import { TransactionDetails } from '../../types'
 
 //truncate to prevent overflow
 interface AccountTableProps {
@@ -15,6 +16,8 @@ interface AccountTableProps {
 function AccountTable({ accountName }: AccountTableProps) {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
   const [clearedRows, setClearedRows] = useState<Set<string>>(new Set())
+  const [searchTerm, setSearchTerm] = useState('')
+
   const selectAllRef = useRef<HTMLInputElement>(null)
   const [editingRow, setEditingRow] = useState<string | null>(null)
   const [showAddTransactionRow, setShowAddTransactionRow] = useState(false)
@@ -22,6 +25,15 @@ function AccountTable({ accountName }: AccountTableProps) {
   const transactionRows = accountName
     ? getTransactionsByAccount(accountName)
     : getAllTransactions()
+  const filteredTransactions = transactionRows.filter((transaction) => {
+    return (
+      searchTerm === '' ||
+      transaction.account.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      transaction.payee.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      transaction.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      transaction.memo.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  })
   const [columnWidths, setColumnWidths] = useState({
     flag: 50,
     checkbox: 40,
@@ -145,7 +157,11 @@ function AccountTable({ accountName }: AccountTableProps) {
     <div className="h-full w-full min-w-[750px] overflow-x-scroll">
       <div className="min-w-full">
         <AccountsHeader accountName={accountName} />
-        <ActionBar onAddTransaction={toggleShowAddTransactionRow} />
+        <ActionBar
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          onAddTransaction={toggleShowAddTransactionRow}
+        />
         <div className="flex flex-row items-stretch border-b border-l border-t border-gray-300 text-[10px] text-gray-500">
           <div
             className="container-class flex items-center justify-center border-r border-gray-300 p-2"
@@ -253,7 +269,7 @@ function AccountTable({ accountName }: AccountTableProps) {
         />
       )}
       <div className="flex w-full flex-col">
-        {transactionRows.map((row) => (
+        {filteredTransactions.map((row) => (
           <TransactionRow
             key={row.id}
             transactionDetails={row}
