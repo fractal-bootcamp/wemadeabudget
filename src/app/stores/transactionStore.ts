@@ -36,7 +36,7 @@ type budgetStore = {
   /** Adds a new account to the store */
   addAccount: (account: AccountDetails) => void
   /** Removes an account from the store by its name */
-  removeAccount: (accountName: string) => void
+  deleteAccount: (accountName: string) => void
   /** Updates an existing account in the store */
   updateAccount: (accountUpdatePayload: AccountUpdatePayload) => void
   /** Adds a new transaction to the store */
@@ -118,7 +118,7 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
     set((state) => ({
       accounts: [...state.accounts, account],
     })),
-  removeAccount: (accountName) =>
+  deleteAccount: (accountName) =>
     set((state) => ({
       accounts: state.accounts.filter(
         (account) => account.name !== accountName
