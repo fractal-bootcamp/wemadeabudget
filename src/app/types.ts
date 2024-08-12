@@ -3,24 +3,37 @@ export interface User {
   email: string
   clerkId: string
 }
-export type AccountType = 'CHECKING' | 'CASH' | 'CREDIT_CARD' | 'SAVINGS'
-export type Flag =
-  | 'NONE'
-  | 'RED'
-  | 'ORANGE'
-  | 'YELLOW'
-  | 'GREEN'
-  | 'BLUE'
-  | 'PURPLE'
-export const flagColors = {
-  NONE: '#f0f0f0',
-  RED: '#ff0000',
-  ORANGE: '#ff7f00',
-  YELLOW: '#ffff00',
-  GREEN: '#00ff00',
-  BLUE: '#0000ff',
-  PURPLE: '#7f00ff',
-}
+const AccountTypes = ['CHECKING', 'CASH', 'CREDIT_CARD', 'SAVINGS'] as const
+
+export type AccountType = (typeof AccountTypes)[number]
+
+export const AccountTypeDetails: { type: AccountType; display: string }[] = [
+  { type: 'CHECKING', display: 'Checking' },
+  { type: 'CASH', display: 'Cash' },
+  { type: 'CREDIT_CARD', display: 'Credit Card' },
+  { type: 'SAVINGS', display: 'Savings' },
+]
+
+const Flags = [
+  'NONE',
+  'RED',
+  'ORANGE',
+  'YELLOW',
+  'GREEN',
+  'BLUE',
+  'PURPLE',
+] as const
+
+export type Flag = (typeof Flags)[number]
+export const FlagDetails: { type: Flag; display: string; hexCode: string }[] = [
+  { type: 'NONE', display: 'None', hexCode: '#f0f0f0' },
+  { type: 'RED', display: 'Red', hexCode: '#ff0000' },
+  { type: 'ORANGE', display: 'Orange', hexCode: '#ff7f00' },
+  { type: 'YELLOW', display: 'Yellow', hexCode: '#ffff00' },
+  { type: 'GREEN', display: 'Green', hexCode: '#00ff00' },
+  { type: 'BLUE', display: 'Blue', hexCode: '#0000ff' },
+  { type: 'PURPLE', display: 'Purple', hexCode: '#7f00ff' },
+]
 export type TransactionDetails = {
   id: string
   account: string

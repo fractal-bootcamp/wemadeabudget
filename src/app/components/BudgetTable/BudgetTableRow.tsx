@@ -55,9 +55,6 @@ export default function BudgetTableRow({
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'Enter' && editAllocation) {
         submitNewAllocation()
-        // updateCategoryAllocation(name, Math.round(newValue * 100))
-        //replace with real setter function
-        console.log('allocation updated')
         inputRef.current?.blur()
         setEditAllocation(false)
       }
@@ -103,7 +100,6 @@ export default function BudgetTableRow({
                 }}
                 onDelete={() => {
                   toggleEdit()
-                  console.log('deleting not yet implemented')
                 }}
               />
             )}

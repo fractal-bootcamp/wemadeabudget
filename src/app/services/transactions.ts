@@ -1,6 +1,5 @@
-import { get } from 'http'
 import prisma from '../client'
-import { AccountType, TransactionDetails } from '../types'
+import { TransactionDetails } from '../types'
 import { Transaction } from '@prisma/client'
 //This is a helper object that is used to include the name field in the related models to the transactions
 const nameInclusions = {

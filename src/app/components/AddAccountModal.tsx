@@ -2,9 +2,9 @@ import { X } from 'lucide-react'
 import {
   AccountDetails,
   AccountType,
+  AccountTypeDetails,
   emptyAccount,
   startingBalanceTransaction,
-  TransactionDetails,
 } from '../types'
 import { useState } from 'react'
 import useBudgetStore from '../stores/transactionStore'
@@ -16,12 +16,6 @@ import {
 import { dbAccountAdd, dbTransactionAdd } from '../actions/controller'
 import { start } from 'repl'
 
-const ACCOUNT_TYPES: { label: string; value: AccountType }[] = [
-  { label: 'Checking', value: 'CHECKING' },
-  { label: 'Cash', value: 'CASH' },
-  { label: 'Credit Card', value: 'CREDIT_CARD' },
-  { label: 'Savings', value: 'SAVINGS' },
-]
 interface AddAccountModalProps {
   toggleShowAccountModal: () => void
 }
@@ -97,9 +91,12 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
               setAcctData({ ...acctData, type: e.target.value as AccountType })
             }
           >
-            {ACCOUNT_TYPES.map((type, index) => (
-              <option key={index} value={type.value}>
-                {type.label}
+            {AccountTypeDetails.map((acctType, index) => (
+              <option
+                key={acctData.type + index.toString()}
+                value={acctType.type}
+              >
+                {acctType.display}
               </option>
             ))}
           </select>

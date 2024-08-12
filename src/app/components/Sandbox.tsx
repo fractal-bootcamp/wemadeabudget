@@ -21,7 +21,6 @@ function Sandbox({ transactions, accounts, categories, payees }: SandboxProps) {
   const { isLoaded, load, addTransaction, addAccount, addCategory, addPayee } =
     useBudgetStore()
   useEffect(() => {
-    console.log('loading store')
     if (isLoaded()) return
     transactions.forEach(addTransaction)
     accounts.forEach(addAccount)

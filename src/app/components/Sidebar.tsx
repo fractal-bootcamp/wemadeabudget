@@ -50,7 +50,6 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
 
   const toggleAddAccountModal = () => {
     setShowAddAccountModal((prev) => !prev)
-    console.log('toggleAddAccountModal')
   }
 
   const firstNameDisplay = isLoaded
