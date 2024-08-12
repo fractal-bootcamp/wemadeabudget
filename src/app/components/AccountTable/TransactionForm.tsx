@@ -1,5 +1,9 @@
 'use client'
-import { emptyTransaction, TransactionDetails } from '../../types'
+import {
+  CategoryDetails,
+  emptyTransaction,
+  TransactionDetails,
+} from '../../types'
 import FlagToggle from './FlagToggle'
 import ClearedButton from './ClearedButton'
 import { useState } from 'react'
@@ -159,10 +163,15 @@ function TransactionForm({
             label="Category"
             addOptions={true}
             addOptionCallback={(newCategoryName: string) => {
+              const payload: CategoryDetails = {
+                name: newCategoryName,
+                allocated: 0,
+                permanent: false,
+              }
               updateStoreAndDb({
                 dbFunction: dbCategoryAdd,
                 storeFunction: addCategory,
-                payload: newCategoryName,
+                payload,
                 method: 'ADD',
               })
               setFormData({ ...formData, category: newCategoryName })
