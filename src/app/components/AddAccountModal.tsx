@@ -20,6 +20,7 @@ const ACCOUNT_TYPES: { label: string; value: AccountType }[] = [
   { label: 'Checking', value: 'CHECKING' },
   { label: 'Cash', value: 'CASH' },
   { label: 'Credit Card', value: 'CREDIT_CARD' },
+  { label: 'Savings', value: 'SAVINGS' },
 ]
 interface AddAccountModalProps {
   toggleShowAccountModal: () => void
