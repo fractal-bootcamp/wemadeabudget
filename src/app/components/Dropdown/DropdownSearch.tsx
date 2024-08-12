@@ -13,7 +13,7 @@ const DropdownSearch = ({
       <input
         type="text"
         className="bg-slate-200 px-4 py-2 "
-        placeholder="Search..."
+        placeholder="Search or Add"
         value={searchTerm}
         onFocus={() => setExpanded(true)}
         onChange={e => setSearchTerm(e.target.value)}

@@ -240,7 +240,7 @@ function TransactionForm({
         </div>
       </div>
       {/* Buttons */}
-      <div className="flex w-[150px] flex-row justify-start gap-2 self-end">
+      <div className="flex flex-row justify-end gap-2" style={{marginRight: `${columnWidths.cleared}px` }}>
         <button
           className="rounded-lg border border-indigo-600 px-4 py-1 text-indigo-600"
           type="button"
