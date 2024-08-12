@@ -135,14 +135,15 @@ function TransactionForm({
             selected={formData.payee}
             addOptions={true}
             label="Payee"
-            addOptionCallback={(newPayeeName: string) =>
+            addOptionCallback={(newPayeeName: string) => {
               updateStoreAndDb({
                 dbFunction: dbPayeeAdd,
                 storeFunction: addPayee,
                 payload: newPayeeName,
                 method: 'ADD',
               })
-            }
+              setFormData({ ...formData, payee: newPayeeName })
+            }}
             setSelected={(selection: string) => {
               setFormData({ ...formData, payee: selection })
             }}
@@ -157,14 +158,15 @@ function TransactionForm({
             selected={formData.category}
             label="Category"
             addOptions={true}
-            addOptionCallback={(newCategoryName: string) =>
+            addOptionCallback={(newCategoryName: string) => {
               updateStoreAndDb({
                 dbFunction: dbCategoryAdd,
                 storeFunction: addCategory,
                 payload: newCategoryName,
                 method: 'ADD',
               })
-            }
+              setFormData({ ...formData, category: newCategoryName })
+            }}
             setSelected={(selection: string) => {
               setFormData({ ...formData, category: selection })
             }}
@@ -240,7 +242,10 @@ function TransactionForm({
         </div>
       </div>
       {/* Buttons */}
-      <div className="flex flex-row justify-end gap-2" style={{marginRight: `${columnWidths.cleared}px` }}>
+      <div
+        className="flex flex-row justify-end gap-2"
+        style={{ marginRight: `${columnWidths.cleared}px` }}
+      >
         <button
           className="rounded-lg border border-indigo-600 px-4 py-1 text-indigo-600"
           type="button"

@@ -10,7 +10,7 @@ interface DropdownProps {
   disabled?: boolean
   addOptions?: boolean
   addOptionCallback?: (option: string) => void
-  setSelected: (selected: string) => void,
+  setSelected: (selected: string) => void
   className?: string
 }
 const MAX_OPTION_LENGTH = 15
@@ -22,7 +22,7 @@ const Dropdown = ({
   addOptions = false,
   addOptionCallback = () => {},
   setSelected, //selected setter function to update parent state,
-  className = ''
+  className = '',
 }: DropdownProps) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [expanded, setExpanded] = useState(false)
@@ -47,8 +47,8 @@ const Dropdown = ({
   }
   return (
     <div
-      className={`cursor-pointer text-xs w-full ${className}`} 
-    // tabIndex makes the dropdown focusable so that onBlur can close it
+      className={`w-full cursor-pointer text-xs ${className}`}
+      // tabIndex makes the dropdown focusable so that onBlur can close it
       tabIndex={0}
       onBlur={() => setExpanded(false)}
     >
@@ -82,7 +82,10 @@ const Dropdown = ({
             searchTerm.length > 0 &&
             !options.some((option) => option === searchTerm) && (
               <AddOptionDropdownRow
-                addOptionCallback={addOptionCallback}
+                addOptionCallback={(searchTerm: string) => {
+                  addOptionCallback(searchTerm)
+                  setSearchTerm('')
+                }}
                 searchTerm={searchTerm}
               />
             )}
