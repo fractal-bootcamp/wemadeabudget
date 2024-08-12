@@ -40,17 +40,19 @@ const mutations = {
     }
   },
   deleteCategory: async (userId: string, categoryName: string) => {
-    const permanent = await prisma.category.findUnique({
-      where: {
-        categoryId: {
-          name: categoryName,
-          userId: userId,
+    const permanent = (
+      await prisma.category.findUnique({
+        where: {
+          categoryId: {
+            name: categoryName,
+            userId: userId,
+          },
         },
-      },
-      select: {
-        permanent: true,
-      },
-    })
+        select: {
+          permanent: true,
+        },
+      })
+    )?.permanent
     if (permanent) {
       throw new Error('Cannot delete a permanent category.')
     }
