@@ -148,7 +148,7 @@ function AccountTable({ accountName }: AccountTableProps) {
           >
             <input
               type="checkbox"
-              className="h-4 w-4"
+              className=""
               onChange={() => toggleSelectAll()}
             />
           </div>
