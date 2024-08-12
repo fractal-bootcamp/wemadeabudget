@@ -46,6 +46,7 @@ export const emptyTransaction: TransactionDetails = {
 export type CategoryDetails = {
   name: string
   allocated: number
+  permanent: boolean
   // categoryGroupName: string;
 }
 

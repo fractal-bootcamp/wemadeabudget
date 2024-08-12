@@ -123,6 +123,9 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
       accounts: state.accounts.filter(
         (account) => account.name !== accountName
       ),
+      transactions: state.transactions.filter(
+        (transaction) => transaction.account !== accountName
+      ),
     })),
   updateAccount: (accountUpdatePayload) =>
     set((state) => ({
@@ -174,15 +177,33 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
       if (state.categories.find((c) => c.name === categoryName)) {
         throw new Error('Category already exists')
       }
-      const newCategory: CategoryDetails = { name: categoryName, allocated: 0 }
+      const newCategory: CategoryDetails = {
+        name: categoryName,
+        allocated: 0,
+        permanent: false,
+      }
       return { categories: [...state.categories, newCategory] }
     }),
   deleteCategory: (categoryName) =>
-    set((state) => ({
-      categories: state.categories.filter(
-        (category) => category.name !== categoryName
-      ),
-    })),
+    set((state) => {
+      //If category is permanent, throw an error
+      const category = state.categories.find((c) => c.name === categoryName)
+      if (category?.permanent) {
+        throw new Error('Cannot delete a permanent category.')
+      }
+      ///otherwise, move all transactions in the category to the Uncategorized category then delete the category
+      return {
+        categories: state.categories.filter(
+          (category) => category.name !== categoryName
+        ),
+        transactions: state.transactions.map((transaction) => {
+          if (transaction.category === categoryName) {
+            return { ...transaction, category: 'Uncategorized' }
+          }
+          return transaction
+        }),
+      }
+    }),
   updateCategory: (categoryUpdatePayload) => {
     set((state) => ({
       categories: state.categories.map((category) => {

@@ -3,7 +3,7 @@ import prisma from '../client'
 import { CategoryDetails } from '../types'
 const queries = {
   getCategories: async (userId: string) => {
-    const categories = await prisma.category.findMany({
+    return await prisma.category.findMany({
       where: {
         user: {
           id: userId,
