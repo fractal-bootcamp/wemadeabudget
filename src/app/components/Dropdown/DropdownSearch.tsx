@@ -1,24 +1,29 @@
+import { Search } from 'lucide-react'
+
 interface DropdownSearchProps {
-  searchTerm: string;
-  setSearchTerm: (searchTerm: string) => void;
-  setExpanded: (expanded: boolean) => void;
+  searchTerm: string
+  setSearchTerm: (searchTerm: string) => void
+  setExpanded: (expanded: boolean) => void
 }
 const DropdownSearch = ({
   searchTerm,
   setSearchTerm,
-  setExpanded
+  setExpanded,
 }: DropdownSearchProps) => {
   return (
-    <div className={`bg-slate-50 w-full cursor-pointer`}>
+    <div className={`relative w-full cursor-pointer bg-slate-50`}>
       <input
         type="text"
-        className="bg-slate-200 px-4 py-2 "
+        className="w-full bg-slate-200 py-2 pl-4 pr-6"
         placeholder="Search or Add"
         value={searchTerm}
         onFocus={() => setExpanded(true)}
-        onChange={e => setSearchTerm(e.target.value)}
+        onChange={(e) => setSearchTerm(e.target.value)}
       />
+      <div className="absolute right-0 top-1/2 -translate-y-1/2 p-1 text-gray-400">
+        <Search size={16} />
+      </div>
     </div>
-  );
-};
-export default DropdownSearch;
+  )
+}
+export default DropdownSearch
