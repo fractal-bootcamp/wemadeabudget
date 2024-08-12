@@ -1,20 +1,24 @@
 'use client'
-import { CategoryDetails, emptyTransaction, TransactionDetails } from '../types'
+import {
+  CategoryDetails,
+  emptyTransaction,
+  TransactionDetails,
+} from '../../types'
 import FlagToggle from './FlagToggle'
 import ClearedButton from './ClearedButton'
 import { useState } from 'react'
-import useBudgetStore from '../stores/transactionStore'
-import Dropdown from './Dropdown/Dropdown'
+import useBudgetStore from '../../stores/transactionStore'
+import Dropdown from '../Dropdown/Dropdown'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import { ChevronDown } from 'lucide-react'
-import { updateStoreAndDb } from '../util/utils'
+import { updateStoreAndDb } from '../../util/utils'
 import {
   dbCategoryAdd,
   dbPayeeAdd,
   dbTransactionAdd,
   dbTransactionUpdate,
-} from '../actions/controller'
+} from '../../actions/controller'
 
 type TransactionFormProps = {
   columnWidths: { [key: string]: number }

@@ -1,8 +1,8 @@
 'use client'
 import { Bookmark } from 'lucide-react'
 import TransactionForm from './TransactionForm'
-import { formatCentsToDollarString } from '../util/utils'
-import { Flag, flagColors, TransactionDetails } from '../types'
+import { formatCentsToDollarString } from '../../util/utils'
+import { Flag, flagColors, TransactionDetails } from '../../types'
 
 interface ColumnWidths {
   [key: string]: number

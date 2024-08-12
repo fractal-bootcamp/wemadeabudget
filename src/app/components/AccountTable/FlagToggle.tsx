@@ -1,6 +1,6 @@
 'use client'
 import { Bookmark } from 'lucide-react'
-import { Flag, flagColors } from '../types'
+import { Flag, flagColors } from '../../types'
 import { useMemo } from 'react'
 
 interface FlogTaggleProps {
