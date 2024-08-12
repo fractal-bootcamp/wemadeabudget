@@ -88,7 +88,7 @@ const defaultCategories = [
   'Stuff I Forgot to Budget For',
   'Celebrations',
 ]
-const defaultPermanetCategories = ['Uncategorized', 'Ready To Assign']
+const defaultPermanetCategories = ['Uncategorized', 'Ready to Assign']
 const defaultAccounts: AccountDetails[] = [
   { name: 'Checking', type: 'CHECKING' },
   { name: 'Savings', type: 'SAVINGS' },
@@ -115,7 +115,7 @@ export const startingBalanceTransaction = (
 ): TransactionDetails => ({
   id: '',
   account: accountName,
-  category: 'Ready To Assign',
+  category: 'Ready to Assign',
   payee: 'Starting Balance',
   date: new Date(),
   cents,
