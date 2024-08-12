@@ -127,18 +127,13 @@ function TransactionRow({
           {cents > 0 ? formatCentsToDollarString(cents) : ''}
         </div>
       </div>
-      <button
-        onClick={(e) => {
-          e.stopPropagation(), toggleCleared()
-        }}
-        className="flex w-[50px] items-center justify-center p-2"
-      >
+      <div className="flex w-[50px] items-center justify-center p-2">
         <div
           className={`h-4 w-4 rounded-full ${cleared ? 'bg-green-600 text-white' : 'border border-gray-400 bg-white text-gray-600'} text-bold text-center text-xs`}
         >
           C
         </div>
-      </button>
+      </div>
     </div>
   )
 }
