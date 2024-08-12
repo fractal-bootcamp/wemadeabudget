@@ -1,6 +1,7 @@
 import EditCategoryModal from './EditCategoryModal'
 import useBudgetStore from '../../stores/transactionStore'
 import { formatCentsToDollarString } from '../../util/utils'
+import { useState, useCallback, useRef } from 'react'
 
 interface BudgetTableRowProps {
   name: string
@@ -11,6 +12,7 @@ interface BudgetTableRowProps {
 }
 export default function BudgetTableRow({
   name,
+
   selected,
   editing,
   toggleEdit,
@@ -20,6 +22,22 @@ export default function BudgetTableRow({
   const allocated = categories.find((c) => c.name === name)?.allocated || 0
   const activityCents = getBalanceByCategory(name)
   const availableCents = allocated + activityCents
+  const [editAllocatedInput, setEditAllocatedInput] = useState((allocated / 100).toFixed(2))
+
+  const inputRef = useRef<HTMLInputElement>(null)
+
+
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      const newValue = parseFloat(editAllocatedInput)
+      if (!isNaN(newValue)) {
+        // updateCategoryAllocation(name, Math.round(newValue * 100))
+        //replace with real setter function
+        console.log("allocation updated")
+        inputRef.current?.blur()
+      }
+    }
+  }, [editAllocatedInput, name])
   return (
     <div
       className={`flex items-stretch border-b border-gray-300 py-2 pr-4 ${selected ? 'bg-indigo-200' : 'bg-white'}`}
@@ -67,11 +85,19 @@ export default function BudgetTableRow({
         </div>
       </div>
       <div className="flex w-[15%] justify-end">
-        <div className="truncate px-2 py-0.5">
-          {allocated >= 0
-            ? `$${(allocated / 100).toFixed(2)}`
-            : `-$${(-allocated / 100).toFixed(2)}`}
-        </div>
+        <input
+          ref={inputRef}
+          type="number"
+          className={`w-full truncate px-2 text-right rounded ${selected ? 'border border-indigo-500 cursor-text' : 'hover:border hover:border-indigo-500 hover:cursor-text'}`}
+          value={editAllocatedInput}
+          onChange={(e) => {
+            setEditAllocatedInput(e.target.value)
+          }}
+          onKeyDown={handleKeyDown}
+          onBlur={() => setEditAllocatedInput((allocated / 100).toFixed(2))}
+          onClick={(e) => e.stopPropagation()}
+          onFocus={(e) => e.target.select()}
+        />
       </div>
       <div className="flex w-[15%] justify-end">
         <div className="truncate px-2 py-0.5">
