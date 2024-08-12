@@ -10,12 +10,13 @@ import {
   PanelLeftOpen,
   PanelLeftClose,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import AddAccountModal from './AddAccountModal'
 import EditAccountModal from './EditAccountModal'
 import { useUser } from '@clerk/nextjs'
 import useBudgetStore from '../stores/transactionStore'
 import { formatCentsToDollarString } from '../util/utils'
+import { UserButton } from '@clerk/nextjs'
 
 interface SidebarProps {
   setCurrentAccount: (account: string | null) => void
@@ -28,6 +29,7 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
   const [showBudgets, setShowBudgets] = useState(false)
   const [showAddAccountModal, setShowAddAccountModal] = useState(false)
   const [showEditAccountModal, setShowEditAccountModal] = useState(false)
+  const [showUserDropdown, setShowUserDropdown] = useState(false)
   const [editingAccount, setEditingAccount] = useState<string | null>(null)
   const { accounts, getBalanceByAccount } = useBudgetStore()
   const accountsWithBalance = accounts.map((account) => ({
@@ -37,6 +39,11 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
   const toggleDropdown = () => {
     setShowBudgets(!showBudgets)
   }
+
+  const toggleUserDropdown = () => {
+    setShowUserDropdown(!showUserDropdown)
+  }
+
 
   const toggleAddAccountModal = () => {
     setShowAddAccountModal((prev) => !prev)
@@ -51,24 +58,45 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
     ? `${user?.firstName ?? user?.username}'s`
     : 'Your'
 
+  const dropdownRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowUserDropdown(false)
+      }
+    }
+
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [])
+
   return (
     <div
       className={`relative flex h-screen transition-all duration-200 ${collapsed ? 'w-[75px]' : 'w-[300px]'} flex-col items-start justify-start gap-2 bg-[#2c396a] px-2 py-2 font-sans font-light text-white`}
     >
       {/* Top card */}
-      <div className="flex w-full cursor-pointer flex-row items-center gap-2 rounded-md px-2 py-3 hover:bg-[#374D9B]">
-        <Sprout className="h-[30px] w-[30px]" />
-        {!collapsed && (
-          <div className="flex max-h-[30px] items-center">
-            <div className="flex flex-col">
-              <div className="font-semibold">{firstNameDisplay} Budget</div>
-              <div className="text-xs">
-                {' '}
-                {user?.emailAddresses[0].emailAddress ?? ''}{' '}
+      <div className="relative" ref={dropdownRef}>
+        <div onClick={toggleUserDropdown} className={`flex w-full cursor-pointer flex-row items-center gap-2 rounded-md px-2 py-3 ${!showUserDropdown && 'hover:bg-[#374D9B]'}`}>
+          <Sprout className="h-[30px] w-[30px]" />
+          {!collapsed && (
+            <div className="flex max-h-[30px] items-center">
+              <div className="flex flex-col">
+                <div className="font-semibold">{firstNameDisplay} Budget</div>
+                <div className="text-xs">
+                  {user?.emailAddresses[0].emailAddress ?? ''}
+                </div>
               </div>
+              <ChevronDown size={20} strokeWidth={3} />
             </div>
-
-            <ChevronDown size={20} strokeWidth={3} />
+          )}
+        </div>
+        {!collapsed && showUserDropdown && (
+          <div className="absolute left-0 top-full z-50 w-full flex flex-row justify-between rounded-md border bg-white p-3 shadow-2xl text-black">
+            Manage Account
+            <UserButton />
           </div>
         )}
       </div>
