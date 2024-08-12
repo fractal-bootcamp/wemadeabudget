@@ -1,8 +1,8 @@
 'use client'
-import TransactionRow from '../TransactionRow'
+import TransactionRow from './TransactionRow'
 import { Bookmark } from 'lucide-react'
 import ResizableColumn from '../ResizableColumn'
-import TransactionForm from '../TransactionForm'
+import TransactionForm from './TransactionForm'
 import { useState, useEffect, useMemo } from 'react'
 import AccountsHeader from './AccountsHeader'
 import ActionBar from './ActionBar'
@@ -174,16 +174,18 @@ function AccountTable({ accountName }: AccountTableProps) {
               size={16}
             />
           </div>
-          <ResizableColumn
-            width={columnWidths.account}
-            minWidth={50}
-            maxWidth={
-              columnWidths.account + Math.max(columnWidths.date - 50, 0)
-            }
-            onResize={onResize('account', 'date')}
-          >
-            <div className="flex pt-2">ACCOUNTS</div>
-          </ResizableColumn>
+          {!accountName && (
+            <ResizableColumn
+              width={columnWidths.account}
+              minWidth={50}
+              maxWidth={
+                columnWidths.account + Math.max(columnWidths.date - 50, 0)
+              }
+              onResize={onResize('account', 'date')}
+            >
+              <div className="flex pt-2">ACCOUNTS</div>
+            </ResizableColumn>
+          )}
           <ResizableColumn
             width={columnWidths.date}
             minWidth={50}
@@ -260,8 +262,8 @@ function AccountTable({ accountName }: AccountTableProps) {
         {transactionRows.map((row) => (
           <TransactionRow
             key={row.id}
-            {...row}
-            showAccount={true}
+            transactionDetails={row}
+            showAccount={!accountName}
             columnWidths={columnWidths}
             isSelected={selectedRows.has(row.id)}
             isEditing={editingRow === row.id}
@@ -269,7 +271,6 @@ function AccountTable({ accountName }: AccountTableProps) {
             onClick={() => handleRowClick(row.id)}
             closeFunction={closeEditingRow}
             toggleCleared={() => toggleCleared(row.id)}
-            isCleared={clearedRows.has(row.id)}
           />
         ))}
       </div>

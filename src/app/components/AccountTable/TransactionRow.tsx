@@ -1,8 +1,8 @@
 'use client'
 import { Bookmark } from 'lucide-react'
 import TransactionForm from './TransactionForm'
-import { formatCentsToDollarString } from '../util/utils'
-import { Flag } from '../types'
+import { formatCentsToDollarString } from '../../util/utils'
+import { Flag, flagColors, TransactionDetails } from '../../types'
 
 interface ColumnWidths {
   [key: string]: number
@@ -17,14 +17,7 @@ interface ColumnWidths {
   inflow: number
 }
 interface TransactionRowProps {
-  id: string
-  account: string
-  date: Date
-  payee: string
-  category: string
-  memo: string
-  cents: number
-  cleared: boolean
+  transactionDetails: TransactionDetails
   showAccount: boolean
   columnWidths: ColumnWidths
   isSelected: boolean
@@ -33,19 +26,10 @@ interface TransactionRowProps {
   onClick: () => void
   closeFunction: () => void
   toggleCleared: () => void
-  isCleared: boolean
-  flag: Flag
 }
 
 function TransactionRow({
-  id,
-  account,
-  date,
-  payee,
-  category,
-  memo,
-  cents,
-  cleared,
+  transactionDetails,
   showAccount,
   columnWidths,
   isEditing,
@@ -54,26 +38,16 @@ function TransactionRow({
   onClick,
   closeFunction,
   toggleCleared,
-  isCleared,
-  flag,
 }: TransactionRowProps) {
+  const { account, date, payee, category, memo, cents, cleared, flag } =
+    transactionDetails
   //TODO: Make edit mode show the same dropdowns as add mode
   return isEditing ? (
     <TransactionForm
       columnWidths={columnWidths}
       showAccount={showAccount}
       closeFunction={closeFunction}
-      existingTransaction={{
-        id,
-        account,
-        date,
-        payee,
-        category,
-        memo,
-        cents,
-        cleared,
-        flag,
-      }}
+      existingTransaction={transactionDetails}
     />
   ) : (
     <div
@@ -102,6 +76,7 @@ function TransactionRow({
         <Bookmark
           className="rotate-[270deg] transform text-gray-400"
           size={16}
+          fill={flagColors[flag]}
         />
       </div>
       {showAccount && (
@@ -159,7 +134,7 @@ function TransactionRow({
         className="flex w-[50px] items-center justify-center p-2"
       >
         <div
-          className={`h-4 w-4 rounded-full ${isCleared ? 'bg-green-600 text-white' : 'border border-gray-400 bg-white text-gray-600'} text-bold text-center text-xs`}
+          className={`h-4 w-4 rounded-full ${cleared ? 'bg-green-600 text-white' : 'border border-gray-400 bg-white text-gray-600'} text-bold text-center text-xs`}
         >
           C
         </div>

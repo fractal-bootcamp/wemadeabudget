@@ -2,7 +2,7 @@
 import Sidebar from './Sidebar'
 import AccountTable from './AccountTable/AccountTable'
 import BudgetTable from './BudgetTable/BudgetTable'
-import TransactionRow from './TransactionRow'
+import TransactionRow from './AccountTable/TransactionRow'
 import { AccountDetails, CategoryDetails, TransactionDetails } from '../types'
 import useBudgetStore from '../stores/transactionStore'
 import { useEffect, useState } from 'react'
@@ -32,9 +32,9 @@ function Sandbox({ transactions, accounts, categories, payees }: SandboxProps) {
   return (
     <div className="flex">
       <Sidebar
-        setCurrentAccount={(page: string | null) => {
+        setCurrentAccount={(acctName: string | null) => {
           setCurrentPage('account')
-          setCurrentAccount(page)
+          setCurrentAccount(acctName)
         }}
         setCurrentPage={setCurrentPage}
       />
