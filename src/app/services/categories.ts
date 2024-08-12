@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
 import prisma from '../client'
-import { CategoryDetails } from '../types'
+import { CategoryDetails, CategoryUpdatePayload } from '../types'
 const queries = {
   getCategories: async (userId: string) => {
     return await prisma.category.findMany({
@@ -96,7 +96,7 @@ const mutations = {
     userId: string,
     categoryUpdatePayload: CategoryUpdatePayload
   ) => {
-    const updatedCategory = await prisma.category.update({
+    return await prisma.category.update({
       where: {
         categoryId: {
           name: categoryUpdatePayload.oldName,
@@ -110,10 +110,7 @@ const mutations = {
     })
   },
 }
-type CategoryUpdatePayload = {
-  oldName: string
-  newDetails: CategoryDetails
-}
+
 const categoryServices = {
   getAllByUser: (userId: string) => queries.getCategories(userId),
   add: (userId: string, name: string) => mutations.addCategory(userId, name),

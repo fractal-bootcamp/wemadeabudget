@@ -49,20 +49,29 @@ export type CategoryDetails = {
   permanent: boolean
   // categoryGroupName: string;
 }
-
+export interface CategoryUpdatePayload {
+  oldName: string
+  newDetails: CategoryDetails
+}
 export interface AccountDetails {
   name: string
   type: AccountType
 }
+export interface AccountUpdatePayload {
+  oldName: string
+  newDetails: AccountDetails
+}
+
 export const emptyAccount: AccountDetails = {
   name: '',
   type: 'CHECKING',
 }
-export interface Category {
-  name: string
-}
 export interface PayeeDetails {
   name: string
+}
+export interface PayeeUpdatePayload {
+  oldName: string
+  newName: string
 }
 
 const defaultCategories = [

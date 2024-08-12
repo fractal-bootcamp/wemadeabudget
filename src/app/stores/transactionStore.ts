@@ -4,7 +4,9 @@ import {
   AccountDetails,
   TransactionDetails,
   CategoryDetails,
-  Category,
+  CategoryUpdatePayload,
+  AccountUpdatePayload,
+  PayeeUpdatePayload,
 } from '../types'
 
 type budgetStore = {
@@ -57,21 +59,6 @@ type budgetStore = {
   deleteCategory: (categoryName: string) => void
   /** Edits an existing category in the store identified by its old name */
   updateCategory: (categoryUpdatePayload: CategoryUpdatePayload) => void
-}
-
-type CategoryUpdatePayload = {
-  oldName: string
-  newDetails: CategoryDetails
-}
-
-type AccountUpdatePayload = {
-  oldName: string
-  newDetails: AccountDetails
-}
-
-type PayeeUpdatePayload = {
-  oldName: string
-  newName: string
 }
 
 const useBudgetStore = create<budgetStore>((set, get) => ({
