@@ -9,6 +9,8 @@ import {
   Pen,
   PanelLeftOpen,
   PanelLeftClose,
+  User,
+  ChevronUp,
 } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import AddAccountModal from './AddAccountModal'
@@ -60,7 +62,7 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
       {/* Underlay to close modal */}
       {showUserDropdown && (
         <div
-          className="absolute inset-0 z-40 h-full w-full bg-red-500 bg-opacity-50"
+          className="absolute inset-0 z-40 h-full w-full bg-transparent"
           onClick={(e) => {
             e.stopPropagation()
             setShowUserDropdown(false)
@@ -74,7 +76,7 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
         <div className="relative">
           <div
             onClick={toggleUserDropdown}
-            className={`flex w-full cursor-pointer flex-row items-center gap-2 rounded-md px-2 py-3 ${!showUserDropdown && 'hover:bg-[#374D9B]'}`}
+            className={`z-50 flex w-full cursor-pointer flex-row items-center gap-2 rounded-md px-2 py-3 ${!showUserDropdown && 'hover:bg-[#374D9B]'}`}
           >
             <Sprout className="h-[30px] w-[30px]" />
             {!collapsed && (
@@ -85,12 +87,19 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
                     {user?.emailAddresses[0].emailAddress ?? ''}
                   </div>
                 </div>
-                <ChevronDown size={20} strokeWidth={3} />
+                {showUserDropdown ? (
+                  <ChevronUp size={20} strokeWidth={3} />
+                ) : (
+                  <ChevronDown size={20} strokeWidth={3} />
+                )}
               </div>
             )}
           </div>
           {showUserDropdown && (
-            <div className="absolute left-0 top-full z-50 flex w-full flex-row justify-between rounded-md border bg-white p-3 text-black shadow-2xl">
+            <div className="absolute left-1/4 top-full z-50 flex w-fit flex-row items-center justify-between gap-2 text-nowrap rounded-md border border-indigo-400 bg-white p-3 text-black shadow-2xl">
+              <div className="shrink-0">
+                <User size={20} strokeWidth={2} fill={'gray'} />
+              </div>
               {!collapsed && <div>Manage Account</div>}
               <UserButton />
             </div>
