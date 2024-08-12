@@ -78,6 +78,7 @@ const defaultCategoryNames = [
   'Personal Care',
   'Stuff I Forgot to Budget For',
   'Celebrations',
+  'Uncategorized',
 ]
 const defaultAccounts: AccountDetails[] = [
   { name: 'Checking', type: 'CHECKING' },
