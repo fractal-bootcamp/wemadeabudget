@@ -1,9 +1,5 @@
 'use client'
-import {
-  CategoryDetails,
-  emptyTransaction,
-  TransactionDetails,
-} from '../../types'
+import { emptyTransaction, TransactionDetails } from '../../types'
 import FlagToggle from './FlagToggle'
 import ClearedButton from './ClearedButton'
 import { useState } from 'react'
@@ -54,9 +50,9 @@ function TransactionForm({
   const dbFunc = existingTransaction ? dbTransactionUpdate : dbTransactionAdd
   const storeFunc = existingTransaction ? updateTransaction : addTransaction
   return (
-    <div className="flex flex-col gap-1 bg-indigo-100 p-2 text-xs">
+    <div className="flex flex-col gap-1 bg-indigo-100 px-0 py-2 text-xs">
       {/* Details/edit fields */}
-      <div className="flex flex-row gap-2">
+      <div className="flex flex-row gap-1">
         {/* dummy always selected checkbox */}
         <div
           className="flex items-center justify-center"
