@@ -1,6 +1,6 @@
 import { UserButton } from '@clerk/nextjs'
 import useBudgetStore from '../../stores/transactionStore' // Adjust the import path as needed
-
+import { formatCentsToDollarString } from '../../util/utils'
 interface AccountsHeaderProps {
   accountName: string | null
 }
@@ -32,7 +32,7 @@ const AccountsHeader = ({ accountName }: AccountsHeaderProps) => {
       </span>
       <div className="flex w-full border-b border-t border-gray-300 p-2">
         <div className="flex flex-col px-2">
-          <div>{clearedBalance.toFixed(2)}</div>
+          <div>{formatCentsToDollarString(clearedBalance * 100)}</div>
           <div className="flex items-center gap-1 text-[10px]">
             <div className="flex h-3 w-3 items-center justify-center rounded-full bg-gray-800 font-bold text-white">
               C
@@ -42,7 +42,9 @@ const AccountsHeader = ({ accountName }: AccountsHeaderProps) => {
         </div>
         <div className="px-2"> + </div>
         <div className="flex flex-col px-2">
-          <div className="text-green-600">{unclearedBalance.toFixed(2)}</div>
+          <div className="text-green-600">
+            {formatCentsToDollarString(unclearedBalance * 100)}
+          </div>
           <div className="flex items-center gap-1 text-[10px]">
             <div className="flex h-3 w-3 items-center justify-center rounded-full border border-gray-500 font-bold text-gray-500">
               C
@@ -52,7 +54,7 @@ const AccountsHeader = ({ accountName }: AccountsHeaderProps) => {
         </div>
         <div className="px-2"> = </div>
         <div className="flex flex-col px-2">
-          <div>{workingBalance.toFixed(2)}</div>
+          <div>{formatCentsToDollarString(workingBalance * 100)}</div>
           <div className="text-[10px]"> Working Balance </div>
         </div>
       </div>
