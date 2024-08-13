@@ -24,7 +24,7 @@ export default function FlagEditModal({
 }: FlagEditModalProps) {
   return (
     <div
-      className="absolute left-1/2 top-full z-50 flex w-[125px] -translate-x-1/2 translate-y-4 flex-col items-center gap-2 rounded-md border bg-white p-3 shadow-2xl"
+      className="top-fullflex absolute left-1/2 z-50 w-[125px] -translate-x-1/2 translate-y-4 flex-col items-center gap-2 rounded-md border bg-white p-3 shadow-2xl"
       onClick={(e) => e.stopPropagation()}
       style={{ overflow: 'visible' }}
     >

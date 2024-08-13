@@ -1,15 +1,7 @@
 import React, { useState } from 'react'
 import { Bookmark, Check } from 'lucide-react'
-import {
-  Flag,
-  FlagDetails,
-  TransactionDetails,
-  typeDetailsArray,
-} from '../../types'
+import { Flag, FlagDetails } from '../../types'
 import FlagEditModal from './FlagEditModal'
-import { METHODS, updateStoreAndDb } from '../../util/utils'
-import { dbTransactionUpdate } from '../../actions/controller'
-import useBudgetStore from '../../stores/transactionStore'
 
 interface FlagToggleProps {
   currentFlag: Flag
@@ -26,27 +18,44 @@ export default function FlagToggle({
     e.stopPropagation()
     setShowFlagModal((prev) => !prev)
   }
-
+  const closeModal = () => setShowFlagModal(false)
   return (
-    <div className="relative" onClick={handleToggleModal}>
-      <Bookmark
-        className="rotate-[270deg] transform text-gray-400"
-        id="form-flag"
-        size={16}
-        fill={
-          FlagDetails[currentFlag].hexCode === '#ffffff'
-            ? 'transparent'
-            : FlagDetails[currentFlag].hexCode
-        }
-        color={
-          FlagDetails[currentFlag].hexCode === '#ffffff'
-            ? 'gray'
-            : FlagDetails[currentFlag].hexCode
-        }
-      />
+    <>
       {showFlagModal && (
-        <FlagEditModal currentFlag={currentFlag} onFlagSelect={onFlagSelect} />
+        <div
+          className="absolute inset-0 z-40 h-full w-full bg-transparent"
+          onClick={(e) => {
+            e.stopPropagation()
+            closeModal()
+          }}
+        />
       )}
-    </div>
+      <div className="relative" onClick={handleToggleModal}>
+        <Bookmark
+          className="rotate-[270deg] transform text-gray-400"
+          id="form-flag"
+          size={16}
+          fill={
+            FlagDetails[currentFlag].hexCode === '#ffffff'
+              ? 'transparent'
+              : FlagDetails[currentFlag].hexCode
+          }
+          color={
+            FlagDetails[currentFlag].hexCode === '#ffffff'
+              ? 'gray'
+              : FlagDetails[currentFlag].hexCode
+          }
+        />
+        {showFlagModal && (
+          <FlagEditModal
+            currentFlag={currentFlag}
+            onFlagSelect={(flag) => {
+              onFlagSelect(flag)
+              closeModal()
+            }}
+          />
+        )}
+      </div>
+    </>
   )
 }
