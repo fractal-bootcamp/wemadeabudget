@@ -23,7 +23,7 @@ const Flags = [
 ] as const
 export type Flag = (typeof Flags)[number]
 export const FlagDetails: Record<Flag, { display: string; hexCode: string }> = {
-  NONE: { display: 'None', hexCode: '#f0f0f0' },
+  NONE: { display: 'None', hexCode: '#ffffff' },
   RED: { display: 'Red', hexCode: '#ff0000' },
   ORANGE: { display: 'Orange', hexCode: '#ff7f00' },
   YELLOW: { display: 'Yellow', hexCode: '#ffff00' },

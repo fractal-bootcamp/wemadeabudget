@@ -1,6 +1,7 @@
 'use client'
-import { Bookmark } from 'lucide-react'
+import { Bookmark, Flag } from 'lucide-react'
 import TransactionForm from './TransactionForm'
+import FlagToggle from './FlagToggle'
 import {
   formatCentsToDollarString,
   METHODS,
@@ -90,11 +91,7 @@ function TransactionRow({
         style={{ width: columnWidths.flag }}
         className="flex items-center justify-center p-2"
       >
-        <Bookmark
-          className="rotate-[270deg] transform text-gray-400"
-          size={16}
-          fill={FlagDetails[flag].hexCode}
-        />
+        <FlagToggle flag={flag} />
       </div>
       {showAccount && (
         <div

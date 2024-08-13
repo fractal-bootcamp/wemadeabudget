@@ -154,7 +154,7 @@ function AccountTable({ accountName }: AccountTableProps) {
 
   return (
     // i think this code is very redundant and might simplify later, but works
-    <div className="h-full w-full min-w-[750px] overflow-x-scroll">
+    <div className="h-full w-full min-w-[750px]">
       <div className="min-w-full">
         <AccountsHeader accountName={accountName} />
         <ActionBar
