@@ -101,12 +101,13 @@ function TransactionForm({
         >
           <FlagToggle
             flag={formData.flag}
-            onToggle={() =>
-              setFormData((prev) => ({
-                ...prev,
-                flag: prev.flag === 'NONE' ? 'GREEN' : 'NONE',
-              }))
-            }
+            // onToggle={() =>
+
+            //   setFormData((prev) => ({
+            //     ...prev,
+            //     flag: prev.flag === 'NONE' ? 'GREEN' : 'NONE',
+            //   }))
+            // }
           />
         </div>
         {showAccount && (
