@@ -1,8 +1,14 @@
 'use client'
 import { Bookmark } from 'lucide-react'
 import TransactionForm from './TransactionForm'
-import { formatCentsToDollarString } from '../../util/utils'
+import {
+  formatCentsToDollarString,
+  METHODS,
+  updateStoreAndDb,
+} from '../../util/utils'
 import { FlagDetails, TransactionDetails } from '../../types'
+import { dbTransactionUpdate } from '../../actions/controller'
+import useBudgetStore from '../../stores/transactionStore'
 
 interface ColumnWidths {
   [key: string]: number
@@ -25,7 +31,6 @@ interface TransactionRowProps {
   onSelect: () => void
   onClick: () => void
   closeFunction: () => void
-  toggleCleared: () => void
 }
 
 function TransactionRow({
@@ -37,10 +42,22 @@ function TransactionRow({
   onSelect,
   onClick,
   closeFunction,
-  toggleCleared,
 }: TransactionRowProps) {
   const { account, date, payee, category, memo, cents, cleared, flag } =
     transactionDetails
+  const { updateTransaction } = useBudgetStore()
+  const toggleCleared = () => {
+    const newTransaction: TransactionDetails = {
+      ...transactionDetails,
+      cleared: !cleared,
+    }
+    updateStoreAndDb({
+      dbFunction: dbTransactionUpdate,
+      storeFunction: updateTransaction,
+      payload: newTransaction,
+      method: METHODS.UPDATE,
+    })
+  }
   //TODO: Make edit mode show the same dropdowns as add mode
   return isEditing ? (
     <TransactionForm
@@ -129,7 +146,11 @@ function TransactionRow({
       </div>
       <div className="flex w-[50px] items-center justify-center p-2">
         <div
-          className={`h-4 w-4 rounded-full ${cleared ? 'bg-green-600 text-white' : 'border border-gray-400 bg-white text-gray-600'} text-bold text-center text-xs`}
+          className={`h-4 w-4 cursor-pointer rounded-full ${cleared ? 'bg-green-600 text-white' : 'border border-gray-400 bg-white text-gray-600'} text-bold text-center text-xs`}
+          onClick={(e) => {
+            e.stopPropagation()
+            toggleCleared()
+          }}
         >
           C
         </div>

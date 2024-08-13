@@ -1,13 +1,19 @@
 'use client'
 import { Bookmark } from 'lucide-react'
-import { Flag, FlagDetails } from '../../types'
+import { Flag, FlagDetails, typeDetailsArray } from '../../types'
 
 interface FlogTaggleProps {
   flag: Flag
+  // setFlag: (flag: Flag) => void
   onToggle: () => void
 }
-export default function FlogTaggle({ onToggle, flag }: FlogTaggleProps) {
+export default function FlogTaggle({
+  onToggle,
+  flag,
+  // setFlag,
+}: FlogTaggleProps) {
   const flagDetails = FlagDetails[flag]
+  const flagDetailsArray = typeDetailsArray(FlagDetails)
   return (
     <div onClick={onToggle}>
       <Bookmark
@@ -16,6 +22,7 @@ export default function FlogTaggle({ onToggle, flag }: FlogTaggleProps) {
         size={16}
         fill={flagDetails.hexCode}
       />
+
       <input type="hidden" name="flag" value={flag} />
     </div>
   )
