@@ -123,7 +123,6 @@ function AccountTable({ accountName }: AccountTableProps) {
   }, [selectedRows])
 
   return (
-    // i think this code is very redundant and might simplify later, but works
     <div className="h-full w-full min-w-[750px]">
       <div className="min-w-full">
         <AccountsHeader accountName={accountName} />
