@@ -21,16 +21,25 @@ export default function FlagToggle({
   const closeModal = () => setShowFlagModal(false)
   return (
     <>
-      {showFlagModal && (
-        <div
-          className="absolute inset-0 z-40 h-full w-full bg-transparent"
-          onClick={(e) => {
-            e.stopPropagation()
-            closeModal()
-          }}
-        />
-      )}
       <div className="relative" onClick={handleToggleModal}>
+        {showFlagModal && (
+          <>
+            <div
+              className="fixed inset-0 z-40 h-full w-full bg-transparent"
+              onClick={(e) => {
+                e.stopPropagation()
+                closeModal()
+              }}
+            ></div>
+            <FlagEditModal
+              currentFlag={currentFlag}
+              onFlagSelect={(flag) => {
+                onFlagSelect(flag)
+                closeModal()
+              }}
+            />
+          </>
+        )}
         <Bookmark
           className="rotate-[270deg] transform cursor-pointer text-gray-400"
           id="form-flag"
@@ -46,15 +55,6 @@ export default function FlagToggle({
               : FlagDetails[currentFlag].hexCode
           }
         />
-        {showFlagModal && (
-          <FlagEditModal
-            currentFlag={currentFlag}
-            onFlagSelect={(flag) => {
-              onFlagSelect(flag)
-              closeModal()
-            }}
-          />
-        )}
       </div>
     </>
   )

@@ -63,7 +63,7 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
       {/* Underlay to close modal */}
       {showUserDropdown && (
         <div
-          className="absolute inset-0 z-40 h-full w-full bg-transparent"
+          className="absolute inset-0 z-30 h-full w-full bg-transparent"
           onClick={(e) => {
             e.stopPropagation()
             setShowUserDropdown(false)
@@ -77,7 +77,7 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
         <div className="relative">
           <div
             onClick={toggleUserDropdown}
-            className={`z-50 flex w-full cursor-pointer flex-row items-center gap-2 rounded-md px-2 py-3 ${!showUserDropdown && 'hover:bg-[#374D9B]'}`}
+            className={`flex w-full cursor-pointer flex-row items-center gap-2 rounded-md px-2 py-3 ${!showUserDropdown && 'hover:bg-[#374D9B]'}`}
           >
             <Sprout className="h-[30px] w-[30px]" />
             {!collapsed && (

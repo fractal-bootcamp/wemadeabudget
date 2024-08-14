@@ -29,7 +29,7 @@ function Sandbox({ transactions, accounts, categories, payees }: SandboxProps) {
     load()
   }, [])
   return (
-    <div className="flex">
+    <div className="flex h-screen">
       <Sidebar
         setCurrentAccount={(acctName: string | null) => {
           setCurrentPage('account')

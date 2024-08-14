@@ -8,6 +8,7 @@ import AccountsHeader from './AccountsHeader'
 import ActionBar from './ActionBar'
 import useBudgetStore from '../../stores/transactionStore'
 import { TransactionDetails } from '../../types'
+import BulkActionsModal from './BulkActionsModal'
 
 //truncate to prevent overflow
 interface AccountTableProps {
@@ -15,7 +16,6 @@ interface AccountTableProps {
 }
 function AccountTable({ accountName }: AccountTableProps) {
   const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set())
-  const [clearedRows, setClearedRows] = useState<Set<string>>(new Set())
   const [searchTerm, setSearchTerm] = useState('')
 
   const selectAllRef = useRef<HTMLInputElement>(null)
@@ -46,22 +46,6 @@ function AccountTable({ accountName }: AccountTableProps) {
     inflow: 120,
     cleared: 50,
   })
-
-  useEffect(() => {
-    const handleDoubleClick = (e: MouseEvent) => {
-      // Check if the double-click occurred outside of any row
-      if (!(e.target as Element).closest('.transaction-row')) {
-        setSelectedRows(new Set())
-        setEditingRow(null)
-      }
-    }
-
-    document.addEventListener('dblclick', handleDoubleClick)
-
-    return () => {
-      document.removeEventListener('dblclick', handleDoubleClick)
-    }
-  }, [])
 
   const onResize =
     (
@@ -111,25 +95,11 @@ function AccountTable({ accountName }: AccountTableProps) {
     if (selectedRows.has(id)) {
       // If the row is already selected, put it into edit mode
       setEditingRow(id)
-      setSelectedRows(new Set(id))
+      setSelectedRows(new Set([id]))
     } else {
       // If the row is not selected, toggle its selection
       toggleRowSelect(id)
     }
-  }
-
-  function toggleCleared(id: string) {
-    //this has gotta changed something in the db
-    //but rn i'll change it locally
-    setClearedRows((prev) => {
-      const newSet = new Set(prev)
-      if (newSet.has(id)) {
-        newSet.delete(id)
-      } else {
-        newSet.add(id)
-      }
-      return newSet // Return the updated set
-    })
   }
 
   function toggleShowAddTransactionRow() {
@@ -153,137 +123,149 @@ function AccountTable({ accountName }: AccountTableProps) {
   }, [selectedRows])
 
   return (
-    // i think this code is very redundant and might simplify later, but works
-    <div className="h-full w-full min-w-[750px]">
-      <div className="min-w-full">
-        <AccountsHeader accountName={accountName} />
-        <ActionBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          onAddTransaction={toggleShowAddTransactionRow}
-        />
-        <div className="flex flex-row items-stretch border-b border-l border-t border-gray-300 text-[10px] text-gray-500">
-          <div
-            className="container-class flex items-center justify-center border-r border-gray-300 p-2"
-            style={{ width: columnWidths.checkbox }}
-          >
-            <input
-              ref={selectAllRef}
-              type="checkbox"
-              className=""
-              onChange={toggleSelectAll}
-            />
-          </div>
-          <div
-            className="flex justify-center border-r border-gray-300 p-2"
-            style={{ width: columnWidths.flag }}
-          >
-            <Bookmark
-              className="rotate-[270deg] transform text-gray-500"
-              size={16}
-            />
-          </div>
-          {!accountName && (
+    <>
+      <div className="relative h-full w-full min-w-[750px]">
+        {selectedRows.size > 0 && (
+          <BulkActionsModal
+            selectedIds={selectedRows}
+            clearSelection={() => {
+              setSelectedRows(new Set())
+              setEditingRow(null)
+            }}
+          />
+        )}
+        <div className="min-w-full">
+          <AccountsHeader accountName={accountName} />
+          <ActionBar
+            searchTerm={searchTerm}
+            setSearchTerm={setSearchTerm}
+            onAddTransaction={toggleShowAddTransactionRow}
+          />
+          <div className="flex flex-row items-stretch border-b border-l border-t border-gray-300 text-[10px] text-gray-500">
+            <div
+              className="container-class flex items-center justify-center border-r border-gray-300 p-2"
+              style={{ width: columnWidths.checkbox }}
+            >
+              <input
+                ref={selectAllRef}
+                type="checkbox"
+                className=""
+                onChange={toggleSelectAll}
+              />
+            </div>
+            <div
+              className="flex justify-center border-r border-gray-300 p-2"
+              style={{ width: columnWidths.flag }}
+            >
+              <Bookmark
+                className="rotate-[270deg] transform text-gray-500"
+                size={16}
+              />
+            </div>
+            {!accountName && (
+              <ResizableColumn
+                width={columnWidths.account}
+                minWidth={50}
+                maxWidth={
+                  columnWidths.account + Math.max(columnWidths.date - 50, 0)
+                }
+                onResize={onResize('account', 'date')}
+              >
+                <div className="flex pt-2">ACCOUNTS</div>
+              </ResizableColumn>
+            )}
             <ResizableColumn
-              width={columnWidths.account}
+              width={columnWidths.date}
               minWidth={50}
               maxWidth={
-                columnWidths.account + Math.max(columnWidths.date - 50, 0)
+                columnWidths.date + Math.max(columnWidths.payee - 50, 0)
               }
-              onResize={onResize('account', 'date')}
+              onResize={onResize('date', 'payee')}
             >
-              <div className="flex pt-2">ACCOUNTS</div>
+              <div className="flex pt-2">DATE</div>
             </ResizableColumn>
-          )}
-          <ResizableColumn
-            width={columnWidths.date}
-            minWidth={50}
-            maxWidth={columnWidths.date + Math.max(columnWidths.payee - 50, 0)}
-            onResize={onResize('date', 'payee')}
-          >
-            <div className="flex pt-2">DATE</div>
-          </ResizableColumn>
-          <ResizableColumn
-            width={columnWidths.payee}
-            minWidth={50}
-            maxWidth={
-              columnWidths.payee + Math.max(columnWidths.category - 50, 0)
-            }
-            onResize={onResize('payee', 'category')}
-          >
-            <div className="flex pt-2">PAYEE</div>
-          </ResizableColumn>
-          <ResizableColumn
-            width={columnWidths.category}
-            minWidth={50}
-            maxWidth={
-              columnWidths.category + Math.max(columnWidths.memo - 50, 0)
-            }
-            onResize={onResize('category', 'memo')}
-          >
-            <div className="flex pt-2">CATEGORY</div>
-          </ResizableColumn>
-          <ResizableColumn
-            width={columnWidths.memo}
-            minWidth={50}
-            maxWidth={
-              columnWidths.memo + Math.max(columnWidths.outflow - 50, 0)
-            }
-            onResize={onResize('memo', 'outflow')}
-          >
-            <div className="flex pt-2">MEMO</div>
-          </ResizableColumn>
-          <ResizableColumn
-            width={columnWidths.outflow}
-            minWidth={50}
-            maxWidth={
-              columnWidths.outflow + Math.max(columnWidths.inflow - 50, 0)
-            }
-            onResize={onResize('outflow', 'inflow')}
-          >
-            <div className="flex justify-end pt-2">OUTFLOW</div>
-          </ResizableColumn>
-          <div
-            className="flex items-center justify-end border-r border-gray-300 px-2"
-            style={{ width: columnWidths.inflow }}
-          >
-            INFLOW
-          </div>
+            <ResizableColumn
+              width={columnWidths.payee}
+              minWidth={50}
+              maxWidth={
+                columnWidths.payee + Math.max(columnWidths.category - 50, 0)
+              }
+              onResize={onResize('payee', 'category')}
+            >
+              <div className="flex pt-2">PAYEE</div>
+            </ResizableColumn>
+            <ResizableColumn
+              width={columnWidths.category}
+              minWidth={50}
+              maxWidth={
+                columnWidths.category + Math.max(columnWidths.memo - 50, 0)
+              }
+              onResize={onResize('category', 'memo')}
+            >
+              <div className="flex pt-2">CATEGORY</div>
+            </ResizableColumn>
+            <ResizableColumn
+              width={columnWidths.memo}
+              minWidth={50}
+              maxWidth={
+                columnWidths.memo + Math.max(columnWidths.outflow - 50, 0)
+              }
+              onResize={onResize('memo', 'outflow')}
+            >
+              <div className="flex pt-2">MEMO</div>
+            </ResizableColumn>
+            <ResizableColumn
+              width={columnWidths.outflow}
+              minWidth={50}
+              maxWidth={
+                columnWidths.outflow + Math.max(columnWidths.inflow - 50, 0)
+              }
+              onResize={onResize('outflow', 'inflow')}
+            >
+              <div className="flex justify-end pt-2">OUTFLOW</div>
+            </ResizableColumn>
+            <div
+              className="flex items-center justify-end border-r border-gray-300 px-2"
+              style={{ width: columnWidths.inflow }}
+            >
+              INFLOW
+            </div>
 
-          <div
-            className={`flex border-gray-300 p-2 w-[${columnWidths.cleared}px] items-center justify-center`}
-          >
-            <div className="text-bold h-4 w-4 rounded-full bg-green-600 text-center text-[12px] text-white">
-              {' '}
-              C{' '}
+            <div
+              className={`flex border-gray-300 p-2 w-[${columnWidths.cleared}px] items-center justify-center`}
+            >
+              <div className="text-bold h-4 w-4 rounded-full bg-green-600 text-center text-[12px] text-white">
+                {' '}
+                C{' '}
+              </div>
             </div>
           </div>
         </div>
-      </div>
-      {showAddTransactionRow && (
-        <TransactionForm
-          columnWidths={columnWidths}
-          showAccount={!accountName}
-          accountName={accountName || ''}
-          closeFunction={closeEditingRow}
-        />
-      )}
-      <div className="flex w-full flex-col">
-        {filteredTransactions.map((row) => (
-          <TransactionRow
-            key={row.id}
-            transactionDetails={row}
-            showAccount={!accountName}
+        {showAddTransactionRow && (
+          <TransactionForm
             columnWidths={columnWidths}
-            isSelected={selectedRows.has(row.id)}
-            isEditing={editingRow === row.id}
-            onSelect={() => toggleRowSelect(row.id)}
-            onClick={() => handleRowClick(row.id)}
+            showAccount={!accountName}
+            accountName={accountName || ''}
             closeFunction={closeEditingRow}
           />
-        ))}
+        )}
+        <div className="flex w-full flex-col">
+          {filteredTransactions.map((row) => (
+            <TransactionRow
+              key={row.id}
+              transactionDetails={row}
+              showAccount={!accountName}
+              columnWidths={columnWidths}
+              isSelected={selectedRows.has(row.id)}
+              isEditing={editingRow === row.id}
+              onSelect={() => toggleRowSelect(row.id)}
+              onClick={() => handleRowClick(row.id)}
+              closeFunction={closeEditingRow}
+            />
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
 

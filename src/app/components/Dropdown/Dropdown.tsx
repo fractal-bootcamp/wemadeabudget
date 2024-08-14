@@ -44,6 +44,7 @@ const Dropdown = ({
   const handleSelect = (value: string) => {
     //if multi-select, add/remove from selection array accordingly
     setSelected(selected === value ? '' : value)
+    setExpanded(false)
   }
   return (
     <div
