@@ -280,7 +280,6 @@ function AccountTable({ accountName }: AccountTableProps) {
             onSelect={() => toggleRowSelect(row.id)}
             onClick={() => handleRowClick(row.id)}
             closeFunction={closeEditingRow}
-            toggleCleared={() => toggleCleared(row.id)}
           />
         ))}
       </div>

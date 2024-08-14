@@ -1,5 +1,5 @@
 'use client'
-import { Bookmark, Flag } from 'lucide-react'
+import { Bookmark } from 'lucide-react'
 import TransactionForm from './TransactionForm'
 import FlagToggle from './FlagToggle'
 import {
@@ -7,7 +7,7 @@ import {
   METHODS,
   updateStoreAndDb,
 } from '../../util/utils'
-import { FlagDetails, TransactionDetails } from '../../types'
+import { Flag, FlagDetails, TransactionDetails } from '../../types'
 import { dbTransactionUpdate } from '../../actions/controller'
 import useBudgetStore from '../../stores/transactionStore'
 
@@ -59,6 +59,18 @@ function TransactionRow({
       method: METHODS.UPDATE,
     })
   }
+  const setFlag = (flag: Flag) => {
+    const newTransaction: TransactionDetails = {
+      ...transactionDetails,
+      flag,
+    }
+    updateStoreAndDb({
+      dbFunction: dbTransactionUpdate,
+      storeFunction: updateTransaction,
+      payload: newTransaction,
+      method: METHODS.UPDATE,
+    })
+  }
   //TODO: Make edit mode show the same dropdowns as add mode
   return isEditing ? (
     <TransactionForm
@@ -91,7 +103,10 @@ function TransactionRow({
         style={{ width: columnWidths.flag }}
         className="flex items-center justify-center p-2"
       >
-        <FlagToggle flag={flag} />
+        <FlagToggle
+          currentFlag={transactionDetails.flag}
+          onFlagSelect={setFlag}
+        />
       </div>
       {showAccount && (
         <div

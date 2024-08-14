@@ -100,14 +100,8 @@ function TransactionForm({
           style={{ width: columnWidths.flag }}
         >
           <FlagToggle
-            flag={formData.flag}
-            // onToggle={() =>
-
-            //   setFormData((prev) => ({
-            //     ...prev,
-            //     flag: prev.flag === 'NONE' ? 'GREEN' : 'NONE',
-            //   }))
-            // }
+            currentFlag={formData.flag}
+            onFlagSelect={(flag) => setFormData({ ...formData, flag })}
           />
         </div>
         {showAccount && (
