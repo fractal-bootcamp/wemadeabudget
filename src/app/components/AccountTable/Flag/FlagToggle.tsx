@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Bookmark, Check } from 'lucide-react'
-import { Flag, FlagDetails } from '../../types'
+import { Flag, FlagDetails } from '../../../types'
 import FlagEditModal from './FlagEditModal'
 
 interface FlagToggleProps {

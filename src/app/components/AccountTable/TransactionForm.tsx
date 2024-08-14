@@ -4,7 +4,7 @@ import {
   emptyTransaction,
   TransactionDetails,
 } from '../../types'
-import FlagToggle from './FlagToggle'
+import FlagToggle from './Flag/FlagToggle'
 import ClearedButton from './ClearedButton'
 import { useState } from 'react'
 import useBudgetStore from '../../stores/transactionStore'

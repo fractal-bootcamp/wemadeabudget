@@ -1,5 +1,5 @@
 import { Flag } from '@prisma/client'
-import { FlagDetails, typeDetailsArray } from '../../types'
+import { FlagDetails, typeDetailsArray } from '../../../types'
 import { Bookmark, Check } from 'lucide-react'
 
 interface FlagEditModalProps {
