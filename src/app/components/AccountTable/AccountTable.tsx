@@ -47,22 +47,6 @@ function AccountTable({ accountName }: AccountTableProps) {
     cleared: 50,
   })
 
-  useEffect(() => {
-    const handleDoubleClick = (e: MouseEvent) => {
-      // Check if the double-click occurred outside of any row
-      if (!(e.target as Element).closest('.transaction-row')) {
-        setSelectedRows(new Set())
-        setEditingRow(null)
-      }
-    }
-
-    document.addEventListener('dblclick', handleDoubleClick)
-
-    return () => {
-      document.removeEventListener('dblclick', handleDoubleClick)
-    }
-  }, [])
-
   const onResize =
     (
       column: keyof typeof columnWidths,
@@ -116,20 +100,6 @@ function AccountTable({ accountName }: AccountTableProps) {
       // If the row is not selected, toggle its selection
       toggleRowSelect(id)
     }
-  }
-
-  function toggleCleared(id: string) {
-    //this has gotta changed something in the db
-    //but rn i'll change it locally
-    setClearedRows((prev) => {
-      const newSet = new Set(prev)
-      if (newSet.has(id)) {
-        newSet.delete(id)
-      } else {
-        newSet.add(id)
-      }
-      return newSet // Return the updated set
-    })
   }
 
   function toggleShowAddTransactionRow() {
