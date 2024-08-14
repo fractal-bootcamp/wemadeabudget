@@ -128,7 +128,10 @@ function AccountTable({ accountName }: AccountTableProps) {
         {selectedRows.size > 0 && (
           <BulkActionsModal
             selectedIds={selectedRows}
-            clearSelection={() => setEditingRow(null)}
+            clearSelection={() => {
+              setSelectedRows(new Set())
+              setEditingRow(null)
+            }}
           />
         )}
         <div className="min-w-full">
