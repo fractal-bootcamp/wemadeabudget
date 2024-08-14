@@ -32,7 +32,7 @@ export default function FlagToggle({
       )}
       <div className="relative" onClick={handleToggleModal}>
         <Bookmark
-          className="rotate-[270deg] transform text-gray-400"
+          className="rotate-[270deg] transform cursor-pointer text-gray-400"
           id="form-flag"
           size={16}
           fill={
