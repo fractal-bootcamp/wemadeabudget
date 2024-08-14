@@ -1,4 +1,4 @@
-import { Trash, X } from 'lucide-react'
+import { Inbox, Trash, X } from 'lucide-react'
 import { METHODS, updateStoreAndDb } from '../../util/utils'
 import { dbTransactionDelete } from '../../actions/controller'
 import useBudgetStore from '../../stores/transactionStore'
@@ -26,15 +26,22 @@ export default function BulkActionsModal({
       })
     })
   }
-  const bulkUpdateTransactions = () => {}
+  const bulkRecategorizeTransactions = () => {}
 
   return (
-    <div className="absolute bottom-10 left-1/2 flex -translate-x-1/2 transform items-center justify-between gap-3 rounded-lg bg-indigo-900 p-2 text-slate-100">
+    <div className="absolute bottom-10 left-1/2 flex -translate-x-1/2 transform items-center justify-between gap-3 rounded-lg bg-indigo-900 p-2 text-sm text-slate-100">
       <button
         onClick={clearSelection}
-        className="flex items-center rounded-lg bg-opacity-50 p-2 text-xs hover:cursor-pointer hover:bg-indigo-500"
+        className="flex items-center gap-2 rounded-lg bg-opacity-50 p-2 hover:cursor-pointer hover:bg-indigo-500"
       >
-        <X size={18} className="mr-2" /> {ids.length} selected
+        <X size={18} /> {ids.length} selected
+      </button>
+      <button
+        onClick={bulkRecategorizeTransactions}
+        data-tip="Not implemented"
+        className="tooltip flex gap-2 rounded-lg p-2 hover:cursor-pointer hover:bg-indigo-500"
+      >
+        <Inbox size={20} /> Categorize
       </button>
       <button
         onClick={() => {
