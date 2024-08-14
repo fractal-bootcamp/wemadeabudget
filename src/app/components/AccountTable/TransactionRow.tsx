@@ -1,7 +1,7 @@
 'use client'
 import { Bookmark } from 'lucide-react'
 import TransactionForm from './TransactionForm'
-import FlagToggle from './FlagToggle'
+import FlagToggle from './Flag/FlagToggle'
 import {
   formatCentsToDollarString,
   METHODS,

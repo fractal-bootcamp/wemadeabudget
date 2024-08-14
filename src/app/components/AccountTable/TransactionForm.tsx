@@ -4,9 +4,9 @@ import {
   emptyTransaction,
   TransactionDetails,
 } from '../../types'
-import FlagToggle from './FlagToggle'
+import FlagToggle from './Flag/FlagToggle'
 import ClearedButton from './ClearedButton'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import useBudgetStore from '../../stores/transactionStore'
 import Dropdown from '../Dropdown/Dropdown'
 import DatePicker from 'react-datepicker'
@@ -75,6 +75,61 @@ function TransactionForm({
   )
   const dbFunc = existingTransaction ? dbTransactionUpdate : dbTransactionAdd
   const storeFunc = existingTransaction ? updateTransaction : addTransaction
+  const handleTransactionSubmit = (formData: TransactionDetails) => {
+    const status = validateTransactionSubmission(formData)
+    if (!status.valid) {
+      setErrorStatus(status)
+      return false
+    }
+    updateStoreAndDb({
+      dbFunction: dbFunc,
+      storeFunction: storeFunc,
+      payload: formData,
+      method: existingTransaction ? METHODS.UPDATE : METHODS.ADD,
+    })
+    return true
+  }
+  const resetForm = () => {
+    setFormData({ ...emptyTransaction, account: accountName || '' })
+    setInflow(0)
+    setOutflow(0)
+    setErrorStatus({ valid: true, message: '' })
+  }
+
+  const handleSave = (formData: TransactionDetails) => {
+    if (!handleTransactionSubmit(formData)) return //abort resetting/closing if submit fails validation
+    closeFunction()
+  }
+
+  const handleSaveAndAddAnother = (formData: TransactionDetails) => {
+    if (!handleTransactionSubmit(formData)) return //abort resetting/closing if submit fails validation
+    resetForm()
+  }
+
+  const handleCancel = () => {
+    closeFunction()
+  }
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Enter') {
+        event.preventDefault()
+        if (!existingTransaction) {
+          handleSaveAndAddAnother(formData)
+        } else {
+          handleSave(formData)
+        }
+      } else if (event.key === 'Escape') {
+        handleCancel()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [formData, existingTransaction])
+
   return (
     <div
       className="flex flex-col gap-1 bg-indigo-100 px-0 py-2 text-xs"
@@ -226,7 +281,7 @@ function TransactionForm({
             className={`${outflow === 0 ? 'text-gray-400' : 'text-black'} flex w-full items-center justify-end rounded-md border border-blue-700 bg-white py-1 pl-2 pr-2 text-right`}
             value={outflow || ''}
             onChange={(e) => {
-              const cents = Math.floor(parseFloat(e.target.value) * 100)
+              const cents = Math.floor(parseFloat(e.target.value) * 100) || 0
 
               setInflow(0)
               setFormData({
@@ -248,7 +303,7 @@ function TransactionForm({
             className={`${inflow === 0 ? 'text-gray-400' : 'text-black'} flex w-full items-center justify-end rounded-md border border-blue-700 bg-white py-1 pl-2 pr-2 text-right`}
             value={inflow || ''}
             onChange={(e) => {
-              const cents = Math.floor(parseFloat(e.target.value) * 100)
+              const cents = Math.floor(parseFloat(e.target.value) * 100) || 0
               setOutflow(0)
               setFormData({
                 ...formData,
@@ -282,32 +337,35 @@ function TransactionForm({
           </div>
         )}
         <button
-          className="rounded-lg border border-indigo-600 px-4 py-1 text-indigo-600"
+          className="rounded-lg border border-indigo-600 px-4 py-1 text-indigo-600 hover:bg-blue-700 hover:text-white"
           type="button"
-          onClick={closeFunction}
+          onClick={(e) => {
+            e.stopPropagation()
+            handleCancel()
+          }}
         >
           Cancel
         </button>
         <button
-          className="rounded-lg bg-blue-600 px-4 py-1 text-white"
+          className="rounded-lg bg-blue-600 px-4 py-1 text-white hover:bg-blue-700"
           onClick={(e) => {
             e.stopPropagation()
-            const status = validateTransactionSubmission(formData)
-            if (!status.valid) {
-              setErrorStatus(status)
-              return
-            }
-            updateStoreAndDb({
-              dbFunction: dbFunc,
-              storeFunction: storeFunc,
-              payload: formData,
-              method: existingTransaction ? METHODS.UPDATE : METHODS.ADD,
-            })
-            closeFunction()
+            handleSave(formData)
           }}
         >
           Save{' '}
         </button>
+        {!existingTransaction && (
+          <button
+            className="rounded-lg bg-blue-600 px-4 py-1 text-white hover:bg-blue-700"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleSaveAndAddAnother(formData)
+            }}
+          >
+            Save and Add Another{' '}
+          </button>
+        )}
       </div>
     </div>
   )

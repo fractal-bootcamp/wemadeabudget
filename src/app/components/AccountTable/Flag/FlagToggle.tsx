@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { Bookmark, Check } from 'lucide-react'
-import { Flag, FlagDetails } from '../../types'
+import { Flag, FlagDetails } from '../../../types'
 import FlagEditModal from './FlagEditModal'
 
 interface FlagToggleProps {
@@ -32,7 +32,7 @@ export default function FlagToggle({
       )}
       <div className="relative" onClick={handleToggleModal}>
         <Bookmark
-          className="rotate-[270deg] transform text-gray-400"
+          className="rotate-[270deg] transform cursor-pointer text-gray-400"
           id="form-flag"
           size={16}
           fill={
