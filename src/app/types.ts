@@ -22,14 +22,17 @@ const Flags = [
   'PURPLE',
 ] as const
 export type Flag = (typeof Flags)[number]
-export const FlagDetails: Record<Flag, { display: string; hexCode: string }> = {
-  NONE: { display: 'None', hexCode: '#ffffff' },
-  RED: { display: 'Red', hexCode: '#ff0000' },
-  ORANGE: { display: 'Orange', hexCode: '#ff7f00' },
-  YELLOW: { display: 'Yellow', hexCode: '#ffff00' },
-  GREEN: { display: 'Green', hexCode: '#00ff00' },
-  BLUE: { display: 'Blue', hexCode: '#0000ff' },
-  PURPLE: { display: 'Purple', hexCode: '#7f00ff' },
+export const FlagDetails: Record<
+  Flag,
+  { display: string; hexCode: string; lighterHexCode: string }
+> = {
+  NONE: { display: 'None', hexCode: '#ffffff', lighterHexCode: '#ffffff' },
+  RED: { display: 'Red', hexCode: '#ff0000', lighterHexCode: '#ff9999' },
+  ORANGE: { display: 'Orange', hexCode: '#ff7f00', lighterHexCode: '#ffcc99' },
+  YELLOW: { display: 'Yellow', hexCode: '#ffdd00', lighterHexCode: '#fff5b3' },
+  GREEN: { display: 'Green', hexCode: '#3dc762', lighterHexCode: '#8cdea2' },
+  BLUE: { display: 'Blue', hexCode: '#00a0ff', lighterHexCode: '#99daff' },
+  PURPLE: { display: 'Purple', hexCode: '#7f00ff', lighterHexCode: '#cc99ff' },
 }
 /** Mapes a type details obj to an array for mapped access to all type details
  * e.g. to write out all Account types: typeDetailsArray(AccountTypeDetails).map(acctType => acctType.display)
