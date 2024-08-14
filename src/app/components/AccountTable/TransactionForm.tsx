@@ -282,14 +282,14 @@ function TransactionForm({
           </div>
         )}
         <button
-          className="rounded-lg border border-indigo-600 px-4 py-1 text-indigo-600"
+          className="rounded-lg border border-indigo-600 px-4 py-1 text-indigo-600 hover:bg-blue-700 hover:text-white"
           type="button"
           onClick={closeFunction}
         >
           Cancel
         </button>
         <button
-          className="rounded-lg bg-blue-600 px-4 py-1 text-white"
+          className="rounded-lg bg-blue-600 px-4 py-1 text-white hover:bg-blue-700"
           onClick={(e) => {
             e.stopPropagation()
             const status = validateTransactionSubmission(formData)
