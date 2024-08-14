@@ -45,7 +45,7 @@ type budgetStore = {
   /** Adds a new transaction to the store */
   addTransaction: (transaction: TransactionDetails) => void
   /** Removes a transaction from the store by its ID */
-  removeTransaction: (transactionId: string) => void
+  deleteTransaction: (transactionId: string) => void
   /** Updates an existing transaction in the store */
   updateTransaction: (newDetails: TransactionDetails) => void
   /** Adds a new payee to the store */
@@ -128,7 +128,7 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
     set((state) => ({
       transactions: [...state.transactions, transaction],
     })),
-  removeTransaction: (transactionId) =>
+  deleteTransaction: (transactionId) =>
     set((state) => ({
       transactions: state.transactions.filter(
         (transaction) => transaction.id !== transactionId
