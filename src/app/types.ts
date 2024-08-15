@@ -51,6 +51,7 @@ export type TransactionDetails = {
   date: Date
   cents: number
   memo: string
+  transfer: boolean
   flag: Flag
   cleared: boolean
 }
@@ -62,6 +63,7 @@ export const emptyTransaction: TransactionDetails = {
   date: new Date(),
   cents: 0,
   memo: '',
+  transfer: false,
   flag: 'NONE',
   cleared: false,
 }
@@ -141,6 +143,7 @@ export const startingBalanceTransaction = (
   payee: 'Starting Balance',
   date: new Date(),
   cents,
+  transfer: false,
   memo: 'Account starting balance (entered automatically)',
   flag: 'NONE',
   cleared: true,

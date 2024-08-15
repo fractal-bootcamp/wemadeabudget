@@ -52,6 +52,7 @@ model Transaction {
   cents      Int
   memo       String
   cleared    Boolean
+  transfer   Boolean  @default(false)
   flag       Flag
   user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String

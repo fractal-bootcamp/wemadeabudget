@@ -36,6 +36,7 @@ const formatTransaction = (
     category: transaction.category.name,
     payee: transaction.payee.name,
     date: transaction.date,
+    transfer: transaction.transfer,
     cents: transaction.cents,
     memo: transaction.memo,
     flag: transaction.flag,
