@@ -16,6 +16,7 @@ import {
 } from '../util/utils'
 import { dbAccountAdd, dbTransactionAdd } from '../actions/controller'
 import { start } from 'repl'
+import Dropdown from './Dropdown/Dropdown'
 
 interface AddAccountModalProps {
   toggleShowAccountModal: () => void
@@ -33,6 +34,7 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
   })
   const resetErrorStatus = () => setSubmitStatus({ valid: true, message: '' })
   const { addAccount, addTransaction, accounts } = useBudgetStore()
+  const acctTypeDetails = typeDetailsArray(AccountTypeDetails)
   return (
     <div
       onClick={(e) => {
@@ -83,6 +85,21 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
           <label htmlFor="accountType">
             What type of account are you adding?
           </label>
+          <Dropdown
+            options={acctTypeDetails.map((acctType) => acctType.display)}
+            selected={AccountTypeDetails[acctData.type].display}
+            label="Account Type"
+            searchable={false}
+            setSelected={(selected: string) =>
+              setAcctData({
+                ...acctData,
+                type: acctTypeDetails.find(
+                  (acctType) => acctType.display === selected
+                )!.type,
+              })
+            }
+          />
+          {/* 
           <select
             id="accountType"
             name="accountType"
@@ -100,7 +117,7 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
                 {acctType.display}
               </option>
             ))}
-          </select>
+          </select> */}
           <label>What is your current account balance?</label>
           <input
             className="rounded border border-gray-400 px-2 py-1"
