@@ -1,6 +1,12 @@
 import { Prisma } from '@prisma/client'
 import prisma from '../client'
-import { AccountDetails, AccountUpdatePayload } from '../types'
+import {
+  AccountDetails,
+  accountTransferPayeeName,
+  AccountUpdatePayload,
+} from '../types'
+import categoryServices from './categories'
+import payeeServices from './payees'
 
 const queries = {
   /** Retrieve all accounts for a user */
@@ -65,12 +71,24 @@ const mutations = {
 
 const accountServices = {
   getAllByUser: (userId: string) => queries.getAccounts(userId),
-  add: (userId: string, details: AccountDetails) =>
-    mutations.addAccount(userId, details),
-  delete: (userId: string, accountName: string) =>
-    mutations.deleteAccount(userId, accountName),
-  update: (userId: string, accountUpdatePayload: AccountUpdatePayload) =>
-    mutations.updateAccount(userId, accountUpdatePayload),
+  add: (userId: string, details: AccountDetails) => {
+    //update the account transfer payee name
+    payeeServices.add(userId, accountTransferPayeeName(details.name))
+    return mutations.addAccount(userId, details)
+  },
+  delete: (userId: string, accountName: string) => {
+    //remove the account transfer payee name
+    payeeServices.delete(userId, accountTransferPayeeName(accountName)),
+      mutations.deleteAccount(userId, accountName)
+  },
+  update: (userId: string, accountUpdatePayload: AccountUpdatePayload) => {
+    //update the account transfer payee name
+    payeeServices.update(userId, {
+      oldName: accountTransferPayeeName(accountUpdatePayload.oldName),
+      newName: accountTransferPayeeName(accountUpdatePayload.newDetails.name),
+    })
+    return mutations.updateAccount(userId, accountUpdatePayload)
+  },
 }
 
 export default accountServices

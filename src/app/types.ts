@@ -93,6 +93,8 @@ export const emptyAccount: AccountDetails = {
 export interface PayeeDetails {
   name: string
 }
+export const accountTransferPayeeName = (accountName: string) =>
+  `Transfer to/from: ${accountName}`
 export interface PayeeUpdatePayload {
   oldName: string
   newName: string
