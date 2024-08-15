@@ -8,6 +8,7 @@ interface DropdownProps {
   selected: string
   label?: string
   disabled?: boolean
+  searchable?: boolean
   addOptions?: boolean
   addOptionCallback?: (option: string) => void
   setSelected: (selected: string) => void
@@ -19,6 +20,7 @@ const Dropdown = ({
   selected, //array of current selection passed in from parent state
   label,
   disabled = false,
+  searchable = true,
   addOptions = false,
   addOptionCallback = () => {},
   setSelected, //selected setter function to update parent state,
@@ -73,11 +75,13 @@ const Dropdown = ({
       >
         <div className="flex flex-col items-start justify-between">
           {/* Search bar */}
-          <DropdownSearch
-            searchTerm={searchTerm}
-            setSearchTerm={setSearchTerm}
-            setExpanded={setExpanded}
-          />
+          {searchable && (
+            <DropdownSearch
+              searchTerm={searchTerm}
+              setSearchTerm={setSearchTerm}
+              setExpanded={setExpanded}
+            />
+          )}
           {/* if anything has been entered into the search bar, display an option to add their query as a new option */}
           {addOptions &&
             searchTerm.length > 0 &&
