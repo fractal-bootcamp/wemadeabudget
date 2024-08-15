@@ -32,12 +32,16 @@ enum AccountType {
 }
 
 model User {
-  id           String        @id @default(cuid())
-  email        String        @unique
-  username     String        @unique
-  clerkId      String        @unique
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Fields
+  email    String @unique
+  username String @unique
+  clerkId  String @unique
+
+  // Relations
   transactions Transaction[]
   payees       Payee[]
   categories   Category[]
@@ -45,59 +49,75 @@ model User {
 }
 
 model Transaction {
-  id         String   @id @default(cuid())
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Fields
   date       DateTime
   cents      Int
   memo       String
   cleared    Boolean
   transfer   Boolean  @default(false)
   flag       Flag
-  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     String
-  category   Category @relation(fields: [categoryId], references: [id])
   categoryId String
-  account    Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
   accountId  String
-  payee      Payee    @relation(fields: [payeeId], references: [id], onDelete: Cascade)
   payeeId    String
+
+  // Relations
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id])
+  account  Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  payee    Payee    @relation(fields: [payeeId], references: [id], onDelete: Cascade)
 }
 
 model Category {
-  id           String        @id @default(cuid())
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  name         String
-  allocated    Int           @default(0)
-  permanent    Boolean       @default(false)
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Fields
+  name      String
+  allocated Int     @default(0)
+  permanent Boolean @default(false)
+  userId    String
+
+  // Relations
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       String
   transactions Transaction[]
 
   @@unique(name: "categoryId", fields: [userId, name])
 }
 
 model Account {
-  id           String        @id @default(cuid())
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  name         String
-  type         AccountType
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Fields
+  name   String
+  type   AccountType
+  userId String
+
+  // Relations
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       String
   transactions Transaction[]
 
   @@unique(name: "accountId", fields: [userId, name])
 }
 
 model Payee {
-  id           String        @id @default(cuid())
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-  name         String
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Fields
+  name   String
+  userId String
+
+  // Relations
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       String
   transactions Transaction[]
 
   @@unique(name: "payeeId", fields: [userId, name])
