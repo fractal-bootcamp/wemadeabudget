@@ -113,8 +113,9 @@ model Payee {
   updatedAt DateTime @updatedAt
 
   // Fields
-  name   String
-  userId String
+  name            String
+  userId          String
+  accountTransfer Boolean @default(false)
 
   // Relations
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
