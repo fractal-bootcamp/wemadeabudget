@@ -3,6 +3,10 @@ export interface User {
   email: string
   clerkId: string
 }
+export type UserUpdatePayload = {
+  email?: string
+  username?: string
+}
 const AccountTypes = ['CHECKING', 'CASH', 'CREDIT_CARD', 'SAVINGS'] as const
 
 export type AccountType = (typeof AccountTypes)[number]
@@ -92,6 +96,7 @@ export const emptyAccount: AccountDetails = {
 }
 export interface PayeeDetails {
   name: string
+  accountTransfer: boolean
 }
 export const accountTransferPayeeName = (accountName: string) =>
   `Transfer to/from: ${accountName}`
@@ -115,6 +120,18 @@ const defaultCategories = [
   'Celebrations',
 ]
 const defaultPermanetCategories = ['Uncategorized', 'Ready to Assign']
+const defaultCategoryDetails = [
+  ...defaultCategories.map((name) => ({
+    name,
+    allocated: 0,
+    permanent: false,
+  })),
+  ...defaultPermanetCategories.map((name) => ({
+    name,
+    allocated: 0,
+    permanent: true,
+  })),
+]
 const defaultAccounts: AccountDetails[] = [
   { name: 'Checking', type: 'CHECKING' },
   { name: 'Savings', type: 'SAVINGS' },
@@ -123,16 +140,14 @@ const defaultAccounts: AccountDetails[] = [
 ]
 const defaultPayees = ['Starting Balance']
 interface Defaults {
-  categories: string[]
-  permanentCategories: string[]
+  categories: CategoryDetails[]
   accounts: AccountDetails[]
   payees: PayeeDetails[]
 }
 export const defaults: Defaults = {
-  categories: defaultCategories,
-  permanentCategories: defaultPermanetCategories,
+  categories: defaultCategoryDetails,
   accounts: defaultAccounts,
-  payees: defaultPayees.map((name) => ({ name })),
+  payees: defaultPayees.map((name) => ({ name, accountTransfer: false })),
 }
 
 export const startingBalanceTransaction = (

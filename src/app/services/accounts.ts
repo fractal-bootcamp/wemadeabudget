@@ -78,8 +78,8 @@ const accountServices = {
   },
   delete: (userId: string, accountName: string) => {
     //remove the account transfer payee name
-    payeeServices.delete(userId, accountTransferPayeeName(accountName)),
-      mutations.deleteAccount(userId, accountName)
+    payeeServices.delete(userId, accountTransferPayeeName(accountName))
+    return mutations.deleteAccount(userId, accountName)
   },
   update: (userId: string, accountUpdatePayload: AccountUpdatePayload) => {
     //update the account transfer payee name

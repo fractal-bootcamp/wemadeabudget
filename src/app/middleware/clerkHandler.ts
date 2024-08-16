@@ -12,7 +12,7 @@ export default async function clerkHandler() {
       ? clerkUser.emailAddresses[0].emailAddress
       : ''
   const username = clerkUser.username ?? ''
-  const userInDb = await userServices.upsertUserFromClerkDetails(
+  const userInDb = await userServices.addOrFetchUserFromClerkId(
     clerkUser.id,
     email,
     username
