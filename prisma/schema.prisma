@@ -54,22 +54,25 @@ model Transaction {
   updatedAt DateTime @updatedAt
 
   // Fields
-  date       DateTime
-  cents      Int
-  memo       String
-  cleared    Boolean
-  transfer   Boolean  @default(false)
-  flag       Flag
-  userId     String
-  categoryId String
-  accountId  String
-  payeeId    String
+  date             DateTime
+  cents            Int
+  memo             String
+  cleared          Boolean
+  transfer         Boolean  @default(false)
+  flag             Flag
+  userId           String
+  categoryId       String
+  accountId        String
+  payeeId          String
+  pairedTransferId String?  @unique
 
   // Relations
-  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  category Category @relation(fields: [categoryId], references: [id])
-  account  Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
-  payee    Payee    @relation(fields: [payeeId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category       Category     @relation(fields: [categoryId], references: [id])
+  account        Account      @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  payee          Payee        @relation(fields: [payeeId], references: [id], onDelete: Cascade)
+  pairedTransfer Transaction? @relation("PairedTransfer", fields: [pairedTransferId], references: [id])
+  pairedBy       Transaction? @relation("PairedTransfer")
 }
 
 model Category {
