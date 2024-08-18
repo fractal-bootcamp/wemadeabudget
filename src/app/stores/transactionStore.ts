@@ -7,6 +7,7 @@ import {
   CategoryUpdatePayload,
   AccountUpdatePayload,
   PayeeUpdatePayload,
+  PayeeDetails,
 } from '../types'
 import { Category } from '@prisma/client'
 
@@ -14,7 +15,7 @@ type budgetStore = {
   loaded: boolean
   transactions: TransactionDetails[]
   accounts: AccountDetails[]
-  payees: string[]
+  payees: PayeeDetails[]
   categories: CategoryDetails[]
   /** Retrieves the entire transaction array */
   getAllTransactions: () => TransactionDetails[]
@@ -49,11 +50,11 @@ type budgetStore = {
   /** Updates an existing transaction in the store */
   updateTransaction: (newDetails: TransactionDetails) => void
   /** Adds a new payee to the store */
-  addPayee: (payee: string) => void
+  addPayee: (payee: PayeeDetails) => void
   /** Removes a payee from the store */
   removePayee: (payee: string) => void
   /** Updates an existing payee in the store */
-  updatePayee: (payeeUpdatePayload: PayeeUpdatePayload) => void
+  updatePayeeName: (payeeUpdatePayload: PayeeUpdatePayload) => void
   /** Adds a new category to the store */
   addCategory: (category: CategoryDetails) => void
   /** Deletes a category from the store by its name, moving its transactions to "Uncategorized" (unless it is permanent) */
@@ -149,13 +150,13 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
     })),
   removePayee: (payee) =>
     set((state) => ({
-      payees: state.payees.filter((p) => p !== payee),
+      payees: state.payees.filter((p) => p.name !== payee),
     })),
-  updatePayee: (payeeUpdatePayload) =>
+  updatePayeeName: (payeeUpdatePayload) =>
     set((state) => ({
       payees: state.payees.map((payee) => {
-        if (payee === payeeUpdatePayload.oldName) {
-          return payeeUpdatePayload.newName
+        if (payee.name === payeeUpdatePayload.oldName) {
+          return { ...payee, name: payeeUpdatePayload.newName }
         }
         return payee
       }),

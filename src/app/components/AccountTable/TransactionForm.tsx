@@ -2,6 +2,7 @@
 import {
   CategoryDetails,
   emptyTransaction,
+  PayeeDetails,
   TransactionDetails,
 } from '../../types'
 import FlagToggle from './Flag/FlagToggle'
@@ -210,15 +211,19 @@ function TransactionForm({
           className="flex items-center truncate px-1 text-xs"
         >
           <Dropdown
-            options={payees}
+            options={payees.map((payee) => payee.name)}
             selected={formData.payee}
             addOptions={true}
             label="Payee"
             addOptionCallback={(newPayeeName: string) => {
+              const payload: PayeeDetails = {
+                name: newPayeeName,
+                accountTransfer: false,
+              }
               updateStoreAndDb({
                 dbFunction: dbPayeeAdd,
                 storeFunction: addPayee,
-                payload: newPayeeName,
+                payload: payload,
                 method: 'ADD',
               })
               setFormData({ ...formData, payee: newPayeeName })

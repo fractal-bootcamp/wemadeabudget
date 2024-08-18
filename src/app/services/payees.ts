@@ -1,9 +1,10 @@
 import { Prisma } from '@prisma/client'
 import prisma from '../client'
+import { PayeeDetails } from '../types'
 
 const queries = {
   /** Retrieve all payees for a user */
-  getPayees: async (userId: string) => {
+  getAllByUserId: async (userId: string) => {
     const payees = await prisma.payee.findMany({
       where: {
         user: {
@@ -13,14 +14,27 @@ const queries = {
     })
     return payees
   },
+  getByName: async (userId: string, payeeName: string) => {
+    const payee = await prisma.payee.findUnique({
+      where: {
+        payeeId: {
+          name: payeeName,
+          userId: userId,
+        },
+      },
+      select: { name: true, accountTransfer: true },
+    })
+    return payee
+  },
 }
 
 const mutations = {
   /** Add a specified payee to a user */
-  addPayee: async (userId: string, name: string) => {
+  add: async (userId: string, payee: PayeeDetails) => {
     const newPayee = await prisma.payee.create({
       data: {
-        name: name,
+        name: payee.name,
+        accountTransfer: payee.accountTransfer,
         user: {
           connect: {
             id: userId,
@@ -30,7 +44,7 @@ const mutations = {
     })
     return newPayee
   },
-  deletePayee: async (userId: string, payeeName: string) => {
+  delete: async (userId: string, payeeName: string) => {
     const deletedPayee = await prisma.payee.delete({
       where: {
         payeeId: {
@@ -41,10 +55,7 @@ const mutations = {
     })
     return deletedPayee
   },
-  updatePayee: async (
-    userId: string,
-    payeeUpdatePayload: PayeeUpdatePayload
-  ) => {
+  update: async (userId: string, payeeUpdatePayload: PayeeUpdatePayload) => {
     const updatedPayee = await prisma.payee.update({
       where: {
         payeeId: {
@@ -66,12 +77,15 @@ type PayeeUpdatePayload = {
 }
 
 const payeeServices = {
-  getAllByUser: (userId: string) => queries.getPayees(userId),
-  add: (userId: string, name: string) => mutations.addPayee(userId, name),
+  getAllByUser: (userId: string) => queries.getAllByUserId(userId),
+  getByName: (userId: string, payeeName: string) =>
+    queries.getByName(userId, payeeName),
+  add: (userId: string, newPayee: PayeeDetails) =>
+    mutations.add(userId, newPayee),
   delete: (userId: string, payeeName: string) =>
-    mutations.deletePayee(userId, payeeName),
+    mutations.delete(userId, payeeName),
   update: (userId: string, payeeUpdatePayload: PayeeUpdatePayload) =>
-    mutations.updatePayee(userId, payeeUpdatePayload),
+    mutations.update(userId, payeeUpdatePayload),
 }
 
 export default payeeServices

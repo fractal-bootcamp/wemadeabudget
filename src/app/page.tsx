@@ -22,7 +22,7 @@ export default async function Home() {
       transactions={transactions}
       accounts={accounts}
       categories={categories}
-      payees={payees.map((p) => p.name)}
+      payees={payees}
     />
   )
 }
