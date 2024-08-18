@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import useBudgetStore from '../../stores/transactionStore'
+import useBudgetStore, { useBudgetActions } from '../../stores/transactionStore'
 import { CategoryDetails } from '../../types'
 import {
   checkSubmittedName,
@@ -14,10 +14,8 @@ interface AddCategoryModalProps {
 export default function AddCategoryModal({
   toggleShowModal: closeFunction,
 }: AddCategoryModalProps) {
-  const { categories, addCategory } = useBudgetStore((store) => ({
-    categories: store.categories,
-    addCategory: store.addCategory,
-  }))
+  const categories = useBudgetStore((store) => store.categories)
+  const { addCategory } = useBudgetActions()
   const [categoryName, setCategoryName] = useState('')
 
   const [submitStatus, setSubmitStatus] = useState<submitStatus>({

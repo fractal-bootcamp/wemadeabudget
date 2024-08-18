@@ -8,7 +8,7 @@ import {
 import FlagToggle from './Flag/FlagToggle'
 import ClearedButton from './ClearedButton'
 import { useState, useEffect } from 'react'
-import useBudgetStore from '../../stores/transactionStore'
+import useBudgetStore, { useBudgetActions } from '../../stores/transactionStore'
 import Dropdown from '../Dropdown/Dropdown'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
@@ -52,15 +52,11 @@ function TransactionForm({
   existingTransaction,
   accountName,
 }: TransactionFormProps) {
-  const {
-    accounts,
-    payees,
-    categories,
-    addCategory,
-    addPayee,
-    addTransaction,
-    updateTransaction,
-  } = useBudgetStore()
+  const accounts = useBudgetStore((state) => state.accounts)
+  const payees = useBudgetStore((state) => state.payees)
+  const categories = useBudgetStore((state) => state.categories)
+  const { addCategory, addPayee, addTransaction, updateTransaction } =
+    useBudgetActions()
   const [formData, setFormData] = useState<TransactionDetails>(
     existingTransaction || { ...emptyTransaction, account: accountName || '' }
   )

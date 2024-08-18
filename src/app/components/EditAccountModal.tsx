@@ -1,7 +1,7 @@
 import { X } from 'lucide-react'
 import { AccountDetails } from '../types'
 import { useState } from 'react'
-import useBudgetStore from '../stores/transactionStore'
+import useBudgetStore, { useBudgetActions } from '../stores/transactionStore'
 import {
   checkSubmittedName,
   METHODS,
@@ -21,7 +21,8 @@ const EditAccountModal: React.FC<EditAccountModalProps> = ({
   setCurrentAccount,
   account,
 }) => {
-  const { accounts, updateAccount, deleteAccount } = useBudgetStore()
+  const accounts = useBudgetStore((state) => state.accounts)
+  const { updateAccount, deleteAccount } = useBudgetActions()
   const [acctData, setAcctData] = useState<AccountDetails>(account)
   const [submitStatus, setSubmitStatus] = useState<submitStatus>({
     valid: true,

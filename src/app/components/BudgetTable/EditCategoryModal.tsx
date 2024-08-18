@@ -7,7 +7,7 @@ import {
   updateStoreAndDb,
 } from '../../util/utils'
 import { dbCategoryUpdate } from '../../actions/controller'
-import useBudgetStore from '../../stores/transactionStore'
+import useBudgetStore, { useBudgetActions } from '../../stores/transactionStore'
 
 interface EditCategoryModalProps {
   originalName: string
@@ -21,7 +21,7 @@ export default function EditCategoryModal({
   closeModal,
   onDelete,
 }: EditCategoryModalProps) {
-  const { updateCategory } = useBudgetStore()
+  const { updateCategory } = useBudgetActions()
   const [categoryName, setCategoryName] = useState(originalName)
   const [submitStatus, setSubmitStatus] = useState<submitStatus>({
     valid: true,

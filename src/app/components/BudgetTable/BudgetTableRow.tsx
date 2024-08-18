@@ -1,5 +1,5 @@
 import EditCategoryModal from './EditCategoryModal'
-import useBudgetStore from '../../stores/transactionStore'
+import useBudgetStore, { useBudgetActions } from '../../stores/transactionStore'
 import {
   formatCentsToDollarString,
   METHODS,
@@ -26,8 +26,9 @@ export default function BudgetTableRow({
   onSelect,
 }: BudgetTableRowProps) {
   const [editAllocation, setEditAllocation] = useState(false)
-  const { categories, getBalanceByCategory, updateCategory, deleteCategory } =
-    useBudgetStore()
+  const { getBalanceByCategory, updateCategory, deleteCategory } =
+    useBudgetActions()
+  const categories = useBudgetStore((state) => state.categories)
   const allocated = categories.find((c) => c.name === name)?.allocated || 0
   const activityCents = getBalanceByCategory(name)
   const availableCents = allocated + activityCents

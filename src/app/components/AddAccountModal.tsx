@@ -8,7 +8,7 @@ import {
   typeDetailsArray,
 } from '../types'
 import { useState } from 'react'
-import useBudgetStore from '../stores/transactionStore'
+import useBudgetStore, { useBudgetActions } from '../stores/transactionStore'
 import {
   checkSubmittedName,
   submitStatus,
@@ -33,7 +33,8 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
     message: '',
   })
   const resetErrorStatus = () => setSubmitStatus({ valid: true, message: '' })
-  const { addAccount, addTransaction, accounts } = useBudgetStore()
+  const { addAccount, addTransaction } = useBudgetActions()
+  const accounts = useBudgetStore((state) => state.accounts)
   const acctTypeDetails = typeDetailsArray(AccountTypeDetails)
   return (
     <div
