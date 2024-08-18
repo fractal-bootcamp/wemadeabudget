@@ -1,6 +1,12 @@
 import { Prisma } from '@prisma/client'
 import prisma from '../client'
 import { CategoryDetails, CategoryUpdatePayload } from '../types'
+import { CategoryService } from './interfaces'
+const selects = {
+  name: true,
+  allocated: true,
+  permanent: true,
+}
 const queries = {
   getCategories: async (userId: string) => {
     return await prisma.category.findMany({
@@ -15,29 +21,19 @@ const queries = {
 
 const mutations = {
   addCategory: async (userId: string, category: CategoryDetails) => {
-    try {
-      const newCategory = await prisma.category.create({
-        data: {
-          name: category.name,
-          user: {
-            connect: {
-              id: userId,
-            },
+    const newCategory = await prisma.category.create({
+      data: {
+        name: category.name,
+        user: {
+          connect: {
+            id: userId,
           },
-          allocated: category.allocated || 0,
         },
-      })
-    } catch (error) {
-      if (
-        error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2002'
-      ) {
-        throw new Error(
-          'A category with this name already exists for this user.'
-        )
-      }
-      throw error // Re-throw other errors
-    }
+        allocated: category.allocated || 0,
+      },
+      select: selects,
+    })
+    return newCategory
   },
   deleteCategory: async (userId: string, categoryName: string) => {
     const permanent = (
@@ -72,17 +68,35 @@ const mutations = {
       },
     })
     //Move all transactions in the category to the Uncategorized category
-    await prisma.transaction.updateMany({
+    //get all existing transactions in the to-be-deleted category
+    const categoryTransactions = await prisma.transaction.findMany({
       where: {
         category: {
           name: categoryName,
           userId: userId,
         },
       },
-      data: {
-        categoryId: uncategorizedCategory.id,
-      },
     })
+    //loop through and move to uncategorized
+    const movedTransactions = await Promise.all(
+      categoryTransactions.map((transaction) =>
+        prisma.transaction.update({
+          where: {
+            id: transaction.id,
+          },
+          data: {
+            category: {
+              connect: {
+                id: uncategorizedCategory.id,
+              },
+            },
+          },
+        })
+      )
+    )
+    const movedTransactionIds = movedTransactions.map(
+      (transaction) => transaction.id
+    )
 
     // Then, delete the category
     const deletedCategory = await prisma.category.delete({
@@ -92,7 +106,9 @@ const mutations = {
           userId: userId,
         },
       },
+      select: selects,
     })
+    return deletedCategory
   },
   updateCategory: async (
     userId: string,
@@ -113,7 +129,7 @@ const mutations = {
   },
 }
 
-const categoryServices = {
+const categoryServices: CategoryService = {
   getAllByUser: (userId: string) => queries.getCategories(userId),
   add: (userId: string, newCategory: CategoryDetails) =>
     mutations.addCategory(userId, newCategory),

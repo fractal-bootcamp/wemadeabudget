@@ -63,6 +63,7 @@ model Transaction {
   categoryId       String
   accountId        String
   payeeId          String
+  transfer         Boolean  @default(false)
   pairedTransferId String?  @unique
 
   // Relations

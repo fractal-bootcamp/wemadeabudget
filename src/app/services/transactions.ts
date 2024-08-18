@@ -1,10 +1,16 @@
 import prisma from '../client'
-import { extractTransferAccount, TransactionDetails } from '../types'
-import { Transaction } from '@prisma/client'
+import {
+  extractTransferAccount,
+  isTransfer,
+  TransactionDetails,
+  TransferDetails,
+} from '../types'
+import { Prisma, Transaction } from '@prisma/client'
 import payeeServices from './payees'
 import { disconnect } from 'process'
+import { TransactionService } from './interfaces'
 //This is a helper object that is used to include the name field in the related models to the transactions
-const nameInclusions = {
+const nameInclusions: Prisma.TransactionInclude = {
   account: {
     select: {
       name: true,
@@ -21,7 +27,52 @@ const nameInclusions = {
     },
   },
 }
-
+const newTransactionDataPayload = (
+  details: TransactionDetails,
+  userId: string
+) => ({
+  date: details.date,
+  cents: details.cents,
+  memo: details.memo,
+  account: {
+    connect: {
+      accountId: {
+        userId: userId,
+        name: details.account,
+      },
+    },
+  },
+  category: {
+    connectOrCreate: {
+      where: {
+        categoryId: {
+          userId: userId,
+          name: details.category,
+        },
+      },
+      create: {
+        name: details.category,
+        userId: userId,
+        allocated: 0,
+      },
+    },
+  },
+  payee: {
+    connect: {
+      payeeId: {
+        userId: userId,
+        name: details.payee,
+      },
+    },
+  },
+  flag: details.flag,
+  cleared: details.cleared,
+  user: {
+    connect: {
+      id: userId,
+    },
+  },
+})
 //What a database transaction response looks like when names above included
 interface FetchedTransaction extends Transaction {
   account: { name: string }
@@ -38,6 +89,7 @@ const formatTransaction = (
     category: transaction.category.name,
     payee: transaction.payee.name,
     date: transaction.date,
+    transfer: transaction.transfer,
     pairedTransferId: transaction.pairedTransferId,
     cents: transaction.cents,
     memo: transaction.memo,
@@ -105,83 +157,83 @@ const mutations = {
       where: {
         id: transactionId,
       },
+      include: nameInclusions,
     })
-    return removedTransaction
+    return formatTransaction(removedTransaction)
   },
-  addTransaction: async (details: TransactionDetails, userId: string) => {
+  add: async (userId: string, details: TransactionDetails) => {
     //the creation data for the base transaction (for reuse if we are creating a paired transfer transcation)
-    const data = {
-      date: details.date,
-      cents: details.cents,
-      memo: details.memo,
-      account: {
-        connect: {
-          accountId: {
-            userId: userId,
-            name: details.account,
-          },
-        },
-      },
-      category: {
-        connectOrCreate: {
-          where: {
-            categoryId: {
-              userId: userId,
-              name: details.category,
-            },
-          },
-          create: {
-            name: details.category,
-            userId: userId,
-            allocated: 0,
-          },
-        },
-      },
-      payee: {
-        connect: {
-          payeeId: {
-            userId: userId,
-            name: details.payee,
-          },
-        },
-      },
-      flag: details.flag,
-      cleared: details.cleared,
-      user: {
-        connect: {
-          id: userId,
-        },
-      },
-    }
+    const data = newTransactionDataPayload(details, userId)
+    const newTransaction = await prisma.transaction.create({
+      data,
+      include: nameInclusions,
+    })
+    return formatTransaction(newTransaction)
+  },
+  addTransfer: async (userId: string, details: TransferDetails) => {
+    const data = newTransactionDataPayload(details, userId)
     const newTransaction = await prisma.transaction.create({
       data: {
         ...data,
-        pairedTransfer: details.pairedTransferId
-          ? {
-              //createa a paired transfer transaciton with similar details
-              create: {
-                //same data as the transaction we are creating
-                ...data,
-                //...except for the following fields
+        pairedTransfer: {
+          //createa a paired transfer transaciton with similar details
+          create: {
+            //same data as the transaction we are creating
+            ...data,
+            //...except for the following fields
 
-                //inverse amount
-                cents: -1 * details.cents,
-                //transfer account extracted from the payee details (feels iffy)
-                account: {
-                  connect: {
-                    accountId: {
-                      userId: userId,
-                      name: extractTransferAccount(details.payee),
-                    },
-                  },
+            //inverse amount
+            cents: -1 * details.cents,
+            //transfer account extracted from the payee details (feels iffy)
+            account: {
+              connect: {
+                accountId: {
+                  userId: userId,
+                  name: extractTransferAccount(details.payee),
                 },
               },
-            }
-          : {}, //if not a transfer, don't create a paired transfer
+            },
+          },
+        },
+      },
+      include: {
+        ...nameInclusions,
+        pairedTransfer: { include: nameInclusions },
       },
     })
-    return newTransaction
+    const { pairedTransfer, ...transactionWithoutPairedTransfer } =
+      newTransaction
+    if (!pairedTransfer) {
+      throw new Error('Paired transfer not created? (this should never happen)')
+    }
+    return {
+      transaction: formatTransaction(transactionWithoutPairedTransfer),
+      pairedTransfer: formatTransaction(pairedTransfer),
+    }
   },
+  updateTransfer: async (userId: string, details: TransferDetails) => {
+    //Look up the transaciton and make sure it belongs to the specified user
+    const existingTransaction = await prisma.transaction.findUnique({
+      where: {
+        id: details.id,
+      },
+    })
+
+    if (!existingTransaction) {
+      throw new Error('Transaction not found')
+    }
+    if (existingTransaction.userId !== userId) {
+      throw new Error('Transaction does not belong to the attached user')
+    }
+    if (!isTransfer(details)) {
+      throw new Error('Transaction is not a transfer')
+    }
+    //delete this existing transaction (and by cascade, the paired transfer)
+    await mutations.deleteTransaction(existingTransaction.id, userId)
+    //create a new transaction entity with the new details, which should handle a new paired transfer too
+    return await mutations.addTransfer(userId, details)
+  },
+
   updateTransaction: async (details: TransactionDetails, userId: string) => {
     //Look up the transaciton and make sure it belongs to the specified user
     const existingTransaction = await prisma.transaction.findUnique({
@@ -196,17 +248,10 @@ const mutations = {
     if (existingTransaction.userId !== userId) {
       throw new Error('Transaction does not belong to the attached user')
     }
-    if (existingTransaction.pairedTransferId) {
-      //you know what, fuck it, if we are updating something that used to be a transfer, just delete both and recreate while preserving the createdAt timestamp
-
-      //save the creation timestamp (is this kosher? should we "falsify" this kind of DB data?)
-      const createdAt = existingTransaction.createdAt
-      //delete this existing transaction (and by cascade, the paired transfer)
-      await mutations.deleteTransaction(existingTransaction.id, userId)
-      //create a new transaction entity with the new details, which should handle a new paired transfer too
-      return await mutations.addTransaction(details, userId)
-    }
-    //if not a transfer, just do a normal update :)
+    if (isTransfer(details))
+      throw new Error(
+        'updateTransaction used on a transfer; use updateTransfer'
+      )
     const updatedTransaction = await prisma.transaction.update({
       where: {
         id: details.id,
@@ -249,34 +294,23 @@ const mutations = {
       },
       include: nameInclusions,
     })
-    return updatedTransaction
+    return formatTransaction(updatedTransaction)
   },
 }
-const transactionServices = {
+const transactionServices: TransactionService = {
   add: async (userId: string, details: TransactionDetails) => {
-    //create the transaction
-    const thisTransaction = await mutations.addTransaction(details, userId)
-    //check if transfer
-    const payee = await payeeServices.getByName(userId, details.payee)
-    //if transfer, add countervailing transaction on the other account
-    if (payee?.accountTransfer) {
-      const otherAccount = payee.name.split(':')[1].trim()
-      const partnerTransaction = await mutations.addTransaction(
-        {
-          ...details,
-          account: otherAccount,
-          payee: details.account,
-        },
-        userId
-      )
-      //add the paired transfer relationship
-    }
-    return await mutations.addTransaction(details, userId)
+    return await mutations.add(userId, details)
+  },
+  addTransfer: async (userId: string, details: TransferDetails) => {
+    //create the first transaction
+    return mutations.addTransfer(userId, details)
   },
   delete: async (userId: string, transactionId: string) =>
     await mutations.deleteTransaction(transactionId, userId),
   update: async (userId: string, details: TransactionDetails) =>
     await mutations.updateTransaction(details, userId),
+  updateTransfer: async (userId: string, details: TransferDetails) =>
+    await mutations.updateTransfer(userId, details),
   getById: async (userId: string, transactionId: string) => {
     const transaction = await queries.getTransactionById(transactionId, userId)
     return transaction ? formatTransaction(transaction) : null
