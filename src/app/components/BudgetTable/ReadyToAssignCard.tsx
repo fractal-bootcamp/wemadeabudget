@@ -3,8 +3,7 @@ import { useBudgetActions } from '../../stores/transactionStore'
 import { formatCentsToDollarString } from '../../util/utils'
 
 export const ReadyToAssignCard = () => {
-  const { netBalanceCents, totalAssigned, getBalanceByCategory } =
-    useBudgetActions()
+  const { totalAssigned, getBalanceByCategory } = useBudgetActions()
   const totalAssignableCents = getBalanceByCategory('Ready to Assign')
 
   const amount = totalAssignableCents - totalAssigned()

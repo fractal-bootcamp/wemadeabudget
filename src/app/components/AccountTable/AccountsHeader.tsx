@@ -1,4 +1,3 @@
-import { UserButton } from '@clerk/nextjs'
 import useBudgetStore, { useBudgetActions } from '../../stores/transactionStore' // Adjust the import path as needed
 import { formatCentsToDollarString } from '../../util/utils'
 interface AccountsHeaderProps {

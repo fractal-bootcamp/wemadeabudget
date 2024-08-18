@@ -19,7 +19,7 @@ export default function BulkActionsModal({
         dbFunction: dbTransactionDelete,
         storeFunction: deleteTransaction,
         payload: id,
-        method: 'DELETE',
+        method: METHODS.DELETE,
       })
     })
   }
