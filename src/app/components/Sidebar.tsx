@@ -16,7 +16,7 @@ import { useState, useEffect, useRef } from 'react'
 import AddAccountModal from './AddAccountModal'
 import EditAccountModal from './EditAccountModal'
 import { useUser } from '@clerk/nextjs'
-import useBudgetStore from '../stores/transactionStore'
+import useBudgetStore, { useBudgetActions } from '../stores/transactionStore'
 import { formatCentsToDollarString } from '../util/utils'
 import { UserButton } from '@clerk/nextjs'
 import { AccountDetails } from '../types'
@@ -35,7 +35,8 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
   const [editingAccount, setEditingAccount] = useState<AccountDetails | null>(
     null
   )
-  const { accounts, getBalanceByAccount } = useBudgetStore()
+  const accounts = useBudgetStore((state) => state.accounts)
+  const { getBalanceByAccount } = useBudgetActions()
   const accountsWithBalance = accounts.map((account) => ({
     ...account,
     balance: getBalanceByAccount(account.name) ?? 0,

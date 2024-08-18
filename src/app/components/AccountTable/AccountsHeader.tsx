@@ -1,14 +1,12 @@
 import { UserButton } from '@clerk/nextjs'
-import useBudgetStore from '../../stores/transactionStore' // Adjust the import path as needed
+import useBudgetStore, { useBudgetActions } from '../../stores/transactionStore' // Adjust the import path as needed
 import { formatCentsToDollarString } from '../../util/utils'
 interface AccountsHeaderProps {
   accountName: string | null
 }
 
 const AccountsHeader = ({ accountName }: AccountsHeaderProps) => {
-  const getBalanceByAccount = useBudgetStore(
-    (state) => state.getBalanceByAccount
-  )
+  const { getBalanceByAccount } = useBudgetActions()
   const transactions = useBudgetStore((state) => state.transactions)
 
   const clearedBalance = accountName

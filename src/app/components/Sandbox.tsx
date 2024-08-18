@@ -9,7 +9,7 @@ import {
   PayeeDetails,
   TransactionDetails,
 } from '../types'
-import useBudgetStore from '../stores/transactionStore'
+import useBudgetStore, { useBudgetActions } from '../stores/transactionStore'
 import { useEffect, useState } from 'react'
 import Reflect from './ReflectPage/Reflect'
 
@@ -23,10 +23,11 @@ interface SandboxProps {
 function Sandbox({ transactions, accounts, categories, payees }: SandboxProps) {
   const [currentAccount, setCurrentAccount] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState('budget')
-  const { isLoaded, load, addTransaction, addAccount, addCategory, addPayee } =
-    useBudgetStore()
+  const loaded = useBudgetStore((state) => state.loaded)
+  const { load, addTransaction, addAccount, addCategory, addPayee } =
+    useBudgetActions()
   useEffect(() => {
-    if (isLoaded()) return
+    if (loaded) return
     transactions.forEach(addTransaction)
     accounts.forEach(addAccount)
     categories.forEach(addCategory)

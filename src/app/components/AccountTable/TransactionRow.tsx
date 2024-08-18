@@ -9,7 +9,7 @@ import {
 } from '../../util/utils'
 import { Flag, FlagDetails, TransactionDetails } from '../../types'
 import { dbTransactionUpdate } from '../../actions/controller'
-import useBudgetStore from '../../stores/transactionStore'
+import useBudgetStore, { useBudgetActions } from '../../stores/transactionStore'
 
 interface ColumnWidths {
   [key: string]: number
@@ -46,7 +46,7 @@ function TransactionRow({
 }: TransactionRowProps) {
   const { account, date, payee, category, memo, cents, cleared, flag } =
     transactionDetails
-  const { updateTransaction } = useBudgetStore()
+  const { updateTransaction } = useBudgetActions()
   const toggleCleared = () => {
     const newTransaction: TransactionDetails = {
       ...transactionDetails,

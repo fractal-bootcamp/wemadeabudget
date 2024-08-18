@@ -1,24 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
-import useBudgetStore from '../../stores/transactionStore'
+import useBudgetStore, { useBudgetActions } from '../../stores/transactionStore'
 import BudgetHeader from './BudgetHeader'
 import BudgetActionBar from './BudgetActionBar'
-import { CategoryDetails } from '../../types'
 import BudgetTableRow from './BudgetTableRow'
 
 export default function BudgetTable() {
   const {
-    categories,
     addCategory,
-    removeCategory,
-    editCategory,
+    deleteCategory,
+    updateCategory,
     getTransactionsByCategory,
-  } = useBudgetStore((store) => ({
-    categories: store.categories,
-    addCategory: store.addCategory,
-    removeCategory: store.deleteCategory,
-    editCategory: store.updateCategory,
-    getTransactionsByCategory: store.getTransactionsByCategory,
-  }))
+  } = useBudgetActions()
+  const categories = useBudgetStore((store) => store.categories)
   const sortedCategories = [...categories]
     .sort((a, b) =>
       a.name.toLocaleLowerCase() < b.name.toLocaleLowerCase() ? -1 : 1
