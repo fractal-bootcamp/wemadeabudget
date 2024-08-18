@@ -2,7 +2,7 @@ import { Prisma } from '@prisma/client'
 import prisma from '../client'
 import {
   AccountDetails,
-  accountTransferPayeeName,
+  accountTransferPayee,
   AccountUpdatePayload,
 } from '../types'
 import categoryServices from './categories'
@@ -73,19 +73,19 @@ const accountServices = {
   getAllByUser: (userId: string) => queries.getAccounts(userId),
   add: (userId: string, details: AccountDetails) => {
     //update the account transfer payee name
-    payeeServices.add(userId, accountTransferPayeeName(details.name))
+    payeeServices.add(userId, accountTransferPayee(details.name))
     return mutations.addAccount(userId, details)
   },
   delete: (userId: string, accountName: string) => {
     //remove the account transfer payee name
-    payeeServices.delete(userId, accountTransferPayeeName(accountName))
+    payeeServices.delete(userId, accountTransferPayee(accountName).name)
     return mutations.deleteAccount(userId, accountName)
   },
   update: (userId: string, accountUpdatePayload: AccountUpdatePayload) => {
     //update the account transfer payee name
     payeeServices.update(userId, {
-      oldName: accountTransferPayeeName(accountUpdatePayload.oldName),
-      newName: accountTransferPayeeName(accountUpdatePayload.newDetails.name),
+      oldName: accountTransferPayee(accountUpdatePayload.oldName).name,
+      newName: accountTransferPayee(accountUpdatePayload.newDetails.name).name,
     })
     return mutations.updateAccount(userId, accountUpdatePayload)
   },

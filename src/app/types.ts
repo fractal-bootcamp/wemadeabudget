@@ -55,7 +55,7 @@ export type TransactionDetails = {
   date: Date
   cents: number
   memo: string
-  transfer: boolean
+  pairedTransferId: string | null //id of the corresponding transaction for a transfer
   flag: Flag
   cleared: boolean
 }
@@ -67,7 +67,7 @@ export const emptyTransaction: TransactionDetails = {
   date: new Date(),
   cents: 0,
   memo: '',
-  transfer: false,
+  pairedTransferId: null,
   flag: 'NONE',
   cleared: false,
 }
@@ -98,8 +98,14 @@ export interface PayeeDetails {
   name: string
   accountTransfer: boolean
 }
-export const accountTransferPayeeName = (accountName: string) =>
-  `Transfer to/from: ${accountName}`
+export const accountTransferPayee = (accountName: string): PayeeDetails => ({
+  name: `Transfer to/from: ${accountName}`,
+  accountTransfer: true,
+})
+export const extractTransferAccount = (payeeName: string): string => {
+  const accountName = payeeName.split(':')[1].trim()
+  return accountName
+}
 export interface PayeeUpdatePayload {
   oldName: string
   newName: string
@@ -160,7 +166,7 @@ export const startingBalanceTransaction = (
   payee: 'Starting Balance',
   date: new Date(),
   cents,
-  transfer: false,
+  pairedTransferId: null,
   memo: 'Account starting balance (entered automatically)',
   flag: 'NONE',
   cleared: true,

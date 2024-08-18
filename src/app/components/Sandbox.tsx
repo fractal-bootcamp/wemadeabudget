@@ -3,7 +3,12 @@ import Sidebar from './Sidebar'
 import AccountTable from './AccountTable/AccountTable'
 import BudgetTable from './BudgetTable/BudgetTable'
 import TransactionRow from './AccountTable/TransactionRow'
-import { AccountDetails, CategoryDetails, TransactionDetails } from '../types'
+import {
+  AccountDetails,
+  CategoryDetails,
+  PayeeDetails,
+  TransactionDetails,
+} from '../types'
 import useBudgetStore from '../stores/transactionStore'
 import { useEffect, useState } from 'react'
 import Reflect from './ReflectPage/Reflect'
@@ -13,7 +18,7 @@ interface SandboxProps {
   transactions: TransactionDetails[]
   accounts: AccountDetails[]
   categories: CategoryDetails[]
-  payees: string[]
+  payees: PayeeDetails[]
 }
 function Sandbox({ transactions, accounts, categories, payees }: SandboxProps) {
   const [currentAccount, setCurrentAccount] = useState<string | null>(null)
