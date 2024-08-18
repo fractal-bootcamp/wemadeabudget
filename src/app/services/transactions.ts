@@ -1,10 +1,5 @@
 import prisma from '../client'
-import {
-  extractTransferAccount,
-  isTransfer,
-  TransactionDetails,
-  TransferDetails,
-} from '../types'
+import { extractTransferAccount, TransactionDetails } from '../types'
 import { Prisma, Transaction } from '@prisma/client'
 import payeeServices from './payees'
 import { disconnect } from 'process'
@@ -170,7 +165,7 @@ const mutations = {
     })
     return formatTransaction(newTransaction)
   },
-  addTransfer: async (userId: string, details: TransferDetails) => {
+  addTransfer: async (userId: string, details: TransactionDetails) => {
     const data = newTransactionDataPayload(details, userId)
     const newTransaction = await prisma.transaction.create({
       data: {
@@ -211,7 +206,7 @@ const mutations = {
       pairedTransfer: formatTransaction(pairedTransfer),
     }
   },
-  updateTransfer: async (userId: string, details: TransferDetails) => {
+  updateTransfer: async (userId: string, details: TransactionDetails) => {
     //Look up the transaciton and make sure it belongs to the specified user
     const existingTransaction = await prisma.transaction.findUnique({
       where: {
@@ -225,7 +220,7 @@ const mutations = {
     if (existingTransaction.userId !== userId) {
       throw new Error('Transaction does not belong to the attached user')
     }
-    if (!isTransfer(details)) {
+    if (!details.transfer) {
       throw new Error('Transaction is not a transfer')
     }
     //delete this existing transaction (and by cascade, the paired transfer)
@@ -248,7 +243,7 @@ const mutations = {
     if (existingTransaction.userId !== userId) {
       throw new Error('Transaction does not belong to the attached user')
     }
-    if (isTransfer(details))
+    if (details.transfer)
       throw new Error(
         'updateTransaction used on a transfer; use updateTransfer'
       )
@@ -301,7 +296,7 @@ const transactionServices: TransactionService = {
   add: async (userId: string, details: TransactionDetails) => {
     return await mutations.add(userId, details)
   },
-  addTransfer: async (userId: string, details: TransferDetails) => {
+  addTransfer: async (userId: string, details: TransactionDetails) => {
     //create the first transaction
     return mutations.addTransfer(userId, details)
   },
@@ -309,7 +304,7 @@ const transactionServices: TransactionService = {
     await mutations.deleteTransaction(transactionId, userId),
   update: async (userId: string, details: TransactionDetails) =>
     await mutations.updateTransaction(details, userId),
-  updateTransfer: async (userId: string, details: TransferDetails) =>
+  updateTransfer: async (userId: string, details: TransactionDetails) =>
     await mutations.updateTransfer(userId, details),
   getById: async (userId: string, transactionId: string) => {
     const transaction = await queries.getTransactionById(transactionId, userId)

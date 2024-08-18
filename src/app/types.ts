@@ -60,10 +60,10 @@ export type TransactionDetails = {
   flag: Flag
   cleared: boolean
 }
-export type TransferDetails = TransactionDetails & { transfer: true }
-export const isTransfer = (
-  details: TransactionDetails
-): details is TransferDetails => details.pairedTransferId !== null
+// export type TransferDetails = TransactionDetails & { transfer: true }
+// export const isTransfer = (
+//   details: TransactionDetails
+// ): details is TransferDetails => details.transfer
 export const emptyTransaction: TransactionDetails = {
   id: '',
   account: '',

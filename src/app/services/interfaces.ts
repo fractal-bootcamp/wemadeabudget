@@ -1,12 +1,11 @@
-import { Transaction } from "@prisma/client"
-import { AccountDetails, AccountUpdatePayload, CategoryDetails, CategoryUpdatePayload, PayeeDetails, PayeeUpdatePayload, TransactionDetails, TransferDetails } from "../types"
+import { AccountDetails, AccountUpdatePayload, CategoryDetails, CategoryUpdatePayload, PayeeDetails, PayeeUpdatePayload, TransactionDetails } from "../types"
 
 export type TransactionService = {
   add: (userId: string, details: TransactionDetails) => Promise<TransactionDetails>
-  addTransfer: (userId: string, details: TransferDetails) => Promise<{ transaction: TransactionDetails, pairedTransfer: TransactionDetails }>
+  addTransfer: (userId: string, details: TransactionDetails) => Promise<{ transaction: TransactionDetails, pairedTransfer: TransactionDetails }>
   delete: (userId: string, transactionId: string) => Promise<TransactionDetails>
   update: (userId: string, details: TransactionDetails) => Promise<TransactionDetails>
-  updateTransfer: (userId: string, details: TransferDetails) => Promise<{ transaction: TransactionDetails, pairedTransfer: TransactionDetails }>
+  updateTransfer: (userId: string, details: TransactionDetails) => Promise<{ transaction: TransactionDetails, pairedTransfer: TransactionDetails }>
   getById: (userId: string, transactionId: string) => Promise<TransactionDetails | null>
   getAllByUser: (userId: string) => Promise<TransactionDetails[]>
   getByCategory: (userId: string, categoryName: string) => Promise<TransactionDetails[]>
