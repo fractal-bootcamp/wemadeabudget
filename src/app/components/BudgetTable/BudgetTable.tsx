@@ -20,10 +20,17 @@ export default function BudgetTable() {
   useEffect(() => {
     if (!selectAllRef.current) return
     //set to checked if all are now selected
-    selectAllRef.current.checked = selectedCategories.size === categories.length
+
     //set to indeterminate if any but not all are selected
-    selectAllRef.current.indeterminate =
-      selectedCategories.size > 0 && selectedCategories.size < categories.length
+    if (
+      selectedCategories.size > 0 &&
+      selectedCategories.size < categories.length
+    )
+      selectAllRef.current.indeterminate = true
+    if (selectedCategories.size === categories.length - 1) {
+      selectAllRef.current.checked = true
+      selectAllRef.current.indeterminate = false
+    }
   }, [selectedCategories])
   const categorySelectionToggle = (category: string) => () => {
     setSelectedCategories((prev) => {
@@ -69,6 +76,7 @@ export default function BudgetTable() {
             type="checkbox"
             ref={selectAllRef}
             className="h-3 w-3"
+            defaultChecked={false}
             onChange={toggleSelectAll}
           />
         </div>
