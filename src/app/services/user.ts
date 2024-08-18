@@ -1,6 +1,7 @@
 import prisma from '../client'
 import { defaults, UserUpdatePayload } from '../types'
 import accountServices from './accounts'
+import { UserService } from './interfaces'
 const queries = {
   findUserByClerkId: async (clerkId: string) => {
     const user = await prisma.user.findUnique({
@@ -58,7 +59,7 @@ const mutations = {
     return deletedUser
   },
 }
-export const userServices = {
+export const userServices: UserService = {
   /**returns database entry for a user from the clerk id */
   findByClerkId: async (clerkId: string) => {
     return await queries.findUserByClerkId(clerkId)

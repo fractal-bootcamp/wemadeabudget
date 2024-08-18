@@ -55,10 +55,15 @@ export type TransactionDetails = {
   date: Date
   cents: number
   memo: string
+  transfer: boolean
   pairedTransferId: string | null //id of the corresponding transaction for a transfer
   flag: Flag
   cleared: boolean
 }
+export type TransferDetails = TransactionDetails & { transfer: true }
+export const isTransfer = (
+  details: TransactionDetails
+): details is TransferDetails => details.pairedTransferId !== null
 export const emptyTransaction: TransactionDetails = {
   id: '',
   account: '',
@@ -67,6 +72,7 @@ export const emptyTransaction: TransactionDetails = {
   date: new Date(),
   cents: 0,
   memo: '',
+  transfer: false,
   pairedTransferId: null,
   flag: 'NONE',
   cleared: false,
@@ -166,6 +172,7 @@ export const startingBalanceTransaction = (
   payee: 'Starting Balance',
   date: new Date(),
   cents,
+  transfer: false,
   pairedTransferId: null,
   memo: 'Account starting balance (entered automatically)',
   flag: 'NONE',

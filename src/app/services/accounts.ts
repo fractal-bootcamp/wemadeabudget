@@ -7,7 +7,11 @@ import {
 } from '../types'
 import categoryServices from './categories'
 import payeeServices from './payees'
-
+import { AccountService } from './interfaces'
+const selects = {
+  name: true,
+  type: true,
+}
 const queries = {
   /** Retrieve all accounts for a user */
   getAccounts: async (userId: string) => {
@@ -17,6 +21,7 @@ const queries = {
           id: userId,
         },
       },
+      select: selects,
     })
     return accounts
   },
@@ -35,6 +40,7 @@ const mutations = {
           },
         },
       },
+      select: selects,
     })
     return newAccount
   },
@@ -46,6 +52,7 @@ const mutations = {
           userId: userId,
         },
       },
+      select: selects,
     })
     return deletedAccount
   },
@@ -64,12 +71,13 @@ const mutations = {
         name: accountUpdatePayload.newDetails.name,
         type: accountUpdatePayload.newDetails.type,
       },
+      select: selects,
     })
     return updatedAccount
   },
 }
 
-const accountServices = {
+const accountServices: AccountService = {
   getAllByUser: (userId: string) => queries.getAccounts(userId),
   add: (userId: string, details: AccountDetails) => {
     //update the account transfer payee name
