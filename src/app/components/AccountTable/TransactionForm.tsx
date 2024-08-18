@@ -234,7 +234,9 @@ function TransactionForm({
           className="flex items-center truncate px-1 text-xs"
         >
           <Dropdown
-            options={categories.map((category) => category.name)}
+            options={categories
+              .map((category) => category.name)
+              .filter((category) => category !== 'Uncategorized')}
             selected={formData.category}
             label="Category"
             addOptions={true}
