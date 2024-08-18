@@ -158,12 +158,21 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
         transactions: [...state.transactions, transaction, transferTransaction],
       }))
     },
-    deleteTransaction: (transactionId) =>
+    deleteTransaction: (transactionId) => {
+      //if the transaction is a transfer, delete the paired transfer as well
+      const transaction = get().transactions.find(
+        (transaction) => transaction.id === transactionId
+      )
+      if (!transaction) throw new Error('Transaction not found')
+      const pairedTransferId = transaction.pairedTransferId
       set((state) => ({
         transactions: state.transactions.filter(
-          (transaction) => transaction.id !== transactionId
+          (transaction) =>
+            transaction.id !== transactionId &&
+            transaction.id !== pairedTransferId
         ),
-      })),
+      }))
+    },
     updateTransaction: (updatedTransactionDetails) =>
       set((state) => ({
         transactions: state.transactions.map((transaction) => {
