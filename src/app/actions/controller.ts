@@ -33,8 +33,10 @@ function attachUserId<T, R>(
 const clientController = {
   transaction: {
     add: attachUserId(transactionServices.add),
+    addTransfer: attachUserId(transactionServices.addTransfer),
     delete: attachUserId(transactionServices.delete),
     update: attachUserId(transactionServices.update),
+    updateTransfer: attachUserId(transactionServices.updateTransfer),
     getById: attachUserId(transactionServices.getById),
     getAllByUser: attachUserId(transactionServices.getAllByUser),
     getByCategory: attachUserId(transactionServices.getByCategory),
@@ -62,11 +64,14 @@ const clientController = {
 }
 
 export const dbTransactionAdd = clientController.transaction.add
+export const dbTransactionAddTransfer = clientController.transaction.addTransfer
 export const dbTransactionDelete = clientController.transaction.delete
 export const dbTransactionGetById = clientController.transaction.getById
 export const dbTransactionGetAllByUser =
   clientController.transaction.getAllByUser
 export const dbTransactionUpdate = clientController.transaction.update
+export const dbTransactionUpdateTransfer =
+  clientController.transaction.updateTransfer
 export const dbTransactionGetByCategory =
   clientController.transaction.getByCategory
 export const dbTransactionGetByPayee = clientController.transaction.getByPayee

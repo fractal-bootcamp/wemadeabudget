@@ -18,7 +18,9 @@ import {
   dbCategoryAdd,
   dbPayeeAdd,
   dbTransactionAdd,
+  dbTransactionAddTransfer,
   dbTransactionUpdate,
+  dbTransactionUpdateTransfer,
 } from '../../actions/controller'
 
 type TransactionFormProps = {
@@ -55,8 +57,14 @@ function TransactionForm({
   const accounts = useBudgetStore((state) => state.accounts)
   const payees = useBudgetStore((state) => state.payees)
   const categories = useBudgetStore((state) => state.categories)
-  const { addCategory, addPayee, addTransaction, updateTransaction } =
-    useBudgetActions()
+  const {
+    addCategory,
+    addPayee,
+    addTransaction,
+    updateTransaction,
+    addTransfer,
+    updateTransfer,
+  } = useBudgetActions()
   const [formData, setFormData] = useState<TransactionDetails>(
     existingTransaction || { ...emptyTransaction, account: accountName || '' }
   )
@@ -70,8 +78,34 @@ function TransactionForm({
   const [outflow, setOutflow] = useState(
     formData.cents < 0 ? Math.abs(formData.cents) / 100 : 0
   )
-  const dbFunc = existingTransaction ? dbTransactionUpdate : dbTransactionAdd
-  const storeFunc = existingTransaction ? updateTransaction : addTransaction
+  const { dbFunc, storeFunc } = (() => {
+    switch (true) {
+      //if there is a preexisting transaction and this is a transfer, update the transfer
+      case existingTransaction && formData.transfer:
+        return {
+          dbFunc: dbTransactionUpdateTransfer,
+          storeFunc: updateTransfer,
+        }
+      //if there is a preexisting transaction and this isnt a transfer, update the transaction
+      case existingTransaction && !formData.transfer:
+        return {
+          dbFunc: dbTransactionUpdate,
+          storeFunc: updateTransaction,
+        }
+      //if there is no preexisting transaction and this is a transfer, add the transfer
+      case !existingTransaction && formData.transfer:
+        return {
+          dbFunc: dbTransactionAddTransfer,
+          storeFunc: addTransfer,
+        }
+      //if there is no preexisting transaction and this isnt a transfer, add the transaction
+      default:
+        return {
+          dbFunc: dbTransactionAdd,
+          storeFunc: addTransaction,
+        }
+    }
+  })()
   const handleTransactionSubmit = (formData: TransactionDetails) => {
     const status = validateTransactionSubmission(formData)
     if (!status.valid) {
@@ -225,7 +259,15 @@ function TransactionForm({
               setFormData({ ...formData, payee: newPayeeName })
             }}
             setSelected={(selection: string) => {
-              setFormData({ ...formData, payee: selection })
+              const payeeDetails = payees.find(
+                (payee) => payee.name === selection
+              )
+              if (!payeeDetails) throw new Error('Payee not found')
+              setFormData({
+                ...formData,
+                payee: selection,
+                transfer: payeeDetails.accountTransfer,
+              })
             }}
           />
         </div>

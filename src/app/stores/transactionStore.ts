@@ -8,6 +8,7 @@ import {
   AccountUpdatePayload,
   PayeeUpdatePayload,
   PayeeDetails,
+  extractTransferAccount,
 } from '../types'
 import { Category } from '@prisma/client'
 
@@ -46,10 +47,14 @@ type budgetStore = {
     updateAccount: (accountUpdatePayload: AccountUpdatePayload) => void
     /** Adds a new transaction to the store */
     addTransaction: (transaction: TransactionDetails) => void
+    /** Adds a new transfer to the store */
+    addTransfer: (transaction: TransactionDetails) => void
     /** Removes a transaction from the store by its ID */
     deleteTransaction: (transactionId: string) => void
     /** Updates an existing transaction in the store */
     updateTransaction: (newDetails: TransactionDetails) => void
+    /** Updates an existing transfer in the store */
+    updateTransfer: (newDetails: TransactionDetails) => void
     /** Adds a new payee to the store */
     addPayee: (payee: PayeeDetails) => void
     /** Removes a payee from the store */
@@ -137,6 +142,22 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
       set((state) => ({
         transactions: [...state.transactions, transaction],
       })),
+    addTransfer: (transaction) => {
+      //create a corresponding transfer transaction in the target/source account
+      const otherAccount = extractTransferAccount(transaction.payee)
+      if (!get().accounts.find((account) => account.name === otherAccount)) {
+        throw new Error('Transfer account not found')
+      }
+      const transferTransaction = {
+        ...transaction,
+        account: otherAccount,
+        cents: -transaction.cents,
+        transfer: true,
+      }
+      set((state) => ({
+        transactions: [...state.transactions, transaction, transferTransaction],
+      }))
+    },
     deleteTransaction: (transactionId) =>
       set((state) => ({
         transactions: state.transactions.filter(
@@ -152,6 +173,17 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
           return transaction
         }),
       })),
+    updateTransfer: (updatedTransactionDetails) => {
+      const existingPairedTransfer = get().transactions.find(
+        (transaction) =>
+          transaction.id === updatedTransactionDetails.pairedTransferId
+      )
+      if (!existingPairedTransfer) throw new Error(`Paired transfer not found `)
+      //delete the existing pair of transfer transactions and make a new pair
+      get().actions.deleteTransaction(existingPairedTransfer.id)
+      get().actions.deleteTransaction(updatedTransactionDetails.id)
+      get().actions.addTransfer(updatedTransactionDetails)
+    },
     addPayee: (payee) =>
       set((state) => ({
         payees: [...state.payees, payee],
