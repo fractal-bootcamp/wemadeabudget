@@ -1,5 +1,4 @@
 'use client'
-import { Bookmark } from 'lucide-react'
 import TransactionForm from './TransactionForm'
 import FlagToggle from './Flag/FlagToggle'
 import {
@@ -7,9 +6,9 @@ import {
   METHODS,
   updateStoreAndDb,
 } from '../../util/utils'
-import { Flag, FlagDetails, TransactionDetails } from '../../types'
+import { Flag, TransactionDetails } from '../../types'
 import { dbTransactionUpdate } from '../../actions/controller'
-import useBudgetStore, { useBudgetActions } from '../../stores/transactionStore'
+import { useBudgetActions } from '../../stores/transactionStore'
 
 interface ColumnWidths {
   [key: string]: number

@@ -7,7 +7,7 @@ import {
 } from '../../util/utils'
 import { useState, useCallback, useRef } from 'react'
 import { dbCategoryDelete, dbCategoryUpdate } from '../../actions/controller'
-import { CategoryDetails, CategoryUpdatePayload } from '../../types'
+import { CategoryDetails } from '../../types'
 
 interface BudgetTableRowProps {
   name: string

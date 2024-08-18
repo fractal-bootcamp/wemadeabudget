@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { CategoryDetails } from '../../types'
 import {
   checkSubmittedName,
@@ -7,7 +7,7 @@ import {
   updateStoreAndDb,
 } from '../../util/utils'
 import { dbCategoryUpdate } from '../../actions/controller'
-import useBudgetStore, { useBudgetActions } from '../../stores/transactionStore'
+import { useBudgetActions } from '../../stores/transactionStore'
 
 interface EditCategoryModalProps {
   originalName: string
