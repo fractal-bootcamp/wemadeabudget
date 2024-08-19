@@ -7,7 +7,6 @@ import { useState, useEffect, useMemo, useRef } from 'react'
 import AccountsHeader from './AccountsHeader'
 import ActionBar from './ActionBar'
 import { useBudgetActions } from '../../stores/transactionStore'
-import { TransactionDetails } from '../../types'
 import BulkActionsModal from './BulkActionsModal'
 
 //truncate to prevent overflow

@@ -1,5 +1,4 @@
 import { PlusCircle, LucideUndo, LucideRedo } from 'lucide-react'
-import { CategoryDetails } from '../../types'
 import AddCategoryModal from './AddCategoryModal'
 interface BudgetActionBarProps {
   showModal: boolean
