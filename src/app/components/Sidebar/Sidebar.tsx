@@ -13,13 +13,14 @@ import {
   ChevronUp,
 } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
-import AddAccountModal from './AddAccountModal'
-import EditAccountModal from './EditAccountModal'
+import AddAccountModal from '../AddAccountModal'
+import EditAccountModal from '../EditAccountModal'
 import { useUser } from '@clerk/nextjs'
-import useBudgetStore, { useBudgetActions } from '../stores/transactionStore'
-import { formatCentsToDollarString } from '../util/utils'
+import useBudgetStore, { useBudgetActions } from '../../stores/transactionStore'
+import { formatCentsToDollarString } from '../../util/utils'
 import { UserButton } from '@clerk/nextjs'
-import { AccountDetails } from '../types'
+import { AccountDetails } from '../../types'
+import SidebarAccount from './SidebarAccount'
 
 interface SidebarProps {
   setCurrentAccount: (account: string | null) => void
@@ -35,6 +36,8 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
   const [editingAccount, setEditingAccount] = useState<AccountDetails | null>(
     null
   )
+  //importing the transactions just to hook in for rerendering
+  const transactions = useBudgetStore((state) => state.transactions)
   const accounts = useBudgetStore((state) => state.accounts)
   const { getBalanceByAccount } = useBudgetActions()
   const accountsWithBalance = accounts.map((account) => ({
@@ -183,42 +186,12 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
               <div className="flex flex-col gap-1 py-2">
                 {showBudgets &&
                   accountsWithBalance.map((account, index) => (
-                    <div
-                      className="group flex cursor-pointer flex-row items-center rounded-md py-1 text-xs hover:bg-[#374D9B]"
+                    <SidebarAccount
                       key={account.name}
-                      onClick={() => setCurrentAccount(account.name)}
-                    >
-                      <div className="flex h-3 w-6 flex-row items-center justify-start px-1 text-white opacity-50 hover:opacity-100">
-                        <Pen
-                          onClick={(e) => {
-                            e.stopPropagation()
-                            setEditingAccount(account)
-                          }}
-                          size={10}
-                          className="hidden transition-all duration-200 group-hover:block"
-                        />
-                      </div>
-                      <div className="flex w-full flex-row justify-between py-1 pr-2 text-xs">
-                        <button className="flex w-full flex-row justify-between text-xs">
-                          <div> {account.name} </div>
-                          <div
-                            className="flex px-1 text-xs"
-                            style={
-                              account.balance > 0
-                                ? { color: 'white' }
-                                : {
-                                    color: '#d10000',
-                                    backgroundColor: 'white',
-                                    borderRadius: 20,
-                                    opacity: 0.8,
-                                  }
-                            }
-                          >
-                            {formatCentsToDollarString(account.balance)}
-                          </div>
-                        </button>
-                      </div>
-                    </div>
+                      account={account}
+                      setCurrentAccount={setCurrentAccount}
+                      setEditingAccount={setEditingAccount}
+                    />
                   ))}
               </div>
             </div>
