@@ -14,7 +14,7 @@ interface DropdownProps {
   setSelected: (selected: string) => void
   className?: string
 }
-const MAX_OPTION_LENGTH = 15
+// const MAX_OPTION_LENGTH = 15
 const Dropdown = ({
   options, //list of selectable options
   selected, //array of current selection passed in from parent state
@@ -32,9 +32,10 @@ const Dropdown = ({
     if (!selected) {
       return `${label ?? 'Select'}...`
     } else {
-      return selected.length > MAX_OPTION_LENGTH
-        ? selected.slice(0, MAX_OPTION_LENGTH) + '...'
-        : selected
+      // return selected.length > MAX_OPTION_LENGTH
+      //   ? selected.slice(0, MAX_OPTION_LENGTH) + '...'
+      //   : selected
+      return selected
     }
   }
   const filteredOptions =
@@ -60,9 +61,7 @@ const Dropdown = ({
         className={`${selected.length === 0 ? 'text-gray-400' : 'text-black'} ${disabled ? 'bg-slate-200 text-gray-400' : 'bg-white'} flex w-full items-center justify-between rounded-md border border-blue-700 py-1 pl-2 pr-2`}
         onClick={() => !disabled && setExpanded(!expanded)}
       >
-        <div className="overflow-hidden text-nowrap">
-          {dropDownDisplayText()}
-        </div>
+        <div className="truncate">{dropDownDisplayText()}</div>
         {expanded ? (
           <ChevronUp className="ml-2 h-4 w-4 min-w-4 text-black" />
         ) : (
