@@ -1,5 +1,5 @@
 'use client'
-import Sidebar from './Sidebar'
+import Sidebar from './Sidebar/Sidebar'
 import AccountTable from './AccountTable/AccountTable'
 import BudgetTable from './BudgetTable/BudgetTable'
 import TransactionRow from './AccountTable/TransactionRow'

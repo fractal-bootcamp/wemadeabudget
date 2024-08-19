@@ -29,10 +29,10 @@ export type AccountService = {
 
 export type PayeeService = {
   getAllByUser: (userId: string) => Promise<PayeeDetails[]>
-  getByName: (userId: string, payeeName: string) => Promise<{ name: string, accountTransfer: boolean } | null>
-  add: (userId: string, newPayee: PayeeDetails) => Promise<void>
-  delete: (userId: string, payeeName: string) => Promise<void>
-  update: (userId: string, payeeUpdatePayload: PayeeUpdatePayload) => Promise<void>
+  getByName: (userId: string, payeeName: string) => Promise<PayeeDetails | null>
+  add: (userId: string, newPayee: PayeeDetails) => Promise<PayeeDetails>
+  delete: (userId: string, payeeName: string) => Promise<PayeeDetails>
+  update: (userId: string, payeeUpdatePayload: PayeeUpdatePayload) => Promise<PayeeDetails>
 }
 
 export type UserService = {
