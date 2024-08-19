@@ -24,14 +24,15 @@ function Sandbox({ transactions, accounts, categories, payees }: SandboxProps) {
   const [currentAccount, setCurrentAccount] = useState<string | null>(null)
   const [currentPage, setCurrentPage] = useState('budget')
   const loaded = useBudgetStore((state) => state.loaded)
-  const { load, isLoaded, addTransaction, addAccount, addCategory, addPayee } =
-    useBudgetActions()
+  const { load, isLoaded, populateStoreFromDb } = useBudgetActions()
   useEffect(() => {
     if (isLoaded()) return
-    transactions.forEach(addTransaction)
-    accounts.forEach(addAccount)
-    categories.forEach(addCategory)
-    payees.forEach(addPayee)
+    populateStoreFromDb({
+      transactions,
+      accounts,
+      categories,
+      payees,
+    })
     load()
   }, [])
   return (

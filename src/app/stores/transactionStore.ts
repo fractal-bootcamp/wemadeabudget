@@ -12,7 +12,12 @@ import {
   accountTransferPayee,
 } from '../types'
 import { Category } from '@prisma/client'
-
+type DbPopulationPayload = {
+  transactions: TransactionDetails[]
+  accounts: AccountDetails[]
+  payees: PayeeDetails[]
+  categories: CategoryDetails[]
+}
 type budgetStore = {
   loaded: boolean
   transactions: TransactionDetails[]
@@ -21,6 +26,7 @@ type budgetStore = {
   categories: CategoryDetails[]
   /** Retrieves the entire transaction array */
   actions: {
+    populateStoreFromDb: (dbData: DbPopulationPayload) => void
     getAllTransactions: () => TransactionDetails[]
     /** Sets the loaded state to true */
     load: () => void
@@ -78,6 +84,14 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
   payees: [],
   categories: [],
   actions: {
+    populateStoreFromDb: (dbData) => {
+      set((state) => ({
+        transactions: dbData.transactions,
+        accounts: dbData.accounts,
+        payees: dbData.payees,
+        categories: dbData.categories,
+      }))
+    },
     getAllTransactions: () => get().transactions,
     load: () => {
       set((state) => ({
