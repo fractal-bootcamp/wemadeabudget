@@ -1,7 +1,11 @@
 import { Prisma } from '@prisma/client'
 import prisma from '../client'
 import { PayeeDetails } from '../types'
-
+import { PayeeService } from './interfaces'
+const selects = {
+  name: true,
+  accountTransfer: true,
+}
 const queries = {
   /** Retrieve all payees for a user */
   getAllByUserId: async (userId: string) => {
@@ -11,6 +15,7 @@ const queries = {
           id: userId,
         },
       },
+      select: selects,
     })
     return payees
   },
@@ -22,7 +27,7 @@ const queries = {
           userId: userId,
         },
       },
-      select: { name: true, accountTransfer: true },
+      select: selects,
     })
     return payee
   },
@@ -41,6 +46,7 @@ const mutations = {
           },
         },
       },
+      select: selects,
     })
     return newPayee
   },
@@ -52,6 +58,7 @@ const mutations = {
           userId: userId,
         },
       },
+      select: selects,
     })
     return deletedPayee
   },
@@ -66,6 +73,7 @@ const mutations = {
       data: {
         name: payeeUpdatePayload.newName,
       },
+      select: selects,
     })
     return updatedPayee
   },
@@ -76,7 +84,7 @@ type PayeeUpdatePayload = {
   newName: string
 }
 
-const payeeServices = {
+const payeeServices: PayeeService = {
   getAllByUser: (userId: string) => queries.getAllByUserId(userId),
   getByName: (userId: string, payeeName: string) =>
     queries.getByName(userId, payeeName),

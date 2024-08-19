@@ -78,7 +78,7 @@ function TransactionForm({
   const [outflow, setOutflow] = useState(
     formData.cents < 0 ? Math.abs(formData.cents) / 100 : 0
   )
-  const { dbFunc, storeFunc } = (() => {
+  const dbAndStoreFuncs = () => {
     switch (true) {
       //if there is a preexisting transaction and this is a transfer, update the transfer
       case existingTransaction && formData.transfer:
@@ -105,9 +105,10 @@ function TransactionForm({
           storeFunc: addTransaction,
         }
     }
-  })()
+  }
   const handleTransactionSubmit = (formData: TransactionDetails) => {
     const status = validateTransactionSubmission(formData)
+    const { dbFunc, storeFunc } = dbAndStoreFuncs()
     if (!status.valid) {
       setErrorStatus(status)
       return false
@@ -262,6 +263,7 @@ function TransactionForm({
               const payeeDetails = payees.find(
                 (payee) => payee.name === selection
               )
+              console.log(payeeDetails)
               if (!payeeDetails) throw new Error('Payee not found')
               setFormData({
                 ...formData,

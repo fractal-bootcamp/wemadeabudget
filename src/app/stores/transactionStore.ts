@@ -9,6 +9,7 @@ import {
   PayeeUpdatePayload,
   PayeeDetails,
   extractTransferAccount,
+  accountTransferPayee,
 } from '../types'
 import { Category } from '@prisma/client'
 
@@ -116,28 +117,46 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
     totalAssigned: () =>
       get().categories.reduce((acc, category) => acc + category.allocated, 0),
 
-    addAccount: (account) =>
+    addAccount: (account) => {
+      //add the transfer payee
+      get().actions.addPayee(accountTransferPayee(account.name))
       set((state) => ({
         accounts: [...state.accounts, account],
-      })),
+      }))
+    },
     deleteAccount: (accountName) =>
       set((state) => ({
+        //remove the transfer payee for this account
+        payees: state.payees.filter(
+          (payee) => payee.name !== accountTransferPayee(accountName).name
+        ),
         accounts: state.accounts.filter(
           (account) => account.name !== accountName
         ),
+        //cascade remove the account's transactions and any transfers to/from it
         transactions: state.transactions.filter(
-          (transaction) => transaction.account !== accountName
+          (transaction) =>
+            transaction.account !== accountName &&
+            transaction.payee !== accountTransferPayee(accountName).name
         ),
       })),
     updateAccount: (accountUpdatePayload) =>
-      set((state) => ({
-        accounts: state.accounts.map((account) => {
-          if (account.name === accountUpdatePayload.oldName) {
-            return accountUpdatePayload.newDetails
-          }
-          return account
-        }),
-      })),
+      //upate the transfer payee name
+      {
+        get().actions.updatePayeeName({
+          oldName: accountTransferPayee(accountUpdatePayload.oldName).name,
+          newName: accountTransferPayee(accountUpdatePayload.newDetails.name)
+            .name,
+        })
+        set((state) => ({
+          accounts: state.accounts.map((account) => {
+            if (account.name === accountUpdatePayload.oldName) {
+              return accountUpdatePayload.newDetails
+            }
+            return account
+          }),
+        }))
+      },
     addTransaction: (transaction) =>
       set((state) => ({
         transactions: [...state.transactions, transaction],
@@ -150,6 +169,7 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
       }
       const transferTransaction = {
         ...transaction,
+        payee: `Transfer to/from: ${transaction.account}`,
         account: otherAccount,
         cents: -transaction.cents,
         transfer: true,
