@@ -102,10 +102,7 @@ function TransactionRow({
         style={{ width: columnWidths.flag }}
         className="flex items-center justify-center p-2"
       >
-        <FlagToggle
-          currentFlag={transactionDetails.flag}
-          onFlagSelect={setFlag}
-        />
+        <FlagToggle currentFlag={flag} onFlagSelect={setFlag} />
       </div>
       {showAccount && (
         <div
