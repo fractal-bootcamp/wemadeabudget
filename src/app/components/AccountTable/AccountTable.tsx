@@ -6,7 +6,7 @@ import TransactionForm from './TransactionForm'
 import { useState, useEffect, useMemo, useRef } from 'react'
 import AccountsHeader from './AccountsHeader'
 import ActionBar from './ActionBar'
-import { useBudgetActions } from '../../stores/transactionStore'
+import useBudgetStore, { useBudgetActions } from '../../stores/transactionStore'
 import BulkActionsModal from './BulkActionsModal'
 
 //truncate to prevent overflow
@@ -20,10 +20,11 @@ function AccountTable({ accountName }: AccountTableProps) {
   const selectAllRef = useRef<HTMLInputElement>(null)
   const [editingRow, setEditingRow] = useState<string | null>(null)
   const [showAddTransactionRow, setShowAddTransactionRow] = useState(false)
-  const { getTransactionsByAccount, getAllTransactions } = useBudgetActions()
-  const transactionRows = accountName
-    ? getTransactionsByAccount(accountName)
-    : getAllTransactions()
+  const transactionRows = useBudgetStore((state) =>
+    accountName
+      ? state.actions.getTransactionsByAccount(accountName)
+      : state.actions.getAllTransactions()
+  )
   const filteredTransactions = transactionRows.filter((transaction) => {
     return (
       searchTerm === '' ||
