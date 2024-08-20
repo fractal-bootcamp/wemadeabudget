@@ -1,7 +1,10 @@
 import { Inbox, Trash, X } from 'lucide-react'
 import { METHODS, updateStoreAndDb } from '../../util/utils'
-import { dbTransactionDelete } from '../../actions/controller'
-import { useBudgetActions } from '../../stores/transactionStore'
+import {
+  dbTransactionDelete,
+  dbTransactionDeleteTransfer,
+} from '../../actions/controller'
+import useBudgetStore, { useBudgetActions } from '../../stores/transactionStore'
 
 type BulkActionsModalProps = {
   selectedIds: Set<string>
@@ -11,14 +14,25 @@ export default function BulkActionsModal({
   selectedIds,
   clearSelection,
 }: BulkActionsModalProps) {
-  const { deleteTransaction, updateTransaction } = useBudgetActions()
+  const {
+    deleteTransaction,
+    updateTransaction,
+    deleteTransfer,
+    getTransactionById,
+  } = useBudgetActions()
   const ids = Array.from(selectedIds)
+  const transactions = ids.map(getTransactionById)
+
   const bulkDeleteTransactions = () => {
-    ids.forEach((id) => {
+    transactions.forEach((transaction) => {
       updateStoreAndDb({
-        dbFunction: dbTransactionDelete,
-        storeFunction: deleteTransaction,
-        payload: id,
+        dbFunction: transaction.transfer
+          ? dbTransactionDeleteTransfer
+          : dbTransactionDelete,
+        storeFunction: transaction.transfer
+          ? deleteTransfer
+          : deleteTransaction,
+        payload: transaction.id,
         method: METHODS.DELETE,
       })
     })
