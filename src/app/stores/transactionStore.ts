@@ -207,15 +207,32 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
         ),
       }))
     },
-    updateTransaction: (updatedTransactionDetails) =>
-      set((state) => ({
-        transactions: state.transactions.map((transaction) => {
-          if (transaction.id === updatedTransactionDetails.id) {
-            return updatedTransactionDetails
-          }
-          return transaction
-        }),
-      })),
+    updateTransaction: (updatedTransactionDetails) => {
+      const existingTransaction = get().transactions.find(
+        (transaction) => transaction.id === updatedTransactionDetails.id
+      )
+      if (!existingTransaction)
+        throw new Error('Transaction to be updated was not found')
+      //if the transactions is not being updated to be a transfer, just update
+      if (!updatedTransactionDetails.transfer)
+        set((state) => ({
+          transactions: state.transactions.map((transaction) => {
+            if (transaction.id === updatedTransactionDetails.id) {
+              return updatedTransactionDetails
+            }
+            return transaction
+          }),
+        }))
+      //otherwise, we are updating a transaction to BECOME a transfer
+      else {
+        //if the existing transaction IS a transfer, we should have called updateTransfer in the first place, but do so now
+        if (existingTransaction.transfer)
+          get().actions.updateTransfer(updatedTransactionDetails)
+        //if not, we are making a new transfer
+        else {
+        }
+      }
+    },
     updateTransfer: (updatedTransactionDetails) => {
       const existingPairedTransfer = get().transactions.find(
         (transaction) =>

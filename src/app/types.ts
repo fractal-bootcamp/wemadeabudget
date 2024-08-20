@@ -105,7 +105,7 @@ export interface PayeeDetails {
   accountTransfer: boolean
 }
 export const accountTransferPayee = (accountName: string): PayeeDetails => ({
-  name: `Transfer to/from: ${accountName}`,
+  name: `To/from: ${accountName}`,
   accountTransfer: true,
 })
 export const extractTransferAccount = (payeeName: string): string => {

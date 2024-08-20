@@ -35,6 +35,7 @@ const clientController = {
     add: attachUserId(transactionServices.add),
     addTransfer: attachUserId(transactionServices.addTransfer),
     delete: attachUserId(transactionServices.delete),
+    deleteTransfer: attachUserId(transactionServices.deleteTransfer),
     update: attachUserId(transactionServices.update),
     updateTransfer: attachUserId(transactionServices.updateTransfer),
     getById: attachUserId(transactionServices.getById),

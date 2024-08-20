@@ -1,5 +1,9 @@
 import prisma from '../client'
-import { extractTransferAccount, TransactionDetails } from '../types'
+import {
+  accountTransferPayee,
+  extractTransferAccount,
+  TransactionDetails,
+} from '../types'
 import { Prisma, Transaction } from '@prisma/client'
 import payeeServices from './payees'
 import { disconnect } from 'process'
@@ -23,8 +27,8 @@ const nameInclusions: Prisma.TransactionInclude = {
   },
 }
 const newTransactionDataPayload = (
-  details: TransactionDetails,
-  userId: string
+  userId: string,
+  details: TransactionDetails
 ) => ({
   date: details.date,
   cents: details.cents,
@@ -38,17 +42,10 @@ const newTransactionDataPayload = (
     },
   },
   category: {
-    connectOrCreate: {
-      where: {
-        categoryId: {
-          userId: userId,
-          name: details.category,
-        },
-      },
-      create: {
-        name: details.category,
+    connect: {
+      categoryId: {
         userId: userId,
-        allocated: 0,
+        name: details.category,
       },
     },
   },
@@ -74,7 +71,7 @@ interface FetchedTransaction extends Transaction {
   category: { name: string }
   payee: { name: string }
 }
-
+/**Formats a database transaction response from prisma into a TransactionDetails object*/
 const formatTransaction = (
   transaction: FetchedTransaction
 ): TransactionDetails => {
@@ -148,6 +145,12 @@ const queries = {
 }
 const mutations = {
   deleteTransaction: async (transactionId: string, userId: string) => {
+    const transaction = await prisma.transaction.findUnique({
+      where: { id: transactionId },
+    })
+    if (transaction?.transfer) {
+      throw new Error('Use deleteTransfer instead')
+    }
     const removedTransaction = await prisma.transaction.delete({
       where: {
         id: transactionId,
@@ -156,9 +159,39 @@ const mutations = {
     })
     return formatTransaction(removedTransaction)
   },
+  deleteTransfer: async (transactionId: string, userId: string) => {
+    const transaction = await prisma.transaction.findUnique({
+      where: {
+        id: transactionId,
+      },
+      include: nameInclusions,
+    })
+    if (!transaction?.pairedTransferId) {
+      throw new Error('Transaction is not a transfer')
+    }
+    const removedTransaction = await prisma.transaction.delete({
+      where: {
+        id: transactionId,
+      },
+      include: nameInclusions,
+    })
+    const removedPairedTransfer = await prisma.transaction.delete({
+      where: {
+        id: transaction.pairedTransferId,
+      },
+      include: nameInclusions,
+    })
+    return {
+      transaction: formatTransaction(removedTransaction),
+      pairedTransfer: formatTransaction(removedPairedTransfer),
+    }
+  },
   add: async (userId: string, details: TransactionDetails) => {
     //the creation data for the base transaction (for reuse if we are creating a paired transfer transcation)
-    const data = newTransactionDataPayload(details, userId)
+    if (details.transfer) {
+      throw new Error('Use addTransfer instead')
+    }
+    const data = newTransactionDataPayload(userId, details)
     const newTransaction = await prisma.transaction.create({
       data,
       include: nameInclusions,
@@ -166,7 +199,7 @@ const mutations = {
     return formatTransaction(newTransaction)
   },
   addTransfer: async (userId: string, details: TransactionDetails) => {
-    const data = newTransactionDataPayload(details, userId)
+    const data = newTransactionDataPayload(userId, details)
     const newTransaction = await prisma.transaction.create({
       data: {
         ...data,
@@ -179,6 +212,15 @@ const mutations = {
 
             //inverse amount
             cents: -1 * details.cents,
+            //payee is the account of the original transaction
+            payee: {
+              connect: {
+                payeeId: {
+                  userId: userId,
+                  name: accountTransferPayee(details.account).name,
+                },
+              },
+            },
             //transfer account extracted from the payee details (feels iffy)
             account: {
               connect: {
@@ -206,27 +248,71 @@ const mutations = {
       pairedTransfer: formatTransaction(pairedTransfer),
     }
   },
+  /**Transfer transactions can only be updated in terms of details; they cant change account/payee and must be deleted and recreated instead*/
   updateTransfer: async (userId: string, details: TransactionDetails) => {
     //Look up the transaciton and make sure it belongs to the specified user
     const existingTransaction = await prisma.transaction.findUnique({
       where: {
+        userId: userId,
         id: details.id,
       },
+      include: nameInclusions,
     })
+    //check for error cases:
+    switch (true) {
+      case !existingTransaction:
+        throw new Error('Transaction not found')
+      case !existingTransaction?.pairedTransferId:
+        throw new Error('Existing transaction is not a transfer')
+      case !details.transfer:
+        throw new Error('Incoming details must still be a transfer')
+      case details.account !== existingTransaction?.account.name ||
+        details.payee !== existingTransaction?.payee.name:
+        throw new Error(
+          'Transfer transactions can only be updated in terms of details; they cant change account/payee and must be deleted and recreated instead'
+        )
+    }
+    // update both transactions with the new details:
+    //the initial transaction being updated:
+    const updateData = {
+      date: details.date,
+      cents: details.cents,
+      memo: details.memo,
+      category: {
+        connect: {
+          categoryId: {
+            userId: userId,
+            name: details.category,
+          },
+        },
+      },
+      flag: details.flag,
+      cleared: details.cleared,
+    }
+    const updatedPairedTransferData = {
+      ...updateData,
+      //inverse amount
+      cents: -1 * details.cents,
+    }
 
-    if (!existingTransaction) {
-      throw new Error('Transaction not found')
+    const updatedTransaction = await prisma.transaction.update({
+      where: {
+        id: existingTransaction.id,
+      },
+      data: updateData,
+      include: nameInclusions,
+    })
+    const updatedPairedTransfer = await prisma.transaction.update({
+      where: {
+        id: existingTransaction.pairedTransferId,
+      },
+      data: updatedPairedTransferData,
+      include: nameInclusions,
+    })
+    return {
+      transaction: formatTransaction(updatedTransaction),
+      pairedTransfer: formatTransaction(updatedPairedTransfer),
     }
-    if (existingTransaction.userId !== userId) {
-      throw new Error('Transaction does not belong to the attached user')
-    }
-    if (!details.transfer) {
-      throw new Error('Transaction is not a transfer')
-    }
-    //delete this existing transaction (and by cascade, the paired transfer)
-    await mutations.deleteTransaction(existingTransaction.id, userId)
-    //create a new transaction entity with the new details, which should handle a new paired transfer too
-    return await mutations.addTransfer(userId, details)
   },
 
   updateTransaction: async (details: TransactionDetails, userId: string) => {
@@ -236,59 +322,23 @@ const mutations = {
         id: details.id,
       },
     })
-
-    if (!existingTransaction) {
-      throw new Error('Transaction not found')
+    switch (true) {
+      case !existingTransaction:
+        throw new Error('Transaction not found')
+      case existingTransaction?.userId !== userId:
+        throw new Error('Transaction does not belong to the attached user')
+      case existingTransaction?.transfer || details.transfer:
+        throw new Error('Use updateTransfer for transfer transactions')
     }
-    if (existingTransaction.userId !== userId) {
-      throw new Error('Transaction does not belong to the attached user')
-    }
-    if (details.transfer)
-      throw new Error(
-        'updateTransaction used on a transfer; use updateTransfer'
-      )
     const updatedTransaction = await prisma.transaction.update({
       where: {
         id: details.id,
       },
-      data: {
-        date: details.date,
-        cents: details.cents,
-        memo: details.memo,
-        account: {
-          connect: {
-            accountId: {
-              userId: userId,
-              name: details.account,
-            },
-          },
-        },
-        category: {
-          connect: {
-            categoryId: {
-              userId: userId,
-              name: details.category,
-            },
-          },
-        },
-        payee: {
-          connect: {
-            payeeId: {
-              userId: userId,
-              name: details.payee,
-            },
-          },
-        },
-        flag: details.flag,
-        cleared: details.cleared,
-        user: {
-          connect: {
-            id: userId,
-          },
-        },
-      },
+      data: newTransactionDataPayload(userId, details),
       include: nameInclusions,
     })
+    //if this is a non-transfer becoming a transfer, just delete and make transfer
+
     return formatTransaction(updatedTransaction)
   },
 }
@@ -302,6 +352,8 @@ const transactionServices: TransactionService = {
   },
   delete: async (userId: string, transactionId: string) =>
     await mutations.deleteTransaction(transactionId, userId),
+  deleteTransfer: async (transactionId: string, userId: string) =>
+    await mutations.deleteTransfer(transactionId, userId),
   update: async (userId: string, details: TransactionDetails) =>
     await mutations.updateTransaction(details, userId),
   updateTransfer: async (userId: string, details: TransactionDetails) =>

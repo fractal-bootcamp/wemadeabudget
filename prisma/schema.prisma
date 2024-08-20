@@ -71,7 +71,7 @@ model Transaction {
   category       Category     @relation(fields: [categoryId], references: [id])
   account        Account      @relation(fields: [accountId], references: [id], onDelete: Cascade)
   payee          Payee        @relation(fields: [payeeId], references: [id], onDelete: Cascade)
-  pairedTransfer Transaction? @relation("PairedTransfer", fields: [pairedTransferId], references: [id], onDelete: Cascade)
+  pairedTransfer Transaction? @relation("PairedTransfer", fields: [pairedTransferId], references: [id])
   pairedBy       Transaction? @relation("PairedTransfer")
 }
 
