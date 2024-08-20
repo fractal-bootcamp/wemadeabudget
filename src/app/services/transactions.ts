@@ -57,6 +57,7 @@ const newTransactionDataPayload = (
       },
     },
   },
+  transfer: details.transfer,
   flag: details.flag,
   cleared: details.cleared,
   user: {
