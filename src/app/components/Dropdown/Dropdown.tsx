@@ -76,9 +76,8 @@ const Dropdown = ({
       )}
       {/* Dropdown header/unexpanded display */}
       <div
-        className={` ${selected.length === 0 ? 'text-gray-400' : 'text-black'} ${disabled ? 'tooltip cursor-not-allowed bg-slate-200 text-gray-400' : 'cursor-pointer bg-white'} flex w-full items-center justify-between rounded-lg border border-blue-700 py-1 pl-2 pr-2`}
+        className={` ${selected.length === 0 ? 'text-gray-400' : 'text-black'} ${disabled ? 'cursor-not-allowed bg-slate-200 text-gray-400' : 'cursor-pointer bg-white'} flex w-full items-center justify-between rounded-lg border border-blue-700 py-1 pl-2 pr-2`}
         onClick={() => !disabled && !expanded && setExpanded(true)}
-        data-tip={disabledText}
       >
         <div className="truncate">{dropDownDisplayText()}</div>
         {expanded ? (
