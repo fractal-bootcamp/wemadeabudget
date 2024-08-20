@@ -67,6 +67,8 @@ const clientController = {
 export const dbTransactionAdd = clientController.transaction.add
 export const dbTransactionAddTransfer = clientController.transaction.addTransfer
 export const dbTransactionDelete = clientController.transaction.delete
+export const dbTransactionDeleteTransfer =
+  clientController.transaction.deleteTransfer
 export const dbTransactionGetById = clientController.transaction.getById
 export const dbTransactionGetAllByUser =
   clientController.transaction.getAllByUser
