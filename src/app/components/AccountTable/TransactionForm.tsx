@@ -142,6 +142,14 @@ function TransactionForm({
   const handleCancel = () => {
     closeFunction()
   }
+  const payeeOptions = payees
+    .filter((payee) => {
+      const editingAndIsTransfer = existingTransaction && payee.accountTransfer //don't allow changing payee to an account transfer
+      const isTransferToCurrentAccount =
+        payee.name === accountTransferPayee(formData.account).name //dont allowing transfers to the current selected account because that doesn't make sense
+      return !isTransferToCurrentAccount && !editingAndIsTransfer
+    })
+    .map((payee) => payee.name)
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -245,12 +253,7 @@ function TransactionForm({
           className="flex items-center truncate px-1 text-xs"
         >
           <Dropdown
-            options={payees
-              .map((payee) => payee.name)
-              .filter(
-                (payeeName) =>
-                  payeeName !== accountTransferPayee(formData.account).name
-              )} //exclude transfer to current account
+            options={payeeOptions}
             selected={formData.payee}
             addOptions={true}
             label="Payee"
