@@ -253,7 +253,7 @@ function TransactionForm({
           className="flex items-center truncate px-1 text-xs"
         >
           <Dropdown
-            options={payeeOptions}
+            options={payeeOptions} //exclude transfer to current account
             selected={formData.payee}
             addOptions={true}
             label="Payee"
