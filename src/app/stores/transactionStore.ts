@@ -36,6 +36,8 @@ type budgetStore = {
     getBalanceByAccount: (accountName: string) => number
     /** Sums up all transactions for a given category */
     getBalanceByCategory: (categoryName: string) => number
+    /**Gets a transaction by its ID */
+    getTransactionById: (transactionId: string) => TransactionDetails
     /** Retrieves all transactions for a given account */
     getTransactionsByAccount: (accountName: string) => TransactionDetails[]
     /** Retrieves all transactions for a given payee */
@@ -99,6 +101,13 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
       }))
     },
     isLoaded: () => get().loaded,
+    getTransactionById: (transactionId) => {
+      const transaction = get().transactions.find(
+        (transaction) => transaction.id === transactionId
+      )
+      if (!transaction) throw new Error('Transaction not found')
+      return transaction
+    },
     /**Sums up all transactions for a given account */
     getBalanceByAccount: (accountName) =>
       get()
