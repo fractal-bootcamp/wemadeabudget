@@ -34,6 +34,7 @@ function Sandbox({ transactions, accounts, categories, payees }: SandboxProps) {
       payees,
     })
     load()
+    console.log(payees)
   }, [])
   return (
     <div className="flex h-screen">

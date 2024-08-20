@@ -199,6 +199,7 @@ function TransactionForm({
             <Dropdown
               options={accounts.map((account) => account.name)}
               selected={formData.account}
+              disabled={existingTransaction && formData.transfer}
               label="Account"
               setSelected={(selection: string) => {
                 setFormData({ ...formData, account: selection })
@@ -246,6 +247,7 @@ function TransactionForm({
             selected={formData.payee}
             addOptions={true}
             label="Payee"
+            disabled={existingTransaction && formData.transfer}
             addOptionCallback={(newPayeeName: string) => {
               const payload: PayeeDetails = {
                 name: newPayeeName,
@@ -263,7 +265,9 @@ function TransactionForm({
               const payeeDetails = payees.find(
                 (payee) => payee.name === selection
               )
-              console.log(payeeDetails)
+              console.log(`Selection: ${selection}`)
+              console.log(`List of Payees: ${JSON.stringify(payees)}`)
+              console.log(`Payee Details: ${JSON.stringify(payeeDetails)}`)
               if (!payeeDetails) throw new Error('Payee not found')
               setFormData({
                 ...formData,

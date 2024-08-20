@@ -4,6 +4,7 @@ export type TransactionService = {
   add: (userId: string, details: TransactionDetails) => Promise<TransactionDetails>
   addTransfer: (userId: string, details: TransactionDetails) => Promise<{ transaction: TransactionDetails, pairedTransfer: TransactionDetails }>
   delete: (userId: string, transactionId: string) => Promise<TransactionDetails>
+  deleteTransfer: (transactionId: string, userId: string) => Promise<{ transaction: TransactionDetails, pairedTransfer: TransactionDetails }>
   update: (userId: string, details: TransactionDetails) => Promise<TransactionDetails>
   updateTransfer: (userId: string, details: TransactionDetails) => Promise<{ transaction: TransactionDetails, pairedTransfer: TransactionDetails }>
   getById: (userId: string, transactionId: string) => Promise<TransactionDetails | null>
