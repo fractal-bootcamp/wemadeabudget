@@ -1,5 +1,6 @@
 'use client'
 import {
+  accountTransferPayee,
   CategoryDetails,
   emptyTransaction,
   PayeeDetails,
@@ -243,7 +244,11 @@ function TransactionForm({
           className="flex items-center truncate px-1 text-xs"
         >
           <Dropdown
-            options={payees.map((payee) => payee.name)}
+            options={payees.map((payee) =>
+              payee.name === accountTransferPayee(formData.account).name
+                ? 'Account Transfer'
+                : payee.name
+            )} //exclude transfer to current account
             selected={formData.payee}
             addOptions={true}
             label="Payee"
