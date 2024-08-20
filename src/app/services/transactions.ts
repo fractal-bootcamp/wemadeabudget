@@ -5,11 +5,9 @@ import {
   TransactionDetails,
 } from '../types'
 import { Prisma, Transaction } from '@prisma/client'
-import payeeServices from './payees'
-import { disconnect } from 'process'
 import { TransactionService } from './interfaces'
 //This is a helper object that is used to include the name field in the related models to the transactions
-const nameInclusions: Prisma.TransactionInclude = {
+const nameInclusions = {
   account: {
     select: {
       name: true,
@@ -25,7 +23,7 @@ const nameInclusions: Prisma.TransactionInclude = {
       name: true,
     },
   },
-}
+} satisfies Prisma.TransactionInclude
 const newTransactionDataPayload = (
   userId: string,
   details: TransactionDetails
@@ -72,7 +70,32 @@ interface FetchedTransaction extends Transaction {
   category: { name: string }
   payee: { name: string }
 }
-/**Formats a database transaction response from prisma into a TransactionDetails object*/
+const selects: Prisma.TransactionSelect = {
+  id: true,
+  date: true,
+  cents: true,
+  memo: true,
+  transfer: true,
+  pairedTransferId: true,
+  flag: true,
+  cleared: true,
+  account: {
+    select: {
+      name: true,
+    },
+  },
+  category: {
+    select: {
+      name: true,
+    },
+  },
+  payee: {
+    select: {
+      name: true,
+    },
+  },
+}
+/**Formats a database transaction response from prisma into a TransactionDetails object; selects fields and flattens name fields*/
 const formatTransaction = (
   transaction: FetchedTransaction
 ): TransactionDetails => {
@@ -93,12 +116,13 @@ const formatTransaction = (
 
 const queries = {
   getAllTransactionsByUser: async (userId: string) => {
-    return await prisma.transaction.findMany({
+    const transactions = await prisma.transaction.findMany({
       where: {
         userId: userId,
       },
       include: nameInclusions,
     })
+    return transactions
   },
   getTransactionsByCategory: async (userId: string, categoryName: string) => {
     return await prisma.transaction.findMany({
@@ -158,14 +182,14 @@ const mutations = {
       },
       include: nameInclusions,
     })
-    return formatTransaction(removedTransaction)
+    return removedTransaction
   },
   deleteTransfer: async (transactionId: string, userId: string) => {
     const transaction = await prisma.transaction.findUnique({
       where: {
         id: transactionId,
       },
-      include: nameInclusions,
+      // include: nameInclusions,
     })
     if (!transaction?.pairedTransferId) {
       throw new Error('Transaction is not a transfer')
@@ -183,8 +207,8 @@ const mutations = {
       include: nameInclusions,
     })
     return {
-      transaction: formatTransaction(removedTransaction),
-      pairedTransfer: formatTransaction(removedPairedTransfer),
+      transaction: removedTransaction,
+      pairedTransfer: removedPairedTransfer,
     }
   },
   add: async (userId: string, details: TransactionDetails) => {
@@ -197,7 +221,7 @@ const mutations = {
       data,
       include: nameInclusions,
     })
-    return formatTransaction(newTransaction)
+    return newTransaction
   },
   addTransfer: async (userId: string, details: TransactionDetails) => {
     const data = newTransactionDataPayload(userId, details)
@@ -245,8 +269,8 @@ const mutations = {
       throw new Error('Paired transfer not created? (this should never happen)')
     }
     return {
-      transaction: formatTransaction(transactionWithoutPairedTransfer),
-      pairedTransfer: formatTransaction(pairedTransfer),
+      transaction: transactionWithoutPairedTransfer,
+      pairedTransfer: pairedTransfer,
     }
   },
   /**Transfer transactions can only be updated in terms of details; they cant change account/payee and must be deleted and recreated instead*/
@@ -311,8 +335,8 @@ const mutations = {
       include: nameInclusions,
     })
     return {
-      transaction: formatTransaction(updatedTransaction),
-      pairedTransfer: formatTransaction(updatedPairedTransfer),
+      transaction: updatedTransaction,
+      pairedTransfer: updatedPairedTransfer,
     }
   },
 
@@ -340,25 +364,48 @@ const mutations = {
     })
     //if this is a non-transfer becoming a transfer, just delete and make transfer
 
-    return formatTransaction(updatedTransaction)
+    return updatedTransaction
   },
 }
 const transactionServices: TransactionService = {
   add: async (userId: string, details: TransactionDetails) => {
-    return await mutations.add(userId, details)
+    return formatTransaction(await mutations.add(userId, details))
   },
   addTransfer: async (userId: string, details: TransactionDetails) => {
     //create the first transaction
-    return mutations.addTransfer(userId, details)
+    const { transaction, pairedTransfer } = await mutations.addTransfer(
+      userId,
+      details
+    )
+    return {
+      transaction: formatTransaction(transaction),
+      pairedTransfer: formatTransaction(pairedTransfer),
+    }
   },
   delete: async (userId: string, transactionId: string) =>
-    await mutations.deleteTransaction(transactionId, userId),
-  deleteTransfer: async (transactionId: string, userId: string) =>
-    await mutations.deleteTransfer(transactionId, userId),
+    formatTransaction(await mutations.deleteTransaction(transactionId, userId)),
+  deleteTransfer: async (transactionId: string, userId: string) => {
+    const { transaction, pairedTransfer } = await mutations.deleteTransfer(
+      transactionId,
+      userId
+    )
+    return {
+      transaction: formatTransaction(transaction),
+      pairedTransfer: formatTransaction(pairedTransfer),
+    }
+  },
   update: async (userId: string, details: TransactionDetails) =>
-    await mutations.updateTransaction(details, userId),
-  updateTransfer: async (userId: string, details: TransactionDetails) =>
-    await mutations.updateTransfer(userId, details),
+    formatTransaction(await mutations.updateTransaction(details, userId)),
+  updateTransfer: async (userId: string, details: TransactionDetails) => {
+    const { transaction, pairedTransfer } = await mutations.updateTransfer(
+      userId,
+      details
+    )
+    return {
+      transaction: formatTransaction(transaction),
+      pairedTransfer: formatTransaction(pairedTransfer),
+    }
+  },
   getById: async (userId: string, transactionId: string) => {
     const transaction = await queries.getTransactionById(transactionId, userId)
     return transaction ? formatTransaction(transaction) : null
