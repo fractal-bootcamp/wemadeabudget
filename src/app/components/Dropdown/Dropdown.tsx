@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import DropdownItem from './DropdownItem'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import DropdownSearch from './DropdownSearch'
@@ -28,6 +28,7 @@ const Dropdown = ({
 }: DropdownProps) => {
   const [searchTerm, setSearchTerm] = useState('')
   const [expanded, setExpanded] = useState(false)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const dropDownDisplayText = () => {
     if (!selected) {
       return `${label ?? 'Select'}...`
@@ -49,17 +50,31 @@ const Dropdown = ({
     setSelected(value)
     setExpanded(false)
   }
+  useEffect(() => {
+    let timeout: NodeJS.Timeout
+    if (expanded) {
+      timeout = setTimeout(() => searchInputRef.current?.focus(), 300)
+    }
+    return () => clearTimeout(timeout)
+  }, [expanded])
   return (
     <div
-      className={`w-full cursor-pointer text-xs ${className}`}
+      className={`w-full text-xs ${className}`}
       // tabIndex makes the dropdown focusable so that onBlur can close it
       tabIndex={0}
-      onBlur={() => setExpanded(false)}
+      onBlur={() => !searchable && setExpanded(false)} //if searchable, we do the onblur on the autofocused search input
     >
+      {/* dropdown invisible underlay */}
+      {expanded && (
+        <div
+          className={`fixed inset-0 z-10 h-full w-full bg-transparent`}
+          onClick={() => setExpanded(false)}
+        />
+      )}
       {/* Dropdown header/unexpanded display */}
       <div
-        className={`${selected.length === 0 ? 'text-gray-400' : 'text-black'} ${disabled ? 'bg-slate-200 text-gray-400' : 'bg-white'} flex w-full items-center justify-between rounded-md border border-blue-700 py-1 pl-2 pr-2`}
-        onClick={() => !disabled && setExpanded(!expanded)}
+        className={`cursor-pointer ${selected.length === 0 ? 'text-gray-400' : 'text-black'} ${disabled ? 'bg-slate-200 text-gray-400' : 'bg-white'} flex w-full items-center justify-between rounded-lg border border-blue-700 py-1 pl-2 pr-2`}
+        onClick={() => !disabled && !expanded && setExpanded(true)}
       >
         <div className="truncate">{dropDownDisplayText()}</div>
         {expanded ? (
@@ -70,7 +85,7 @@ const Dropdown = ({
       </div>
       {/* Dropdown list */}
       <div
-        className={`rounded-lg border border-slate-400 shadow-2xl ${expanded ? 'max-h-[150px] opacity-100' : 'max-h-[0px] opacity-0'} absolute w-fit min-w-[100px] max-w-[200px] overflow-x-auto overflow-y-auto border border-slate-200 transition-all duration-500`}
+        className={`z-20 rounded-b-lg border border-slate-400 shadow-2xl ${expanded ? 'max-h-[150px] opacity-100' : 'max-h-[0px] opacity-0'} absolute w-fit min-w-[100px] max-w-[200px] overflow-x-auto overflow-y-auto border border-slate-200 transition-all duration-500`}
       >
         <div className="flex flex-col items-start justify-between">
           {/* Search bar */}
@@ -79,6 +94,7 @@ const Dropdown = ({
               searchTerm={searchTerm}
               setSearchTerm={setSearchTerm}
               setExpanded={setExpanded}
+              inputRef={searchInputRef}
             />
           )}
           {/* if anything has been entered into the search bar, display an option to add their query as a new option */}
