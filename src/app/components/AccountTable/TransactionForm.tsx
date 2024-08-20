@@ -265,9 +265,6 @@ function TransactionForm({
               const payeeDetails = payees.find(
                 (payee) => payee.name === selection
               )
-              console.log(`Selection: ${selection}`)
-              console.log(`List of Payees: ${JSON.stringify(payees)}`)
-              console.log(`Payee Details: ${JSON.stringify(payeeDetails)}`)
               if (!payeeDetails) throw new Error('Payee not found')
               setFormData({
                 ...formData,
