@@ -201,6 +201,7 @@ function TransactionForm({
               options={accounts.map((account) => account.name)}
               selected={formData.account}
               disabled={existingTransaction && formData.transfer}
+              disabledText="Can't edit account for transfers; delete and replace instead"
               label="Account"
               setSelected={(selection: string) => {
                 setFormData({ ...formData, account: selection })
@@ -244,15 +245,17 @@ function TransactionForm({
           className="flex items-center truncate px-1 text-xs"
         >
           <Dropdown
-            options={payees.map((payee) =>
-              payee.name === accountTransferPayee(formData.account).name
-                ? 'Account Transfer'
-                : payee.name
-            )} //exclude transfer to current account
+            options={payees
+              .map((payee) => payee.name)
+              .filter(
+                (payeeName) =>
+                  payeeName !== accountTransferPayee(formData.account).name
+              )} //exclude transfer to current account
             selected={formData.payee}
             addOptions={true}
             label="Payee"
             disabled={existingTransaction && formData.transfer}
+            disabledText="Can't edit payee for transfers; delete and replace instead"
             addOptionCallback={(newPayeeName: string) => {
               const payload: PayeeDetails = {
                 name: newPayeeName,

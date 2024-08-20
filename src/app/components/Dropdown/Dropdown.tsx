@@ -8,6 +8,7 @@ interface DropdownProps {
   selected: string
   label?: string
   disabled?: boolean
+  disabledText?: string
   searchable?: boolean
   addOptions?: boolean
   addOptionCallback?: (option: string) => void
@@ -20,6 +21,7 @@ const Dropdown = ({
   selected, //array of current selection passed in from parent state
   label,
   disabled = false,
+  disabledText,
   searchable = true,
   addOptions = false,
   addOptionCallback = () => {},
@@ -62,6 +64,7 @@ const Dropdown = ({
       className={`w-full text-xs ${className}`}
       // tabIndex makes the dropdown focusable so that onBlur can close it
       tabIndex={0}
+      onClick={(e) => e.stopPropagation()}
       onBlur={() => !searchable && setExpanded(false)} //if searchable, we do the onblur on the autofocused search input
     >
       {/* dropdown invisible underlay */}
@@ -73,8 +76,9 @@ const Dropdown = ({
       )}
       {/* Dropdown header/unexpanded display */}
       <div
-        className={`cursor-pointer ${selected.length === 0 ? 'text-gray-400' : 'text-black'} ${disabled ? 'bg-slate-200 text-gray-400' : 'bg-white'} flex w-full items-center justify-between rounded-lg border border-blue-700 py-1 pl-2 pr-2`}
+        className={`cursor-pointer ${selected.length === 0 ? 'text-gray-400' : 'text-black'} ${disabled ? 'tooltip cursor-not-allowed bg-slate-200 text-gray-400' : 'bg-white'} flex w-full items-center justify-between rounded-lg border border-blue-700 py-1 pl-2 pr-2`}
         onClick={() => !disabled && !expanded && setExpanded(true)}
+        data-tip={disabledText}
       >
         <div className="truncate">{dropDownDisplayText()}</div>
         {expanded ? (

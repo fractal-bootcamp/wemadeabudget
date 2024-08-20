@@ -21,7 +21,7 @@ const DropdownSearch = ({
         value={searchTerm}
         ref={inputRef}
         onFocus={() => setExpanded(true)}
-        onBlur={() => setExpanded(false)}
+        // onBlur={() => setExpanded(false)}
         onChange={(e) => setSearchTerm(e.target.value)}
       />
       <div className="absolute right-0 top-1/2 -translate-y-1/2 p-1 text-gray-400">
