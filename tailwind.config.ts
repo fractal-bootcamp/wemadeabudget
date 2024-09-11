@@ -1,5 +1,6 @@
 import type { Config } from 'tailwindcss'
 import daisyui from 'daisyui'
+import tailwindContainers from '@tailwindcss/container-queries'
 const config: Config = {
   content: ['./src/**/*.{js,ts,jsx,tsx,mdx}'],
   theme: {
@@ -24,7 +25,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [daisyui],
+  plugins: [daisyui, tailwindContainers],
   daisyui: {
     themes: ['light'],
   },

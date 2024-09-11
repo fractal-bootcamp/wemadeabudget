@@ -21,7 +21,9 @@ import { formatCentsToDollarString } from '../../util/utils'
 import { UserButton } from '@clerk/nextjs'
 import { AccountDetails } from '../../types'
 import SidebarAccount from './SidebarAccount'
-
+import github from '../../../../public/github.svg'
+import Image from 'next/image'
+import AppInfo from '../AppInfo'
 interface SidebarProps {
   setCurrentAccount: (account: string | null) => void
   setCurrentPage: (page: string) => void
@@ -65,18 +67,18 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
   return (
     <>
       {/* Underlay to close modal */}
-      {showUserDropdown && (
-        <div
-          className="absolute inset-0 z-30 h-full w-full bg-transparent"
-          onClick={(e) => {
-            e.stopPropagation()
-            setShowUserDropdown(false)
-          }}
-        />
-      )}
       <div
-        className={`relative flex h-screen transition-all duration-200 ${collapsed ? 'w-[75px]' : 'w-[300px]'} flex-col items-start justify-start gap-2 bg-[#2c396a] px-2 py-2 font-sans font-light text-white`}
+        className={`@container relative flex h-screen transition-all duration-200 ${collapsed ? 'w-[75px]' : 'w-[300px]'} flex-col items-start justify-start gap-2 bg-[#2c396a] px-2 py-2 font-sans font-light text-white`}
       >
+        {showUserDropdown && (
+          <div
+            className="absolute inset-0 z-30 h-full w-full bg-transparent"
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowUserDropdown(false)
+            }}
+          />
+        )}
         {/* Top card */}
         <div className="relative">
           <div
@@ -224,6 +226,9 @@ function Sidebar({ setCurrentAccount, setCurrentPage }: SidebarProps) {
           ) : (
             <PanelLeftClose size={28} strokeWidth={1.5} />
           )}
+        </div>
+        <div className="@[200px]:block absolute bottom-0 left-0 hidden w-[70%] overflow-hidden">
+          <AppInfo colorMode="light" />
         </div>
       </div>
     </>

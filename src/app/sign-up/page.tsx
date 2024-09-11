@@ -1,6 +1,7 @@
 import { SignInButton, SignUp } from '@clerk/nextjs'
 
 import { Figtree } from 'next/font/google'
+import AppInfo from '../components/AppInfo'
 const figtree = Figtree({ subsets: ['latin'], weight: '600' })
 
 export default function SignUpOrIn() {
@@ -16,6 +17,9 @@ export default function SignUpOrIn() {
           Sign in/up
         </span>
       </SignInButton>
+      <div className="absolute bottom-0 right-0">
+        <AppInfo colorMode="dark" />
+      </div>
     </div>
   )
 }
