@@ -31,7 +31,7 @@ export default function AppInfo({ colorMode }: AppInfoProps) {
         made by{' '}
         <a
           className={`${linkColorClass}`}
-          href="https://github.com/sarahbicknell"
+          href="https://github.com/hyperdiscogirl"
         >
           Disco
         </a>{' '}
