@@ -5,7 +5,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;600&display=swap');
 @layer base {
   a {
-    @apply text-blue-200 underline hover:text-blue-300;
   }
 }
 @layer components {

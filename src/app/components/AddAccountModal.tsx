@@ -42,7 +42,7 @@ const AddAccountModal: React.FC<AddAccountModalProps> = ({
         e.stopPropagation()
         toggleShowAccountModal()
       }}
-      className="fixed inset-0 z-40 flex flex-col items-center justify-center bg-black bg-opacity-20 font-semibold text-black"
+      className="absolute inset-0 z-40 flex h-full w-full flex-col items-center justify-center bg-black bg-opacity-20 font-semibold text-black"
     >
       <div
         onClick={(e) => e.stopPropagation()}
