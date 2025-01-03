@@ -7,7 +7,7 @@ const figtree = Figtree({ subsets: ['latin'], weight: '600' })
 export default function SignUpOrIn() {
   return (
     <div
-      className={`${figtree.className} flex h-screen w-screen flex-col items-center justify-center gap-5 bg-slate-100 text-indigo-700`}
+      className={`${figtree.className} flex h-[100dvh] w-[100dvw] flex-col items-center justify-center gap-5 bg-slate-100 text-indigo-700`}
     >
       <span className="animate-[fadeIn_2s_forwards] text-center text-5xl opacity-0">
         🌱 We Made A Budget
@@ -17,7 +17,7 @@ export default function SignUpOrIn() {
           Sign in/up
         </span>
       </SignInButton>
-      <div className="absolute bottom-0 right-0">
+      <div className="fixed bottom-0 right-0">
         <AppInfo colorMode="dark" />
       </div>
     </div>
