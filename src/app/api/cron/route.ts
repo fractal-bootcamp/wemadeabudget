@@ -7,7 +7,7 @@ export async function GET() {
     console.log('Database URL:', process.env.DATABASE_URL); // Will be redacted in logs
     
     const result = await prisma.user.count();
-    console.log('Query result:', result);
+    console.log(`Database pinged successfully at ${new Date().toISOString()} (${result} users)`);
     
     return NextResponse.json({ 
       success: true, 
