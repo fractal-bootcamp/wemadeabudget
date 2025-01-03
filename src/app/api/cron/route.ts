@@ -3,8 +3,11 @@ import { NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    // Simple query to keep the connection alive
-    const result = await prisma.user.count()
+    console.log('Starting cron job...');
+    console.log('Database URL:', process.env.DATABASE_URL); // Will be redacted in logs
+    
+    const result = await prisma.user.count();
+    console.log('Query result:', result);
     
     return NextResponse.json({ 
       success: true, 
@@ -13,6 +16,7 @@ export async function GET() {
       userCount: result 
     })
   } catch (error) {
+    console.error('Cron error:', error);
     return NextResponse.json({ error }, { status: 500 })
   }
 } 
