@@ -45,7 +45,7 @@ export default function Error({
     <div className="flex flex-col items-center justify-center min-h-screen p-4">
       <h2 className="text-xl font-bold mb-4">Oops! Something went wrong</h2>
       <p className="text-gray-600 mb-4">
-        We've logged the error and we'll look into it.
+        We&apos;ve logged the error and we&apos;ll look into it.
       </p>
       <button
         onClick={() => {
