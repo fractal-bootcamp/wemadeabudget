@@ -3,28 +3,16 @@
 import { useEffect } from 'react';
 
 const logError = (error: any, context?: any) => {
-  // In development, log to console
-  if (process.env.NODE_ENV === 'development') {
-    console.error('Error:', error, context);
-    return;
-  }
-
-  // In production on Netlify, use fetch to log to Netlify's logging endpoint
-  fetch('/.netlify/functions/log', {
-    method: 'POST',
-    body: JSON.stringify({
-      level: 'error',
+  console.error('Application error:', {
+    error: {
       message: error?.message || 'Unknown error',
-      error: {
-        message: error?.message,
-        stack: error?.stack,
-        name: error?.name,
-        digest: error?.digest
-      },
-      context,
-      timestamp: new Date().toISOString()
-    })
-  }).catch(console.error);
+      stack: error?.stack,
+      name: error?.name,
+      digest: error?.digest
+    },
+    context,
+    timestamp: new Date().toISOString()
+  });
 };
 
 export default function Error({
@@ -49,8 +37,8 @@ export default function Error({
       </p>
       <button
         onClick={() => {
-          console.info('User initiated error reset');
-          reset();
+          console.info('User initiated page refresh');
+          window.location.reload();
         }}
         className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
       >
