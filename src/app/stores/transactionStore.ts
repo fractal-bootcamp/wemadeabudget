@@ -290,7 +290,6 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
       })),
     addCategory: (category) =>
       set((state) => {
-        console.log(category.name)
         if (state.categories.find((c) => c.name === category.name)) {
           throw new Error('Category already exists: ' + category.name)
         }
