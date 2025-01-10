@@ -7,7 +7,7 @@ import { Suspense } from 'react'
 import Loading from './loading'
 
 const inter = Inter({ subsets: ['latin'] })
-
+export const dynamic = 'force-dynamic'
 export const metadata: Metadata = {
   title: 'WMAB',
   description: 'An App',
