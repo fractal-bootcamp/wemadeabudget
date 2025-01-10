@@ -1,0 +1,61 @@
+'use client';
+
+import { useEffect } from 'react';
+
+const logError = (error: any, context?: any) => {
+  // In development, log to console
+  if (process.env.NODE_ENV === 'development') {
+    console.error('Error:', error, context);
+    return;
+  }
+
+  // In production on Netlify, use fetch to log to Netlify's logging endpoint
+  fetch('/.netlify/functions/log', {
+    method: 'POST',
+    body: JSON.stringify({
+      level: 'error',
+      message: error?.message || 'Unknown error',
+      error: {
+        message: error?.message,
+        stack: error?.stack,
+        name: error?.name,
+        digest: error?.digest
+      },
+      context,
+      timestamp: new Date().toISOString()
+    })
+  }).catch(console.error);
+};
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  useEffect(() => {
+    logError(error, {
+      url: typeof window !== 'undefined' ? window.location.href : null,
+      userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : null
+    });
+  }, [error]);
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+      <h2 className="text-xl font-bold mb-4">Oops! Something went wrong</h2>
+      <p className="text-gray-600 mb-4">
+        We've logged the error and we'll look into it.
+      </p>
+      <button
+        onClick={() => {
+          console.info('User initiated error reset');
+          reset();
+        }}
+        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+      >
+        Try again
+      </button>
+    </div>
+  );
+}
