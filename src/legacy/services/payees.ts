@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
-import prisma from '../client'
-import { PayeeDetails } from '../types'
+import prisma from '../prisma'
+import { PayeeDetails } from '@/app/types'
 import { PayeeService } from './interfaces'
 const selects = {
   name: true,

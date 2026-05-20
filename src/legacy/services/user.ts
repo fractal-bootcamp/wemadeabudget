@@ -1,5 +1,5 @@
-import prisma from '../client'
-import { defaults, UserUpdatePayload } from '../types'
+import prisma from '../prisma'
+import { defaults, UserUpdatePayload } from '@/app/types'
 import accountServices from './accounts'
 import { UserService } from './interfaces'
 const queries = {

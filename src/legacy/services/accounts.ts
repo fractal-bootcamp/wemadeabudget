@@ -1,10 +1,10 @@
 import { Prisma } from '@prisma/client'
-import prisma from '../client'
+import prisma from '../prisma'
 import {
   AccountDetails,
   accountTransferPayee,
   AccountUpdatePayload,
-} from '../types'
+} from '@/app/types'
 import categoryServices from './categories'
 import payeeServices from './payees'
 import { AccountService } from './interfaces'

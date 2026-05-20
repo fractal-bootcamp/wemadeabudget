@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import github from '@/public/github.svg'
+import github from '../../../public/github.svg'
 import { GithubLogo } from './GithubLogo'
 
 type AppInfoProps = {

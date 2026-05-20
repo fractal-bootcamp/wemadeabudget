@@ -1,4 +1,8 @@
-import prisma from '@/src/app/client'
+// LEGACY — daily cron that pinged Postgres to keep the connection warm
+// (Supabase pauses idle dbs). Was wired in vercel.json `crons` at /api/cron.
+// Not used by the local-only build.
+
+import prisma from './prisma'
 import { NextResponse } from 'next/server'
 
 export async function GET() {

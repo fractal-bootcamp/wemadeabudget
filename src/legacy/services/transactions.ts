@@ -1,9 +1,9 @@
-import prisma from '../client'
+import prisma from '../prisma'
 import {
   accountTransferPayee,
   extractTransferAccount,
   TransactionDetails,
-} from '../types'
+} from '@/app/types'
 import { Prisma, Transaction } from '@prisma/client'
 import { TransactionService } from './interfaces'
 //This is a helper object that is used to include the name field in the related models to the transactions

@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client'
-import prisma from '../client'
-import { CategoryDetails, CategoryUpdatePayload } from '../types'
+import prisma from '../prisma'
+import { CategoryDetails, CategoryUpdatePayload } from '@/app/types'
 import { CategoryService } from './interfaces'
 const selects = {
   name: true,

@@ -1,4 +1,4 @@
-import { AccountDetails, AccountUpdatePayload, CategoryDetails, CategoryUpdatePayload, PayeeDetails, PayeeUpdatePayload, TransactionDetails } from "../types"
+import { AccountDetails, AccountUpdatePayload, CategoryDetails, CategoryUpdatePayload, PayeeDetails, PayeeUpdatePayload, TransactionDetails } from '@/app/types'
 
 export type TransactionService = {
   add: (userId: string, details: TransactionDetails) => Promise<TransactionDetails>

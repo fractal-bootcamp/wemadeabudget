@@ -1,97 +1,64 @@
-'use server'
-import clerkHandler from '../middleware/clerkHandler'
-import categoryServices from '../services/categories'
-import payeeServices from '../services/payees'
-import transactionServices from '../services/transactions'
-import accountServices from '../services/accounts'
+// Local-only stubs that replace the original Postgres-backed server-action
+// controller (preserved at src/legacy/controller.ts). The signature surface
+// here matches the live import sites, but every mutation is a no-op — the
+// zustand store with persist middleware is the source of truth now. The
+// helper in utils.ts (updateStoreAndDb) only invokes storeFunction, so these
+// dbXxx exports are functionally unused; they exist so the component imports
+// resolve and so the auth/DB path can be revived without touching call sites.
 
-type CallbackWithPayload<T, R> = (userId: string, payload: T) => Promise<R>
-type CallbackWithoutPayload<R> = (userId: string) => Promise<R>
+import {
+  AccountDetails,
+  AccountUpdatePayload,
+  CategoryDetails,
+  CategoryUpdatePayload,
+  PayeeDetails,
+  PayeeUpdatePayload,
+  TransactionDetails,
+} from '../types'
 
-function attachUserId<R>(callback: CallbackWithoutPayload<R>): () => Promise<R>
-function attachUserId<T, R>(
-  callback: CallbackWithPayload<T, R>
-): (payload: T) => Promise<R>
-function attachUserId<T, R>(
-  callback: CallbackWithPayload<T, R> | CallbackWithoutPayload<R>
-) {
-  return async (payload?: T): Promise<R> => {
-    // get the userId from the clerk context
-    const { authenticated, user } = await clerkHandler()
-    if (!authenticated || user === null) {
-      throw new Error('User is not authenticated')
-    }
-    // call the db function with the userId and the payload if provided
-    if (payload !== undefined) {
-      return await (callback as CallbackWithPayload<T, R>)(user.id, payload)
-    } else {
-      return await (callback as CallbackWithoutPayload<R>)(user.id)
-    }
-  }
-}
+const noop = async <T>(_payload?: T): Promise<void> => {}
+const emptyList = async <T>(): Promise<T[]> => []
 
-const clientController = {
-  transaction: {
-    add: attachUserId(transactionServices.add),
-    addTransfer: attachUserId(transactionServices.addTransfer),
-    delete: attachUserId(transactionServices.delete),
-    deleteTransfer: attachUserId(transactionServices.deleteTransfer),
-    update: attachUserId(transactionServices.update),
-    updateTransfer: attachUserId(transactionServices.updateTransfer),
-    getById: attachUserId(transactionServices.getById),
-    getAllByUser: attachUserId(transactionServices.getAllByUser),
-    getByCategory: attachUserId(transactionServices.getByCategory),
-    getByPayee: attachUserId(transactionServices.getByPayee),
-    getByAccount: attachUserId(transactionServices.getByAccount),
-  },
-  category: {
-    add: attachUserId(categoryServices.add),
-    delete: attachUserId(categoryServices.delete),
-    getAllByUser: attachUserId(categoryServices.getAllByUser),
-    update: attachUserId(categoryServices.update),
-  },
-  payee: {
-    add: attachUserId(payeeServices.add),
-    delete: attachUserId(payeeServices.delete),
-    update: attachUserId(payeeServices.update),
-    getAllByUser: attachUserId(payeeServices.getAllByUser),
-  },
-  account: {
-    add: attachUserId(accountServices.add),
-    delete: attachUserId(accountServices.delete),
-    update: attachUserId(accountServices.update),
-    getAllByUser: attachUserId(accountServices.getAllByUser),
-  },
-}
+export const dbTransactionAdd: (p: TransactionDetails) => Promise<void> = noop
+export const dbTransactionAddTransfer: (
+  p: TransactionDetails
+) => Promise<void> = noop
+export const dbTransactionDelete: (p: string) => Promise<void> = noop
+export const dbTransactionDeleteTransfer: (p: string) => Promise<void> = noop
+export const dbTransactionUpdate: (
+  p: TransactionDetails
+) => Promise<void> = noop
+export const dbTransactionUpdateTransfer: (
+  p: TransactionDetails
+) => Promise<void> = noop
+export const dbTransactionGetById: (
+  p: string
+) => Promise<TransactionDetails | null> = async () => null
+export const dbTransactionGetAllByUser: () => Promise<TransactionDetails[]> =
+  emptyList
+export const dbTransactionGetByCategory: (
+  p: string
+) => Promise<TransactionDetails[]> = emptyList
+export const dbTransactionGetByPayee: (
+  p: string
+) => Promise<TransactionDetails[]> = emptyList
+export const dbTransactionGetByAccount: (
+  p: string
+) => Promise<TransactionDetails[]> = emptyList
 
-export const dbTransactionAdd = clientController.transaction.add
-export const dbTransactionAddTransfer = clientController.transaction.addTransfer
-export const dbTransactionDelete = clientController.transaction.delete
-export const dbTransactionDeleteTransfer =
-  clientController.transaction.deleteTransfer
-export const dbTransactionGetById = clientController.transaction.getById
-export const dbTransactionGetAllByUser =
-  clientController.transaction.getAllByUser
-export const dbTransactionUpdate = clientController.transaction.update
-export const dbTransactionUpdateTransfer =
-  clientController.transaction.updateTransfer
-export const dbTransactionGetByCategory =
-  clientController.transaction.getByCategory
-export const dbTransactionGetByPayee = clientController.transaction.getByPayee
-export const dbTransactionGetByAccount =
-  clientController.transaction.getByAccount
+export const dbCategoryAdd: (p: CategoryDetails) => Promise<void> = noop
+export const dbCategoryDelete: (p: string) => Promise<void> = noop
+export const dbCategoryGetAllByUser: () => Promise<CategoryDetails[]> =
+  emptyList
+export const dbCategoryUpdate: (p: CategoryUpdatePayload) => Promise<void> =
+  noop
 
-export const dbCategoryAdd = clientController.category.add
-export const dbCategoryDelete = clientController.category.delete
-export const dbCategoryGetAllByUser = clientController.category.getAllByUser
-export const dbCategoryUpdate = clientController.category.update
+export const dbPayeeAdd: (p: PayeeDetails) => Promise<void> = noop
+export const dbPayeeDelete: (p: string) => Promise<void> = noop
+export const dbPayeeGetAllByUser: () => Promise<PayeeDetails[]> = emptyList
+export const dbPayeeUpdate: (p: PayeeUpdatePayload) => Promise<void> = noop
 
-export const dbPayeeAdd = clientController.payee.add
-export const dbPayeeDelete = clientController.payee.delete
-export const dbPayeeGetAllByUser = clientController.payee.getAllByUser
-export const dbPayeeUpdate = clientController.payee.update
-
-export const dbAccountAdd = clientController.account.add
-export const dbAccountDelete = clientController.account.delete
-export const dbAccountGetAllByUser = clientController.account.getAllByUser
-export const dbAccountUpdate = clientController.account.update
+export const dbAccountAdd: (p: AccountDetails) => Promise<void> = noop
+export const dbAccountDelete: (p: string) => Promise<void> = noop
+export const dbAccountGetAllByUser: () => Promise<AccountDetails[]> = emptyList
+export const dbAccountUpdate: (p: AccountUpdatePayload) => Promise<void> = noop

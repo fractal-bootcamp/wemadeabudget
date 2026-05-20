@@ -1,5 +1,5 @@
-import { User } from '@clerk/nextjs/server'
 import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
 import {
   AccountDetails,
   TransactionDetails,
@@ -11,7 +11,6 @@ import {
   extractTransferAccount,
   accountTransferPayee,
 } from '../types'
-import { Category } from '@prisma/client'
 type DbPopulationPayload = {
   transactions: TransactionDetails[]
   accounts: AccountDetails[]
@@ -81,13 +80,15 @@ type budgetStore = {
   }
 }
 
-const useBudgetStore = create<budgetStore>((set, get) => ({
-  loaded: false,
-  transactions: [],
-  accounts: [],
-  payees: [],
-  categories: [],
-  actions: {
+const useBudgetStore = create<budgetStore>()(
+  persist(
+    (set, get) => ({
+      loaded: false,
+      transactions: [],
+      accounts: [],
+      payees: [],
+      categories: [],
+      actions: {
     populateStoreFromDb: (dbData) => {
       set((state) => ({
         transactions: dbData.transactions,
@@ -325,8 +326,29 @@ const useBudgetStore = create<budgetStore>((set, get) => ({
         }),
       }))
     },
-  },
-}))
+      },
+    }),
+    {
+      name: 'wmab-store',
+      storage: createJSONStorage(() => localStorage),
+      partialize: (state) => ({
+        loaded: state.loaded,
+        transactions: state.transactions,
+        accounts: state.accounts,
+        payees: state.payees,
+        categories: state.categories,
+      }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return
+        state.transactions = state.transactions.map((t) => ({
+          ...t,
+          date: new Date(t.date),
+        }))
+      },
+      skipHydration: true,
+    }
+  )
+)
 
 export default useBudgetStore
 export const useBudgetActions = () => useBudgetStore((state) => state.actions)

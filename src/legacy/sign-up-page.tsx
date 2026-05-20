@@ -1,7 +1,10 @@
+// LEGACY — original sign-in/up splash with Clerk modal. Replaced by a
+// no-auth "Enter" splash in src/app/page.tsx (rendered by the EntryGate).
+
 import { SignInButton, SignUp } from '@clerk/nextjs'
 
 import { Figtree } from 'next/font/google'
-import AppInfo from '../components/AppInfo'
+import AppInfo from '@/app/components/AppInfo'
 const figtree = Figtree({ subsets: ['latin'], weight: '600' })
 
 export default function SignUpOrIn() {

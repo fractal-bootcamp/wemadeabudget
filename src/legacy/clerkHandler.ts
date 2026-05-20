@@ -1,5 +1,9 @@
+// LEGACY — bridged Clerk's currentUser() to the Postgres User row, creating
+// one on first sight. Was the auth gate for every server action in
+// controller.ts. Not imported by anything live.
+
 import { currentUser } from '@clerk/nextjs/server'
-import { userServices } from '../services/user'
+import { userServices } from './services/user'
 
 type ClerkHandlerResult = {
   authenticated: boolean
